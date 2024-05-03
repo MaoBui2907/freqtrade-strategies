@@ -1,6 +1,5 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
 from functools import reduce
 from pandas import DataFrame
 # --------------------------------
@@ -8,12 +7,9 @@ import talib.abstract as ta
 import numpy as np
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import datetime
-from technical.util import resample_to_interval, resampled_merge
 from datetime import datetime, timedelta
 from freqtrade.persistence import Trade
-from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter, CategoricalParameter
-import technical.indicators as ftt
-from freqtrade.exchange import timeframe_to_prev_date, timeframe_to_seconds
+from freqtrade.strategy import DecimalParameter, IntParameter
 import pandas_ta as pta
 
 # Buy hyperspace params:
@@ -389,7 +385,7 @@ class ElliotV531(IStrategy):
                     if current_rate * 1.015 < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 5%
                     return 0.01

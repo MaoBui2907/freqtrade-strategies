@@ -1,22 +1,20 @@
 
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import List, Optional, Tuple
+from datetime import datetime
 from cachetools import TTLCache
-from pandas import DataFrame, Series
+from pandas import DataFrame
 import numpy as np
 
 ## Indicator libs
 import talib.abstract as ta
-from finta import TA as fta
 import technical.indicators as ftt
 from technical.indicators import hull_moving_average
 from technical.indicators import PMAX, zema
 from technical.indicators import cmf
 
 ## FT stuffs
-from freqtrade.strategy import IStrategy, merge_informative_pair, stoploss_from_open, IntParameter, DecimalParameter, CategoricalParameter
+from freqtrade.strategy import IStrategy, merge_informative_pair, IntParameter, DecimalParameter, CategoricalParameter
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.exchange import timeframe_to_minutes
 from freqtrade.persistence import Trade
 from skopt.space import Dimension
 
@@ -751,7 +749,7 @@ class MacheteV8b(IStrategy):
 
     def populate_trades(self, pair: str) -> dict:
         # Initialize the trades dict if it doesn't exist, persist it otherwise
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         # init the temp dicts and set the trade stuff to false

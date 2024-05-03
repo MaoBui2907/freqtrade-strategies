@@ -7,11 +7,9 @@ import numpy as np
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes
-from freqtrade.exchange import timeframe_to_prev_date
 from pandas import DataFrame, Series, concat
 from functools import reduce
 import math
-from typing import Dict
 from freqtrade.persistence import Trade
 from datetime import datetime, timedelta
 from technical.util import resample_to_interval, resampled_merge
@@ -2356,7 +2354,7 @@ class NostalgiaForInfinityNextV7155(IStrategy):
                 pair_dataframe = pair_dataframe.iloc[-7:,:]
 
             # Set the date index of the self.coin_metrics['tt_dataframe'] once
-            if not 'date' in self.coin_metrics['tt_dataframe']:
+            if 'date' not in self.coin_metrics['tt_dataframe']:
                 self.coin_metrics['tt_dataframe']['date'] = pair_dataframe['date']
                 self.coin_metrics['tt_dataframe'].set_index('date')
 
@@ -2409,7 +2407,7 @@ class NostalgiaForInfinityNextV7155(IStrategy):
                 pair_dataframe = pair_dataframe.iloc[-7:,:]
 
             # Set the date index of the self.coin_metrics['tg_dataframe'] once
-            if not 'date' in self.coin_metrics['tg_dataframe']:
+            if 'date' not in self.coin_metrics['tg_dataframe']:
                 self.coin_metrics['tg_dataframe']['date'] = pair_dataframe['date']
                 self.coin_metrics['tg_dataframe'].set_index('date')
 
@@ -4541,7 +4539,7 @@ class NostalgiaForInfinityNextV7155(IStrategy):
         dataframe['volume_mean_4'] = dataframe['volume'].rolling(4).mean().shift(1)
         dataframe['volume_mean_30'] = dataframe['volume'].rolling(30).mean()
 
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True
@@ -4723,7 +4721,7 @@ class NostalgiaForInfinityNextV7155(IStrategy):
                     item_buy_protection_list.append(dataframe['close'] > dataframe[f"{global_buy_protection_params['close_over_pivot_type']}_1d"] * global_buy_protection_params['close_over_pivot_offset'])
                 if global_buy_protection_params['close_under_pivot_type'] != 'none':
                     item_buy_protection_list.append(dataframe['close'] < dataframe[f"{global_buy_protection_params['close_under_pivot_type']}_1d"] * global_buy_protection_params['close_under_pivot_offset'])
-                if not self.config['runmode'].value in ('live', 'dry_run'):
+                if self.config['runmode'].value not in ('live', 'dry_run'):
                     if self.has_bt_agefilter:
                         item_buy_protection_list.append(dataframe['bt_agefilter_ok'])
                 else:

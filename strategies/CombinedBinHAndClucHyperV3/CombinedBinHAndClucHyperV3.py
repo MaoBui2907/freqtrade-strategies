@@ -1,16 +1,14 @@
 # --- Do not remove these libs ---
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 # --------------------------------
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import CategoricalParameter, DecimalParameter, IntParameter
-from abc import ABC, abstractmethod
+from freqtrade.strategy import DecimalParameter, IntParameter
+from abc import ABC
 from pandas import DataFrame
 from freqtrade.persistence import Trade
 from freqtrade.exchange import timeframe_to_prev_date, timeframe_to_seconds
 from datetime import datetime, timedelta
-import math
 
 class CombinedBinHAndClucHyperV3(IStrategy):
     # Based on a backtesting:

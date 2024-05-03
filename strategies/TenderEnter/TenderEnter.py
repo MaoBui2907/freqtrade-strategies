@@ -1,17 +1,13 @@
 # pragma pylint: disable=missing-docstring, invalid-name, pointless-string-statement
 
 # --- Do not remove these libs ---
-import math
 import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
-from freqtrade.persistence import Trade
-from freqtrade.strategy import IStrategy, merge_informative_pair
+from freqtrade.strategy import IStrategy
 # from freqtrade.exchange import timeframe_to_minutes
 # --------------------------------
 # Add your lib to import here
-import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 # from freqtrade.strategy.strategy_helper import merge_informative_pair
 
 class TenderEnter(IStrategy):

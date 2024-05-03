@@ -1,19 +1,16 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from functools import reduce
-from typing import List
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
-import pandas as pd
 import pandas_ta as pta
 import talib.abstract as ta
 import technical.indicators as ftt
-from freqtrade.persistence import Trade, PairLocks
+from freqtrade.persistence import Trade
 from freqtrade.strategy import (BooleanParameter, DecimalParameter,
                                 IntParameter, stoploss_from_open, merge_informative_pair)
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame, Series
-from skopt.space import Dimension, Integer
 
 def bollinger_bands(stock_price, window_size, num_of_std):
     rolling_mean = stock_price.rolling(window=window_size).mean()

@@ -1,19 +1,13 @@
 import datetime
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import logging
-import numpy as np
-import pandas as pd
 import talib.abstract as ta
-import technical.indicators as ftt
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.persistence import Trade
-from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter, CategoricalParameter
+from freqtrade.strategy import merge_informative_pair, DecimalParameter, IntParameter
 from freqtrade.strategy.interface import IStrategy
 from functools import reduce
-from logging import FATAL
 from pandas import DataFrame
-from technical.util import resample_to_interval, resampled_merge
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 

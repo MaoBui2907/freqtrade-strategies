@@ -1,7 +1,7 @@
 # --- Do not remove these libs ---
 # --------------------------------
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import talib.abstract as ta
 from pandas import DataFrame

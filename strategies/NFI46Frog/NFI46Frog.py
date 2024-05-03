@@ -2,7 +2,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
 from finta import TA as fta
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import (merge_informative_pair,
                                 DecimalParameter, IntParameter, CategoricalParameter)
@@ -10,9 +10,7 @@ from pandas import DataFrame, Series
 from functools import reduce
 from freqtrade.exchange import timeframe_to_minutes
 from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
-from cachetools import TTLCache
-from skopt.space import Dimension
+from datetime import datetime
 
 
 ###########################################################################################################
@@ -971,7 +969,7 @@ class NFI46Frog(IStrategy):
             dataframe = merge_informative_pair(dataframe, informative, self.timeframe, self.inf_1h, ffill=True)
             
             skip_columns = [(s + "_" + self.inf_1h) for s in ['date', 'open', 'high', 'low', 'close', 'volume', 'emac', 'emao']]
-            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.inf_1h), "") if (not s in skip_columns) else s, inplace=True)
+            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.inf_1h), "") if (s not in skip_columns) else s, inplace=True)
 
         # Slam some indicators into the trade_info dict so we can dynamic roi and custom stoploss in backtest
         if self.dp.runmode.value in ('backtest', 'hyperopt'):
@@ -1589,7 +1587,7 @@ class NFI46Frog(IStrategy):
     """
     def populate_trades(self, pair: str) -> dict:
         # Initialize the trades dict if it doesn't exist, persist it otherwise
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         # init the temp dicts and set the trade stuff to false

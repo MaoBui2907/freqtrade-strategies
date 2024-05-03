@@ -6,9 +6,7 @@ from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
 # --------------------------------
 # Add your lib to import here
-import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from technical.util import resample_to_interval, resampled_merge
 from freqtrade.strategy import IStrategy, merge_informative_pair
 from technical.indicators import ichimoku
 

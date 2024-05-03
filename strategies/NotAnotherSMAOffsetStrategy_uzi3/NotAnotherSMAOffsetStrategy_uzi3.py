@@ -1,5 +1,4 @@
 # --- Do not remove these libs ---
-from typing import DefaultDict
 from freqtrade.strategy.interface import IStrategy
 from functools import reduce
 from pandas import DataFrame

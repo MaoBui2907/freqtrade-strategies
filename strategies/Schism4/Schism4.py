@@ -4,10 +4,9 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import arrow
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair
-from typing import Dict, List, Optional, Tuple
-from pandas import DataFrame, Series
+from typing import Dict
+from pandas import DataFrame
 from functools import reduce
-from datetime import datetime
 from freqtrade.persistence import Trade
 from technical.indicators import RMI
 from statistics import mean
@@ -251,7 +250,7 @@ class Schism4(IStrategy):
     # Populate trades_data from the database
     def populate_trades(self, pair: str) -> dict:
         # Initialize the trades dict if it doesn't exist, persist it otherwise
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         # init the temp dicts and set the trade stuff to false

@@ -205,7 +205,7 @@ class SuperBuy(Uptrend):
         all_points = None
         for pair in full_pairlist:
             # NO DATA FOR THIS PAIR
-            if not pair in self.best_buy_point_dict:
+            if pair not in self.best_buy_point_dict:
                 continue
             if all_best_points is None:
                 all_best_points = self.best_buy_point_dict[pair]
@@ -227,7 +227,7 @@ class SuperBuy(Uptrend):
             df_mask = count >= 1 / 100 * all_best_points.shape[0]
             count = count[df_mask]
 
-            if not count.empty and not column in ['entry', 'buy_tag']:
+            if not count.empty and column not in ['entry', 'buy_tag']:
                 count_normalized = count / all_best_points.shape[0]
                 all_bad_points_values_count_normalized = all_bad_points_values_count / all_bad_points.shape[0]
                 df_all = count.to_frame(name='best_points').join(all_bad_points_values_count.to_frame(name='bad_points'))
@@ -238,7 +238,7 @@ class SuperBuy(Uptrend):
                 print(column)
                 print(df_all)
                 values = df_all.query(
-                    f"part_of_best_points > 3 & "  # the part of best points should be at least 3% for the value
+                    "part_of_best_points > 3 & "  # the part of best points should be at least 3% for the value
                     "part_of_best_points_percent > 13 & "  # proportion of value is X* more important in best points than in bad points
                     "best_points > 12"  # minimum number of the value (because we don't want close=1.121213243482902183 as result)
                 ).index.tolist()  # & df_all["part_of_best_points_percent"] > 10)]
@@ -294,7 +294,7 @@ class SuperBuy(Uptrend):
         columns.remove('exit')
         columns.remove('entry')
         columns.remove('buy_tag')
-        columns = [column for column in columns if not 'date' in column]
+        columns = [column for column in columns if 'date' not in column]
 
         # generated random conditions
         buy_conds = []
@@ -399,7 +399,7 @@ class SuperBuy(Uptrend):
             pass
         try:
             buy_conds += random.sample(buy_conds_best_point, self.operators_used_to_with_best_point.value)
-        except ValueError as e:
+        except ValueError:
             if self.config['runmode'].value != 'hyperopt':
                 print("not enough conditions to compare with best point")
             # Sample larger than population or is negative

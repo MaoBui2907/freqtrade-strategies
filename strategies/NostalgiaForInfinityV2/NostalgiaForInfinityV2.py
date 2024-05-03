@@ -5,7 +5,6 @@ from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import DecimalParameter, IntParameter
 from pandas import DataFrame
 from freqtrade.strategy import merge_informative_pair
-from freqtrade.persistence import Trade
 
 
 ###########################################################################################################

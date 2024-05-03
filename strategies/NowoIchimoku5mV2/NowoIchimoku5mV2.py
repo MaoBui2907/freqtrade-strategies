@@ -19,7 +19,6 @@ from freqtrade.strategy import IStrategy
 # Add your lib to import here
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.strategy import IntParameter
 from pandas import Series
 from numpy.typing import ArrayLike
 from datetime import datetime, timedelta
@@ -227,7 +226,7 @@ class NowoIchimoku5mV2(IStrategy):
         skip_columns = [(s + "_" + self.informative_timeframe) for s in
                         ['date', 'open', 'high', 'low', 'close', 'volume']]
         df.rename(
-            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s,
+            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s,
             inplace=True)
 
         return df

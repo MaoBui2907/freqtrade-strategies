@@ -1,14 +1,13 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from typing import Dict, List
 import numpy as np
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import (merge_informative_pair,
-                                DecimalParameter, IntParameter, BooleanParameter, timeframe_to_minutes, stoploss_from_open)
+                                DecimalParameter, IntParameter, BooleanParameter, stoploss_from_open)
 from pandas import DataFrame, Series
 from functools import reduce
 from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.exchange import timeframe_to_prev_date
 from technical.indicators import zema, VIDYA
 
@@ -330,7 +329,7 @@ class MultiMA_TSL3(IStrategy):
             dataframe['live_data_ok'] = True
 
         # Check if the entry already exists
-        if not metadata["pair"] in self.custom_info:
+        if metadata["pair"] not in self.custom_info:
             # Create empty entry for this pair {datestamp, sellma, sell_trigger}
             self.custom_info[metadata["pair"]] = ['', 0, 0]
 
@@ -548,7 +547,7 @@ class MultiMA_TSL3a(MultiMA_TSL3):
             dataframe['live_data_ok'] = True
 
         # Check if the entry already exists
-        if not metadata["pair"] in self.custom_info:
+        if metadata["pair"] not in self.custom_info:
             # Create empty entry for this pair {datestamp, sellma, sell_trigger}
             self.custom_info[metadata["pair"]] = ['', 0, 0]
 

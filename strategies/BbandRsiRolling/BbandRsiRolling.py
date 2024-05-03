@@ -3,8 +3,6 @@ from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from typing import Dict, List
-from functools import reduce
 
 # --------------------------------
 

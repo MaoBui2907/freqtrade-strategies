@@ -1,17 +1,15 @@
 # --- Do not remove these libs ---
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 import pandas_ta as pta
-from typing import Dict, List
 
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
-from pandas import DataFrame, Series, DatetimeIndex, merge
-from datetime import datetime, timedelta
-from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
+from pandas import DataFrame, Series
+from datetime import datetime
+from freqtrade.strategy import CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
 from functools import reduce
-from technical.indicators import RMI, zema
+from technical.indicators import RMI
 
 # --------------------------------
 def EWO(dataframe, ema_length=5, ema2_length=35):
@@ -533,9 +531,9 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if (reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]):
+        if (reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]):
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

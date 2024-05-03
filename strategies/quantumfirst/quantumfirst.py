@@ -7,8 +7,6 @@ Created on Sat Aug 29 15:18:55 2020
 """
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
-from functools import reduce
 from pandas import DataFrame
 # --------------------------------
 

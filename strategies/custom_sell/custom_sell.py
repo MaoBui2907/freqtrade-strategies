@@ -1,28 +1,20 @@
 # --- Do not remove these libs ---
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
-from functools import reduce
-from freqtrade.strategy import CategoricalParameter, DecimalParameter, IntParameter
+from freqtrade.strategy import CategoricalParameter
 #from technical.indicators import vwma, Rmi, WTO, IIIX, PMAX, vwmacd
 
-import numpy as np
-import sys
 # --------------------------------
-import talib.abstract as ta
 #from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import IStrategy, merge_informative_pair, informative
-from pandas import DataFrame, Series, DatetimeIndex, merge, to_numeric
+from freqtrade.strategy import IStrategy
+from pandas import DataFrame
 from freqtrade.persistence import Trade
-from freqtrade.exchange import timeframe_to_prev_date
 import pandas as pd
 
 from warnings import simplefilter
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
-import arrow
-from freqtrade.exchange import timeframe_to_minutes
-import time
 
 class custom_exit(IStrategy):
     custom_info = {}

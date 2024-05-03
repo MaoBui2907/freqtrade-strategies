@@ -21,7 +21,6 @@ import numpy as np
 # import talib.abstract as ta
 import talib as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from functools import reduce
 
 class Ichess(IStrategy):
     

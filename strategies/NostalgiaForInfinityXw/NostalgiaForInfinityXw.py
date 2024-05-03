@@ -7,16 +7,13 @@ import numpy as np
 import talib.abstract as ta
 import ta as ta2
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
-from freqtrade.exchange import timeframe_to_prev_date
-from pandas import DataFrame, Series, concat
+from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes, CategoricalParameter, DecimalParameter, IntParameter
+from pandas import DataFrame, Series
 from functools import reduce
-import math
-from typing import Dict
 from freqtrade.persistence import Trade
 from datetime import datetime, timedelta
 from technical.util import resample_to_interval, resampled_merge
-from technical.indicators import RMI, zema, VIDYA, ichimoku
+from technical.indicators import RMI, zema, VIDYA
 import time
 
 log = logging.getLogger(__name__)
@@ -2503,7 +2500,7 @@ class NostalgiaForInfinityXw(IStrategy):
                 pair_dataframe = pair_dataframe.iloc[-7:,:]
 
             # Set the date index of the self.coin_metrics['tt_dataframe'] once
-            if not 'date' in self.coin_metrics['tt_dataframe']:
+            if 'date' not in self.coin_metrics['tt_dataframe']:
                 self.coin_metrics['tt_dataframe']['date'] = pair_dataframe['date']
                 self.coin_metrics['tt_dataframe'].set_index('date')
 
@@ -2556,7 +2553,7 @@ class NostalgiaForInfinityXw(IStrategy):
                 pair_dataframe = pair_dataframe.iloc[-7:,:]
 
             # Set the date index of the self.coin_metrics['tg_dataframe'] once
-            if not 'date' in self.coin_metrics['tg_dataframe']:
+            if 'date' not in self.coin_metrics['tg_dataframe']:
                 self.coin_metrics['tg_dataframe']['date'] = pair_dataframe['date']
                 self.coin_metrics['tg_dataframe'].set_index('date')
 
@@ -9141,7 +9138,7 @@ class NostalgiaForInfinityXw(IStrategy):
         dataframe['tpct_change_12']  = self.top_percent_change(dataframe,12)
         dataframe['tpct_change_144'] = self.top_percent_change(dataframe,144)
 
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True
@@ -9336,7 +9333,7 @@ class NostalgiaForInfinityXw(IStrategy):
                     item_buy_protection_list.append(dataframe['close'] > dataframe[f"{global_buy_protection_params['close_over_pivot_type']}_1d"] * global_buy_protection_params['close_over_pivot_offset'])
                 if global_buy_protection_params['close_under_pivot_type'] != 'none':
                     item_buy_protection_list.append(dataframe['close'] < dataframe[f"{global_buy_protection_params['close_under_pivot_type']}_1d"] * global_buy_protection_params['close_under_pivot_offset'])
-                if not self.config['runmode'].value in ('live', 'dry_run'):
+                if self.config['runmode'].value not in ('live', 'dry_run'):
                     if self.has_bt_agefilter:
                         item_buy_protection_list.append(dataframe['bt_agefilter_ok'])
                 else:

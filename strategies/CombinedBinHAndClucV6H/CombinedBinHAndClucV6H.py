@@ -2,9 +2,8 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import talib.abstract as ta
 import logging
-import pandas as pd
 import numpy as np
-from pandas import DataFrame, Series, DatetimeIndex, merge
+from pandas import DataFrame
 from freqtrade.exchange import timeframe_to_minutes
 from freqtrade.strategy import IStrategy, IntParameter, DecimalParameter, CategoricalParameter, merge_informative_pair
 from freqtrade.persistence import Trade

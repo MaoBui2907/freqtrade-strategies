@@ -4,15 +4,12 @@
 import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
-import numpy
-import tabulate
 
 from freqtrade.strategy.interface import IStrategy
 
 # --------------------------------
 # Add your lib to import here
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
 class MomStrategy(IStrategy):

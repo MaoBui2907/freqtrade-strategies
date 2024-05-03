@@ -3,7 +3,7 @@ from pandas import DataFrame
 from technical.util import resample_to_interval, resampled_merge
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.strategy import IStrategy, merge_informative_pair
+from freqtrade.strategy import IStrategy
 
 
 class BBRSIS(IStrategy):

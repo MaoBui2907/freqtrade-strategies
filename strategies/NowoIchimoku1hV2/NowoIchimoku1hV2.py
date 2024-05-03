@@ -16,7 +16,6 @@ from freqtrade.strategy import IStrategy
 # Add your lib to import here
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.strategy import IntParameter
 from pandas import Series
 from numpy.typing import ArrayLike
 from datetime import datetime, timedelta

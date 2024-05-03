@@ -1,6 +1,5 @@
 from freqtrade.strategy import IStrategy
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (BooleanParameter, CategoricalParameter, IntParameter)
 from functools import reduce
 from pandas import DataFrame
 # --------------------------------

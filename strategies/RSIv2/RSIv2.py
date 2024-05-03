@@ -1,13 +1,7 @@
 # --- Do not remove these libs ---
-from freqtrade.strategy import IStrategy, merge_informative_pair, informative
-from typing import Dict, List
-from functools import reduce
+from freqtrade.strategy import IStrategy, informative
 from pandas import DataFrame
 import talib.abstract as ta
-from talib import WILLR
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-import requests
-import json
 # --------------------------------
 
 

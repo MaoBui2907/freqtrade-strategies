@@ -10,7 +10,7 @@ from freqtrade.strategy import IStrategy
 from freqtrade.strategy import CategoricalParameter, DecimalParameter, IntParameter
 from datetime import datetime
 from freqtrade.persistence import Trade
-from freqtrade.strategy import IStrategy, stoploss_from_open
+from freqtrade.strategy import stoploss_from_open
 
 pd.options.mode.chained_assignment = None  # default='warn'
 

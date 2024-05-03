@@ -1,10 +1,8 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from pandas import DataFrame, Series, DatetimeIndex, merge
-import freqtrade.vendor.qtpylib.indicators as qtpylib
+from pandas import DataFrame, Series
 import pandas_ta as pta
 import talib.abstract as ta
-from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
 
 # --------------------------------
 

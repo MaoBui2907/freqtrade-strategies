@@ -1,25 +1,17 @@
 # --- Do not remove these libs ---
 import pandas_ta as pta
-import copy
 import logging
-import pathlib
-import rapidjson
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes
-from freqtrade.exchange import timeframe_to_prev_date
-from pandas import DataFrame, Series, concat
+from freqtrade.strategy import merge_informative_pair
+from pandas import DataFrame, Series
 from functools import reduce
-import math
-from random import shuffle
-from typing import Dict
 from freqtrade.persistence import Trade
 from datetime import datetime, timedelta
-from technical.util import resample_to_interval, resampled_merge
-from technical.indicators import RMI, zema, VIDYA, ichimoku
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
+from technical.indicators import RMI, zema, VIDYA
+from freqtrade.strategy import (CategoricalParameter, DecimalParameter,
                                 IStrategy, IntParameter)
 import time
 
@@ -2765,9 +2757,9 @@ class BB_RPB_TSL_Tranz_TrailingBuy(BB_RPB_TSL_SMA_Tranz_TB_1_1_1):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if (reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]):
+        if (reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]):
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

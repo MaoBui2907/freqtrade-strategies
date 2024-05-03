@@ -5,13 +5,11 @@ from pandas import DataFrame
 # Add your lib to import here
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import pandas_ta as pta
 import numpy as np  # noqa
 import pandas as pd  # noqa
 
 # These libs are for hyperopt
-from functools import reduce
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,IStrategy, IntParameter)
+from freqtrade.strategy import (IStrategy)
 
 class keltnerchannel(IStrategy):
     timeframe = "6h"

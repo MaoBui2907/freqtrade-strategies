@@ -102,7 +102,7 @@ class CombinedBinHAndClucV2(IStrategy):
         skip_columns = [(s + "_" + self.informative_timeframe) for s in
                         ['date', 'open', 'high', 'low', 'close', 'volume']]
         dataframe.rename(
-            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s,
+            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s,
             inplace=True)
 
         typical_price = qtpylib.typical_price(dataframe)

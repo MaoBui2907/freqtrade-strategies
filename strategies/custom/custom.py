@@ -1,6 +1,5 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
 from functools import reduce
 from pandas import DataFrame
 # --------------------------------
@@ -9,10 +8,9 @@ import talib.abstract as ta
 import numpy as np
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import datetime
-from technical.util import resample_to_interval, resampled_merge
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.persistence import Trade
-from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter, CategoricalParameter
+from freqtrade.strategy import merge_informative_pair, DecimalParameter, IntParameter
 import technical.indicators as ftt
 
 
@@ -599,7 +597,7 @@ class SMAoffset_antipump_div(custom):
                         current_rate: float, current_profit: float, **kwargs) -> float:
         sl_new = 1
 
-        if not self.config['runmode'].value in ('backtest', 'hyperopt'):
+        if self.config['runmode'].value not in ('backtest', 'hyperopt'):
             dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
             if(len(dataframe) >= 1):
                 last_candle = dataframe.iloc[-1]

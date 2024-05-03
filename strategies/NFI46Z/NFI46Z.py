@@ -949,7 +949,7 @@ class NFI46Z(IStrategy):
                     if current_rate * 1.015 < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 10%
                     return 0.5

@@ -4,10 +4,7 @@
 # github: https://github.com/mablue/
 # freqtrade hyperopt --hyperopt-loss SharpeHyperOptLoss --strategy Persia
 # --- Do not remove these libs ---
-from typing import get_type_hints
-from numpy.lib.function_base import append
 
-from pandas.core.series import Series
 
 from freqtrade.strategy.hyper import CategoricalParameter, IntParameter, DecimalParameter
 from freqtrade.strategy.interface import IStrategy

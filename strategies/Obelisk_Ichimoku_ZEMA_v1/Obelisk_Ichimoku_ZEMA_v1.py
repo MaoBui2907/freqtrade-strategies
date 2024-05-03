@@ -2,10 +2,8 @@
 from freqtrade.strategy import IStrategy, merge_informative_pair, DecimalParameter, IntParameter
 from pandas import DataFrame
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 # --------------------------------
-import pandas as pd
 import numpy as np
 import technical.indicators as ftt
 from freqtrade.exchange import timeframe_to_minutes
@@ -191,8 +189,8 @@ class Obelisk_Ichimoku_ZEMA_v1(IStrategy):
         else:
             dataframe[f'zema_{self.zema_len_buy.value}'] = ftt.zema(dataframe, period=self.zema_len_buy.value)
             dataframe[f'zema_{self.zema_len_sell.value}'] = ftt.zema(dataframe, period=self.zema_len_sell.value)
-            dataframe[f'zema_buy'] = ftt.zema(dataframe, period=self.zema_len_buy.value) * self.low_offset.value
-            dataframe[f'zema_sell'] = ftt.zema(dataframe, period=self.zema_len_sell.value) * self.high_offset.value
+            dataframe['zema_buy'] = ftt.zema(dataframe, period=self.zema_len_buy.value) * self.low_offset.value
+            dataframe['zema_sell'] = ftt.zema(dataframe, period=self.zema_len_sell.value) * self.high_offset.value
 
 
         return dataframe
@@ -212,7 +210,7 @@ class Obelisk_Ichimoku_ZEMA_v1(IStrategy):
             dataframe = merge_informative_pair(dataframe, informative, self.timeframe, self.informative_timeframe, ffill=True)
             # don't overwrite the base dataframe's OHLCV information
             skip_columns = [(s + "_" + self.informative_timeframe) for s in ['date', 'open', 'high', 'low', 'close', 'volume']]
-            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s, inplace=True)
+            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s, inplace=True)
 
         dataframe = self.fast_tf_indicators(dataframe, metadata)
 

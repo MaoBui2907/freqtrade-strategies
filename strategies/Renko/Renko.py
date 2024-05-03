@@ -1,9 +1,8 @@
 import talib.abstract as ta
-from pandas import DataFrame, Series, DatetimeIndex, merge
+from pandas import DataFrame
 import pandas as pd
 import numpy as np
 #import pdb 
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 from freqtrade.strategy.interface import IStrategy 
 pd.set_option("display.precision", 10) 
 

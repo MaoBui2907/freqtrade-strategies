@@ -11,7 +11,6 @@ from freqtrade.strategy import IStrategy, merge_informative_pair
 # --------------------------------
 # Add your lib to import here
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
 # This class is a sample. Feel free to customize it.

@@ -1,12 +1,9 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
-from functools import reduce
 from pandas import DataFrame
 # --------------------------------
 
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy # noqa
 
 __author__      = "Kevin OssenbrÃ¼ck"

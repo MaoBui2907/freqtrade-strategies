@@ -177,9 +177,9 @@ class InverseV2(IStrategy):
         
         # Commodity Channel Index: values [Oversold:-100, Overbought:100]
         for cci_length in self.buy_fisher_length.range:
-            dataframe[f'cci'] = ta.CCI(dataframe, timeperiod=cci_length)
+            dataframe['cci'] = ta.CCI(dataframe, timeperiod=cci_length)
             # Inverse Fisher transform on CCI
-            cci = 0.1 * (dataframe[f'cci'] / 4)
+            cci = 0.1 * (dataframe['cci'] / 4)
             wmacci = ta.WMA(cci, timeperiod = 9)
             dataframe[f'fisher_cci_{cci_length}'] = (numpy.exp(2 * wmacci) - 1) / (numpy.exp(2 * wmacci) + 1)
         

@@ -658,7 +658,7 @@ class BigZ0407HO(IStrategy):
                     if current_rate * self.custom_stoploss_current_rates_2.value < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 10%
                     return 0.1

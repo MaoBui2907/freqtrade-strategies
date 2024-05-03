@@ -1,5 +1,4 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
@@ -259,7 +258,7 @@ class BigZ04HO2(IStrategy):
                     if current_rate * self.custom_stoploss_current_rates_2.value < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 10%
                     return 0.1

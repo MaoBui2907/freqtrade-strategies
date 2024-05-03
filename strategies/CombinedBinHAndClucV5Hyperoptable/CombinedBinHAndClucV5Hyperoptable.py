@@ -1,11 +1,9 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
-from freqtrade.strategy import (IStrategy, timeframe_to_prev_date, merge_informative_pair, stoploss_from_open, 
-                                IntParameter, DecimalParameter, CategoricalParameter, RealParameter)
+from freqtrade.strategy import (IStrategy, IntParameter, RealParameter)
 from pandas import DataFrame
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import List
 from skopt.space import Dimension
 
 

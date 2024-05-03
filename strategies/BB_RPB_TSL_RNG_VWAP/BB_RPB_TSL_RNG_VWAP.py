@@ -1,16 +1,15 @@
 # --- Do not remove these libs ---
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 import pandas_ta as pta
 
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
-from pandas import DataFrame, Series, DatetimeIndex, merge
-from datetime import datetime, timedelta
-from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
+from pandas import DataFrame, Series
+from datetime import datetime
+from freqtrade.strategy import CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
 from functools import reduce
-from technical.indicators import RMI, zema
+from technical.indicators import RMI
 
 # --------------------------------
 def EWO(dataframe, ema_length=5, ema2_length=35):

@@ -1,10 +1,9 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
 from functools import reduce
 

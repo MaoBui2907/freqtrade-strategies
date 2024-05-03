@@ -1,7 +1,5 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy import IStrategy, merge_informative_pair
-from typing import Dict, List
-from functools import reduce
 from pandas import DataFrame
 # --------------------------------
 
@@ -70,7 +68,7 @@ class SMAOffsetV2(IStrategy):
         skip_columns = [(s + "_" + self.informative_timeframe) for s in
                         ['date', 'open', 'high', 'low', 'close', 'volume']]
         dataframe.rename(
-            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s,
+            columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s,
             inplace=True)
 
         # ---------------------------------------------------------------------------------

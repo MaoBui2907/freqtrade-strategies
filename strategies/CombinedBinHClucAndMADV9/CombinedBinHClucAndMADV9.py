@@ -183,7 +183,7 @@ class CombinedBinHClucAndMADV9(IStrategy):
                     if current_rate * 1.015 < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 5%
                     return 0.01

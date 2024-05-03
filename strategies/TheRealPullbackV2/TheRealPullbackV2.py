@@ -1,4 +1,4 @@
-from freqtrade.strategy import IStrategy, merge_informative_pair
+from freqtrade.strategy import IStrategy
 from pandas import DataFrame, Series
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib

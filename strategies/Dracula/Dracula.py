@@ -1,11 +1,11 @@
 
-from freqtrade.strategy import DecimalParameter, IntParameter
+from freqtrade.strategy import DecimalParameter
 
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 # --------------------------------
 
-from pandas import DataFrame, Series
+from pandas import Series
 from freqtrade.persistence import Trade
 from datetime import datetime
 import talib.abstract as taa
@@ -186,7 +186,7 @@ class Dracula(IStrategy):
         item_buy_logic.append(lost_protect)
         dataframe.loc[
             reduce(lambda x, y: x & y, item_buy_logic),
-            ['entry', 'buy_tag']] = (1, f'buy_1')
+            ['entry', 'buy_tag']] = (1, 'buy_1')
 
         item_buy_logic = []
         item_buy_logic.append(dataframe['volume'] > 0)
@@ -199,7 +199,7 @@ class Dracula(IStrategy):
         item_buy_logic.append(lost_protect)
         dataframe.loc[
             reduce(lambda x, y: x & y, item_buy_logic),
-            ['entry', 'buy_tag']] = (1, f'buy_2')
+            ['entry', 'buy_tag']] = (1, 'buy_2')
 
         return dataframe
 

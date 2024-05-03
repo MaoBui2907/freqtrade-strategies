@@ -1,23 +1,17 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from functools import reduce
-from typing import List
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
 from pandas import DataFrame, Series
 import logging
-import pandas as pd
 import numpy as np
 from freqtrade.persistence import Trade
-import time
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pandas_ta as pta
 import talib.abstract as ta
 import technical.indicators as ftt
-from freqtrade.persistence import Trade, PairLocks
 from freqtrade.strategy import (BooleanParameter, DecimalParameter,
                                 IntParameter, stoploss_from_open, merge_informative_pair)
-from skopt.space import Dimension, Integer
 
 logger = logging.getLogger(__name__)
 
@@ -521,9 +515,9 @@ class ClucHAnix_BB_RPB_MOD2_ROI_DYNAMIC_TB(ClucHAnix5m):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if (reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]):
+        if (reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]):
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

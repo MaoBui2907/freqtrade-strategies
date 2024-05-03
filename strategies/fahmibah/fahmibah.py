@@ -1,18 +1,14 @@
-from typing import Optional
 from functools import reduce
-from typing import List
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
-import pandas as pd
-import pandas_ta as pta
 import talib.abstract as ta
 
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import merge_informative_pair, DecimalParameter, stoploss_from_open, RealParameter, IntParameter, BooleanParameter
+from freqtrade.strategy import merge_informative_pair, DecimalParameter, stoploss_from_open, IntParameter, BooleanParameter
 from pandas import DataFrame, Series
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 
 def bollinger_bands(stock_price, window_size, num_of_std):

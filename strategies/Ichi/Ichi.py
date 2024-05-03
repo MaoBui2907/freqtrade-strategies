@@ -3,20 +3,13 @@
 # --- Do not remove these libs ---
 import numpy as np  # noqa
 import pandas as pd  # noqa
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter, \
-    CategoricalParameter
 from technical.indicators import ichimoku
 
 # --------------------------------
 # Add your lib to import here
-import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 from datetime import datetime
-from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
-from functools import reduce
 # from freqtrade.state import RunMode
 import logging
 import os

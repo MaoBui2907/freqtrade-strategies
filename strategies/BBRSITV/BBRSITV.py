@@ -2,11 +2,8 @@
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame, Series
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 from freqtrade.strategy import DecimalParameter, IntParameter, stoploss_from_open
-from datetime import datetime, timedelta
-from functools import reduce
+from datetime import datetime
 
 # --------------------------------
 def EWO(dataframe, ema_length=5, ema2_length=35):

@@ -1,5 +1,4 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy

@@ -2,7 +2,6 @@ from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy
 from technical.indicators import ichimoku
 
 class Ichimoku_SenkouSpanCross(IStrategy):

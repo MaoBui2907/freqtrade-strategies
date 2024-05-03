@@ -2,7 +2,6 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy import IStrategy, merge_informative_pair
 from pandas import DataFrame
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 import talib.abstract as ta
 import numpy as np
 # --------------------------------

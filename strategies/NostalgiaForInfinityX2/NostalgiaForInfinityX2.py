@@ -5,9 +5,9 @@ import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair
 from pandas import DataFrame, Series
-from functools import reduce, partial
+from functools import reduce
 from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 
 log = logging.getLogger(__name__)
@@ -469,7 +469,7 @@ class NostalgiaForInfinityX2(IStrategy):
 
         # Global protections
         # -----------------------------------------------------------------------------------------
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True
@@ -840,7 +840,7 @@ class NostalgiaForInfinityX2(IStrategy):
 
         # Global protections
         # -----------------------------------------------------------------------------------------
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True

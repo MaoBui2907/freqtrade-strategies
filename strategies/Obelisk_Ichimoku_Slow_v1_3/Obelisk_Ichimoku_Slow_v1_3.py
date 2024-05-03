@@ -2,13 +2,10 @@
 from freqtrade.strategy import IStrategy, merge_informative_pair
 from pandas import DataFrame
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 # --------------------------------
-import pandas as pd
 import numpy as np
 import technical.indicators as ftt
-from freqtrade.exchange import timeframe_to_minutes
 
 # Obelisk_Ichimoku_Slow v1.3 - 2021-04-20
 #
@@ -222,7 +219,7 @@ class Obelisk_Ichimoku_Slow_v1_3(IStrategy):
             dataframe = merge_informative_pair(dataframe, informative, self.timeframe, self.informative_timeframe, ffill=True)
             # don't overwrite the base dataframe's OHLCV information
             skip_columns = [(s + "_" + self.informative_timeframe) for s in ['date', 'open', 'high', 'low', 'close', 'volume']]
-            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s, inplace=True)
+            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s, inplace=True)
 
         dataframe = self.fast_tf_indicators(dataframe, metadata)
 

@@ -1,13 +1,12 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
-import time
 import logging
 
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair, DecimalParameter, stoploss_from_open, RealParameter
 from pandas import DataFrame, Series
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from freqtrade.persistence import Trade
 
 logger = logging.getLogger(__name__)
@@ -539,9 +538,9 @@ class ClucHAnix_hhll_TB(ClucHAnix_hhll):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if (reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]):
+        if (reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]):
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

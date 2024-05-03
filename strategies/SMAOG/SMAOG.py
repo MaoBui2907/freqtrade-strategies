@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta
 import talib.abstract as ta
-from freqtrade.persistence import Trade
 from freqtrade.strategy import CategoricalParameter
 from freqtrade.strategy import DecimalParameter, IntParameter
 from freqtrade.strategy.interface import IStrategy

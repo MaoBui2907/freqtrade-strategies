@@ -5,8 +5,7 @@ from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair, DecimalParameter, stoploss_from_open, RealParameter
 from pandas import DataFrame, Series
 from datetime import datetime
-from typing import Dict, List
-from datetime import datetime, timezone
+from datetime import timezone
 from freqtrade.persistence import Trade
 import logging
 
@@ -273,9 +272,9 @@ class ClucHAnix_5mTB1(ClucHAnix_5m1):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if (reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]):
+        if (reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]):
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

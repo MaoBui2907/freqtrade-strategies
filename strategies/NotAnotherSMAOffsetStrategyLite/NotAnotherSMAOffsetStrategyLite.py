@@ -4,11 +4,9 @@ from pandas import DataFrame
 
 # --------------------------------
 import talib.abstract as ta
-import numpy as np
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 from datetime import datetime, timedelta
 from freqtrade.persistence import Trade
-from freqtrade.strategy import stoploss_from_open, DecimalParameter, IntParameter, CategoricalParameter
+from freqtrade.strategy import DecimalParameter, IntParameter
 
 # @Rallipanos
 

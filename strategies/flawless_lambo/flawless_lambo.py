@@ -2,17 +2,13 @@ import logging
 import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
-from sqlalchemy.orm.base import RELATED_OBJECT_OK
-from sqlalchemy.sql.elements import or_
 import talib.abstract as ta
 import pandas_ta as pta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.exchange import timeframe_to_minutes
 from freqtrade.persistence import Trade
 from technical import indicators
 from datetime import datetime, timezone
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter, RealParameter,
-                                IStrategy, IntParameter, merge_informative_pair)
+from freqtrade.strategy import (DecimalParameter, IStrategy)
 
 
 class flawless_lambo(IStrategy):
@@ -963,9 +959,9 @@ class flawless_lambo(IStrategy):
 
     def trailing_sell(self, pair, reinit=False):
         # returns trailing sell info for pair (init if necessary)
-        if not pair in self.custom_info_trail_sell:
+        if pair not in self.custom_info_trail_sell:
             self.custom_info_trail_sell[pair] = dict()
-        if (reinit or not 'trailing_sell' in self.custom_info_trail_sell[pair]):
+        if (reinit or 'trailing_sell' not in self.custom_info_trail_sell[pair]):
             self.custom_info_trail_sell[pair]['trailing_sell'] = self.init_trailing_sell_dict.copy()
         
         return self.custom_info_trail_sell[pair]['trailing_sell']

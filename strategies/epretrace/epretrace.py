@@ -1,17 +1,12 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy.hyper import CategoricalParameter, DecimalParameter, IntParameter
-from typing import Dict, List
-from functools import reduce
 from pandas import DataFrame
 from freqtrade.persistence import Trade
-from datetime import datetime, date, timedelta
-from technical.indicators import ichimoku, chaikin_money_flow
+from datetime import datetime
 from freqtrade.exchange import timeframe_to_prev_date
 # --------------------------------
 
-import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
 class epretrace(IStrategy):

@@ -5,10 +5,8 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import arrow
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair
-from typing import Dict, List, Optional, Tuple
 from pandas import DataFrame, Series
 from functools import reduce
-from datetime import datetime
 from freqtrade.persistence import Trade
 from statistics import mean
 from cachetools import TTLCache
@@ -193,7 +191,7 @@ class Stinkfist(IStrategy):
     Super Legit Custom Methods
     """
     def populate_trades(self, pair: str) -> dict:
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         trade_data = {}

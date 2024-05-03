@@ -1,14 +1,10 @@
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import (merge_informative_pair,
-                                DecimalParameter, IntParameter, BooleanParameter, CategoricalParameter, stoploss_from_open)
+from freqtrade.strategy import (DecimalParameter, IntParameter, BooleanParameter)
 from pandas import DataFrame
 from functools import reduce
 from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
-from freqtrade.exchange import timeframe_to_prev_date
+from datetime import datetime
 from technical.indicators import zema
 
 ###########################################################################################################
@@ -151,7 +147,7 @@ class MultiMA_TSL(IStrategy):
                         current_rate: float, current_profit: float, **kwargs) -> float:
         sl_new = 1
 
-        if not self.config['runmode'].value in ('backtest', 'hyperopt'):
+        if self.config['runmode'].value not in ('backtest', 'hyperopt'):
             dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
             if(len(dataframe) >= 1):
                 last_candle = dataframe.iloc[-1]
@@ -262,7 +258,7 @@ class MultiMA_TSL(IStrategy):
                 ['sell_copy', 'exit_long']
             ]=(1,1)
 
-        if not self.config['runmode'].value in ('backtest', 'hyperopt'):
+        if self.config['runmode'].value not in ('backtest', 'hyperopt'):
             dataframe.loc[:, 'exit_long'] = 0
 
         return dataframe

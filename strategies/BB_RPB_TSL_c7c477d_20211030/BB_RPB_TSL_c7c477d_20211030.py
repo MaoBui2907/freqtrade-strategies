@@ -6,11 +6,11 @@ import pandas_ta as pta
 
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
-from pandas import DataFrame, Series, DatetimeIndex, merge
-from datetime import datetime, timedelta
-from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter, stoploss_from_open
+from pandas import DataFrame, Series
+from datetime import datetime
+from freqtrade.strategy import merge_informative_pair, DecimalParameter, IntParameter, stoploss_from_open
 from functools import reduce
-from technical.indicators import RMI, zema, ichimoku
+from technical.indicators import RMI, ichimoku
 
 # --------------------------------
 def EWO(dataframe, ema_length=5, ema2_length=35):

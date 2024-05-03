@@ -2873,7 +2873,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V5_2(IStrategy):
         dataframe['volume_mean_4'] = dataframe['volume'].rolling(4).mean().shift(1)
         dataframe['volume_mean_30'] = dataframe['volume'].rolling(30).mean()
 
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True
@@ -2898,7 +2898,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V5_2(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s  if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s  if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 
@@ -2911,7 +2911,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V5_2(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 
@@ -2994,7 +2994,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V5_2(IStrategy):
                     item_buy_protection_list.append(dataframe[f"safe_pump_{global_buy_protection_params['safe_pump_period']}_{global_buy_protection_params['safe_pump_type']}_1h"])
                 if global_buy_protection_params['btc_1h_not_downtrend']:
                     item_buy_protection_list.append(dataframe['btc_not_downtrend_1h'])
-                if not self.config['runmode'] in ('live', 'dry_run'):
+                if self.config['runmode'] not in ('live', 'dry_run'):
                     if self.has_bt_agefilter:
                         item_buy_protection_list.append(dataframe['bt_agefilter_ok'])
                 else:

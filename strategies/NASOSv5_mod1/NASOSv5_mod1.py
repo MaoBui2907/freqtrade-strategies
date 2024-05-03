@@ -1,8 +1,6 @@
 # --- Do not remove these libs ---
 # --- Do not remove these libs ---
-from logging import FATAL
 from freqtrade.strategy.interface import IStrategy
-from typing import Dict, List
 from functools import reduce
 from pandas import DataFrame
 # --------------------------------
@@ -10,11 +8,9 @@ import talib.abstract as ta
 import numpy as np
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import datetime
-from technical.util import resample_to_interval, resampled_merge
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.persistence import Trade
-from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter, CategoricalParameter
-import technical.indicators as ftt
+from freqtrade.strategy import stoploss_from_open, merge_informative_pair, DecimalParameter, IntParameter
 import logging
 import pandas as pd
 
@@ -589,9 +585,9 @@ class TrailingBuyStrat(NASOSv5_mod1):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe = super(TrailingBuyStrat, self).populate_indicators(dataframe, metadata)
-        if not metadata["pair"] in self.custom_info:
+        if metadata["pair"] not in self.custom_info:
             self.custom_info[metadata["pair"]] = dict()
-        if not 'trailing_buy' in self.custom_info[metadata['pair']]:
+        if 'trailing_buy' not in self.custom_info[metadata['pair']]:
             self.custom_info[metadata["pair"]]['trailing_buy'] = {
                 'trailing_buy_order_started': False,
                 'trailing_buy_order_uplimit': 0,
@@ -629,7 +625,7 @@ class TrailingBuyStrat(NASOSv5_mod1):
                 self.custom_info[metadata["pair"]]['trailing_buy']['trailing_buy_order_started'] = True
                 self.custom_info[metadata["pair"]]['trailing_buy']['start_trailing_price'] = last_candle['close']
                 self.custom_info[metadata["pair"]]['trailing_buy']['buy_tag'] = last_candle['buy_tag']
-                self.custom_info[metadata["pair"]]['trailing_buy']['trailing_buy_order_uplimit'] = last_candle[f'close']
+                self.custom_info[metadata["pair"]]['trailing_buy']['trailing_buy_order_uplimit'] = last_candle['close']
                 logger.info(f'start trailing buy for {metadata["pair"]} at {last_candle["close"]}')
             elif self.custom_info[metadata["pair"]]['trailing_buy']['trailing_buy_order_started']:
                 if current_price < self.custom_info[metadata["pair"]]['trailing_buy']['trailing_buy_order_uplimit']:

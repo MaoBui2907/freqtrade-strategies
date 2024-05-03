@@ -1,29 +1,9 @@
-import copy
-import logging
-import pathlib
-import rapidjson
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
-import pandas as pd
-import pandas_ta as pta
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes
-from freqtrade.exchange import timeframe_to_prev_date
-from pandas import DataFrame, Series, concat
-from functools import reduce
-import math
-from typing import Dict
-from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
-from technical.util import resample_to_interval, resampled_merge
-from technical.indicators import RMI, zema, VIDYA, ichimoku
-import time
-import warnings
+from pandas import DataFrame
+from datetime import datetime
 
 # Custom imports to fetch API data
-import requests
-import json
 
 
 class INSIDEUP(IStrategy):

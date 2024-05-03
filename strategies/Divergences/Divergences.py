@@ -3,7 +3,7 @@
 # --- Do not remove these libs ---
 import numpy as np  # noqa
 import pandas as pd  # noqa
-from pandas import DataFrame, Series, DatetimeIndex, merge
+from pandas import DataFrame
 
 from freqtrade.strategy.interface import IStrategy
 

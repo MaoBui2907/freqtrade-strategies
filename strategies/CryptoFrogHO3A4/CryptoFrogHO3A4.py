@@ -1,5 +1,5 @@
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
+from typing import List, Optional, Tuple
+from datetime import datetime
 from cachetools import TTLCache
 
 ## I hope you know what these are already
@@ -11,7 +11,7 @@ import talib.abstract as ta
 from finta import TA as fta
 
 ## FT stuffs
-from freqtrade.strategy import IStrategy, merge_informative_pair, stoploss_from_open, IntParameter, DecimalParameter, CategoricalParameter
+from freqtrade.strategy import IStrategy, merge_informative_pair, IntParameter, DecimalParameter, CategoricalParameter
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 from freqtrade.exchange import timeframe_to_minutes
 from freqtrade.persistence import Trade
@@ -289,7 +289,7 @@ class CryptoFrogHO3A4(IStrategy):
             dataframe = merge_informative_pair(dataframe, informative, self.timeframe, self.informative_timeframe, ffill=True)
             
             skip_columns = [(s + "_" + self.informative_timeframe) for s in ['date', 'open', 'high', 'low', 'close', 'volume', 'emac', 'emao']]
-            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (not s in skip_columns) else s, inplace=True)
+            dataframe.rename(columns=lambda s: s.replace("_{}".format(self.informative_timeframe), "") if (s not in skip_columns) else s, inplace=True)
 
         # Slam some indicators into the trade_info dict so we can dynamic roi and custom stoploss in backtest
         if self.dp.runmode.value in ('backtest', 'hyperopt'):
@@ -514,7 +514,7 @@ class CryptoFrogHO3A4(IStrategy):
     """
     def populate_trades(self, pair: str) -> dict:
         # Initialize the trades dict if it doesn't exist, persist it otherwise
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         # init the temp dicts and set the trade stuff to false

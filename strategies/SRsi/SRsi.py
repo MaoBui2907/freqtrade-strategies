@@ -1,7 +1,6 @@
 import talib.abstract as ta
 from pandas import DataFrame
 
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 from freqtrade.strategy.interface import IStrategy
 
 class SRsi(IStrategy):

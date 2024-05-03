@@ -7,7 +7,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 # --------------------------------
 from freqtrade.persistence import Trade
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import reduce
 #
 

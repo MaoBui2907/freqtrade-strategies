@@ -8,7 +8,6 @@ import talib.abstract as ta
 from freqtrade.misc import json_load, file_dump_json
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair, timeframe_to_minutes
-from freqtrade.strategy import DecimalParameter, IntParameter, CategoricalParameter
 from freqtrade.exchange import timeframe_to_prev_date
 from pandas import DataFrame, Series, concat
 from functools import reduce
@@ -2963,7 +2962,7 @@ class NostalgiaForInfinityNext_maximizer(IStrategy):
         dataframe['cci'] = ta.CCI(dataframe, source='hlc3', timeperiod=20)
 
 
-        if not self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config['runmode'].value not in ('live', 'dry_run'):
             # Backtest age filter
             dataframe['bt_agefilter_ok'] = False
             dataframe.loc[dataframe.index > (12 * 24 * self.bt_min_age_days),'bt_agefilter_ok'] = True
@@ -2988,7 +2987,7 @@ class NostalgiaForInfinityNext_maximizer(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s  if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s  if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 
@@ -3001,7 +3000,7 @@ class NostalgiaForInfinityNext_maximizer(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 
@@ -3084,7 +3083,7 @@ class NostalgiaForInfinityNext_maximizer(IStrategy):
                     item_buy_protection_list.append(dataframe[f"safe_pump_{global_buy_protection_params['safe_pump_period']}_{global_buy_protection_params['safe_pump_type']}_1h"])
                 if global_buy_protection_params['btc_1h_not_downtrend']:
                     item_buy_protection_list.append(dataframe['btc_not_downtrend_1h'])
-                if not self.config['runmode'].value in ('live', 'dry_run'):
+                if self.config['runmode'].value not in ('live', 'dry_run'):
                     if self.has_bt_agefilter:
                         item_buy_protection_list.append(dataframe['bt_agefilter_ok'])
                 else:

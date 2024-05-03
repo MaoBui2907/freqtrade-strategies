@@ -1,14 +1,13 @@
 import numpy as np
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import arrow
 
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import merge_informative_pair, stoploss_from_open, IntParameter, DecimalParameter, CategoricalParameter
-from typing import Dict, List, Optional, Tuple
+from freqtrade.strategy import merge_informative_pair, IntParameter, DecimalParameter, CategoricalParameter
+from typing import Dict, Optional, Tuple
 from pandas import DataFrame, Series
 from functools import reduce
-from datetime import datetime, timedelta
+from datetime import datetime
 from freqtrade.persistence import Trade
 
 # Get rid of pandas warnings during backtesting
@@ -20,11 +19,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
-import numpy as np
-import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 
-from pandas import DataFrame, Series
 
 
 """
@@ -340,7 +335,7 @@ class Dyna_opti(IStrategy):
     Indicator Definitions
     """ 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        if not metadata['pair'] in self.custom_trade_info:
+        if metadata['pair'] not in self.custom_trade_info:
             self.custom_trade_info[metadata['pair']] = {}
 
         ## Base Timeframe / Pair
@@ -644,7 +639,7 @@ class Dyna_opti(IStrategy):
     """
     def populate_trades(self, pair: str) -> dict:
         # Initialize the trades dict if it doesn't exist, persist it otherwise
-        if not pair in self.custom_trade_info:
+        if pair not in self.custom_trade_info:
             self.custom_trade_info[pair] = {}
 
         # init the temp dicts and set the trade stuff to false

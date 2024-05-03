@@ -3,10 +3,7 @@ from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.persistence import Trade
-from datetime import timedelta, datetime, timezone
 #from freqtrade.strategy.strategy_helper import  merge_informative_pair
-from typing import Dict, List
 import numpy as np
 # --------------------------------
 # 11-Aug-20  - seems to be good making a few trades  5 days 33 wins 7 losses AVE 0.41% tot ROI 17.14%

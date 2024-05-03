@@ -1,7 +1,6 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
-import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
@@ -10,10 +9,7 @@ import pandas as pd  # noqa
 pd.options.mode.chained_assignment = None  # default='warn'
 
 import technical.indicators as ftt
-from technical.util import resample_to_interval, resampled_merge
 
-from functools import reduce
-from datetime import datetime, timedelta
 
 # Obelisk_TradeProIM v1 - 2021-03-25
 #

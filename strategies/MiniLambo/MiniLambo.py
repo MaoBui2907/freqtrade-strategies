@@ -1,7 +1,6 @@
 from skopt.space import Dimension, Integer
 
 import logging
-import logging
 from datetime import datetime, timezone
 from functools import reduce
 from typing import List
@@ -9,14 +8,11 @@ from typing import List
 import numpy as np
 import pandas_ta as pta
 import talib.abstract as ta
-import technical.indicators as ftt
 from pandas import DataFrame, Series
-from skopt.space import Dimension, Integer
 
-import freqtrade.vendor.qtpylib.indicators as qtpylib
 from freqtrade.persistence import Trade
-from freqtrade.strategy import (BooleanParameter, DecimalParameter,
-                                IntParameter, merge_informative_pair)
+from freqtrade.strategy import (DecimalParameter,
+                                IntParameter)
 from freqtrade.strategy.interface import IStrategy
 
 logger = logging.getLogger(__name__)
@@ -333,9 +329,9 @@ class MiniLambo_TBS(MiniLambo):
 
     def trailing_buy(self, pair, reinit=False):
         # returns trailing buy info for pair (init if necessary)
-        if not pair in self.custom_info_trail_buy:
+        if pair not in self.custom_info_trail_buy:
             self.custom_info_trail_buy[pair] = dict()
-        if reinit or not 'trailing_buy' in self.custom_info_trail_buy[pair]:
+        if reinit or 'trailing_buy' not in self.custom_info_trail_buy[pair]:
             self.custom_info_trail_buy[pair]['trailing_buy'] = self.init_trailing_dict.copy()
         return self.custom_info_trail_buy[pair]['trailing_buy']
 

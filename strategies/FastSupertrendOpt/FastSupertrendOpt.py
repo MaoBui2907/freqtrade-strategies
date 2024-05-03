@@ -12,8 +12,6 @@ Supertrend strategy:
             2. The implementation for `supertrend` on this strategy is not validated; meaning this that is not proven to match the results by the paper where it was originally introduced or any other trusted academic resources
 """
 
-import logging
-from numpy.lib import math
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy.hyper import IntParameter
 from pandas import DataFrame
@@ -95,9 +93,9 @@ class FastSupertrendOpt(IStrategy):
 
         dataframe.loc[
             (
-               (dataframe[f'supertrend_1_buy'] == 'up') &
-               (dataframe[f'supertrend_2_buy'] == 'up') &
-               (dataframe[f'supertrend_3_buy'] == 'up') & # The three indicators are 'up' for the current candle
+               (dataframe['supertrend_1_buy'] == 'up') &
+               (dataframe['supertrend_2_buy'] == 'up') &
+               (dataframe['supertrend_3_buy'] == 'up') & # The three indicators are 'up' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
         ),
             'enter_long'] = 1
@@ -107,9 +105,9 @@ class FastSupertrendOpt(IStrategy):
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-               (dataframe[f'supertrend_1_sell'] == 'down') &
-               (dataframe[f'supertrend_2_sell'] == 'down') &
-               (dataframe[f'supertrend_3_sell'] == 'down') & # The three indicators are 'down' for the current candle
+               (dataframe['supertrend_1_sell'] == 'down') &
+               (dataframe['supertrend_2_sell'] == 'down') &
+               (dataframe['supertrend_3_sell'] == 'down') & # The three indicators are 'down' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
             ),
             'exit_long'] = 1

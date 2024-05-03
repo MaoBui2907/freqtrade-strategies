@@ -2772,7 +2772,7 @@ class Nostalgia(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s  if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s  if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 
@@ -2785,7 +2785,7 @@ class Nostalgia(IStrategy):
         # Add prefix
         # -----------------------------------------------------------------------------------------
         ignore_columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        dataframe.rename(columns=lambda s: "btc_" + s if (not s in ignore_columns) else s, inplace=True)
+        dataframe.rename(columns=lambda s: "btc_" + s if (s not in ignore_columns) else s, inplace=True)
 
         return dataframe
 

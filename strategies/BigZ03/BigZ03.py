@@ -1,11 +1,10 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np
 import talib.abstract as ta
 from freqtrade.persistence import Trade
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 from datetime import datetime, timedelta
-from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter, IntParameter
+from freqtrade.strategy import merge_informative_pair, CategoricalParameter, DecimalParameter
 
 
 ###########################################################################################################
@@ -186,7 +185,7 @@ class BigZ03(IStrategy):
                     if current_rate * 1.015 < candle['open']:
                         return 0.01
 
-                except IndexError as error:
+                except IndexError:
 
                     # Whoops, set stoploss at 10%
                     return 0.5
