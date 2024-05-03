@@ -8,8 +8,8 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 # --------------------------------
 
 
-
 # import numpy as np # noqa
+
 
 class Low_BB(IStrategy):
     """
@@ -24,35 +24,28 @@ class Low_BB(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.9,
-        "1": 0.05,
-        "10": 0.04,
-        "15": 0.5
-    }
+    minimal_roi = {"0": 0.9, "1": 0.05, "10": 0.04, "15": 0.5}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.015
 
     # Optimal timeframe for the strategy
-    timeframe = '1m'
+    timeframe = "1m"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         ##################################################################################
         # buy and sell indicators
 
-        bollinger = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=2
-        )
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # dataframe['cci'] = ta.CCI(dataframe)
         # dataframe['mfi'] = ta.MFI(dataframe)
@@ -65,10 +58,10 @@ class Low_BB(IStrategy):
         # dataframe.loc[dataframe.close.rolling(600).max() * 0.8 >  dataframe.close, 'canbuy2'] = 1
         ##################################################################################
         # required for graphing
-        bollinger = qtpylib.bollinger_bands(dataframe['close'], window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe['bb_middleband'] = bollinger['mid']
+        bollinger = qtpylib.bollinger_bands(dataframe["close"], window=20, stds=2)
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_middleband"] = bollinger["mid"]
 
         return dataframe
 
@@ -78,14 +71,7 @@ class Low_BB(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (
-
-                (dataframe['close'] <= 0.98 * dataframe['bb_lowerband'])
-
-            )
-            ,
-            'enter_long'] = 1
+        dataframe.loc[(dataframe["close"] <= 0.98 * dataframe["bb_lowerband"]), "enter_long"] = 1
 
         return dataframe
 
@@ -95,7 +81,5 @@ class Low_BB(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (),
-            'exit_long'] = 1
+        dataframe.loc[(), "exit_long"] = 1
         return dataframe

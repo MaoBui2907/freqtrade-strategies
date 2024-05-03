@@ -28,18 +28,15 @@ class TemaMaster3(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
     # ROI table:
-    minimal_roi = {
-        "0": 0.25574
-    }
-
+    minimal_roi = {"0": 0.25574}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     # Stoploss:
     stoploss = -0.08848
-    
+
     # Optimal timeframe for the strategy
-    timeframe = '1m'
+    timeframe = "1m"
 
     # Trailing stop:
     trailing_stop = True
@@ -54,7 +51,6 @@ class TemaMaster3(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-
 
     def informative_pairs(self):
         """
@@ -77,19 +73,18 @@ class TemaMaster3(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['CMO'] = ta.CMO(dataframe, timeperiod = 180)
-        dataframe['TEMA'] = ta.TEMA(dataframe, timeperiod = 60)
-      
+        dataframe["CMO"] = ta.CMO(dataframe, timeperiod=180)
+        dataframe["TEMA"] = ta.TEMA(dataframe, timeperiod=60)
+
         # Bollinger bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=60, stds=1.4)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-            
-            
-        dataframe['STDDEV'] = ta.STDDEV(dataframe, timeperiod=26, nbdev=1.4)
-        dataframe['MA'] = ta.MA(dataframe, timeperiod=26, matype=0)
-        dataframe["COEFFV"] = dataframe['STDDEV']/dataframe['MA']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+
+        dataframe["STDDEV"] = ta.STDDEV(dataframe, timeperiod=26, nbdev=1.4)
+        dataframe["MA"] = ta.MA(dataframe, timeperiod=26, matype=0)
+        dataframe["COEFFV"] = dataframe["STDDEV"] / dataframe["MA"]
 
         return dataframe
 
@@ -99,20 +94,14 @@ class TemaMaster3(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                        
-        
+
         dataframe.loc[
             (
-                  
-            (
                 (qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_lowerband"]))
-            & 
-              (dataframe['CMO']>-3)
-             )
-                
-                
+                & (dataframe["CMO"] > -3)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -122,13 +111,13 @@ class TemaMaster3(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                       
+
         dataframe.loc[
             (
-               (qtpylib.crossed_below(dataframe["CMO"],-22)) 
-               |
-                (qtpylib.crossed_below(dataframe["CMO"],25)) 
+                (qtpylib.crossed_below(dataframe["CMO"], -22))
+                | (qtpylib.crossed_below(dataframe["CMO"], 25))
             ),
-            'exit_long'] = 1        
-        
+            "exit_long",
+        ] = 1
+
         return dataframe

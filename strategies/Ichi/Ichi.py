@@ -10,29 +10,30 @@ from technical.indicators import ichimoku
 # --------------------------------
 # Add your lib to import here
 from datetime import datetime
+
 # from freqtrade.state import RunMode
 import logging
 import os
 
 logger = logging.getLogger(__name__)
 
-LOG_FILENAME = datetime.now().strftime('logfile_%d_%m_%Y.log')
+LOG_FILENAME = datetime.now().strftime("logfile_%d_%m_%Y.log")
 os.system("rm " + LOG_FILENAME)
 
-# This will have an impact on all the logging from FreqTrade, when using other strategies than this one !!! 
+# This will have an impact on all the logging from FreqTrade, when using other strategies than this one !!!
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
-logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG, format='%(asctime)s :: %(message)s')
+logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG, format="%(asctime)s :: %(message)s")
 
 logging.info("test")
 
 
 class Ichi(IStrategy):
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'limit',
-        'stoploss_on_exchange': True
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "limit",
+        "stoploss_on_exchange": True,
     }
 
     minimal_roi = {
@@ -44,20 +45,20 @@ class Ichi(IStrategy):
         "5": 0.01 / 2,
         "0": 0.02 / 2,
     }
-    timeframe = '15m'
+    timeframe = "15m"
     stoploss = -0.20
 
     INTERFACE_VERSION = 2
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         ichi = ichimoku(dataframe)
-        dataframe['tenkan'] = ichi['tenkan_sen']
-        dataframe['kijun'] = ichi['kijun_sen']
-        dataframe['senkou_a'] = ichi['senkou_span_a']
-        dataframe['senkou_b'] = ichi['senkou_span_b']
-        dataframe['cloud_green'] = ichi['cloud_green']
-        dataframe['cloud_red'] = ichi['cloud_red']
-        dataframe['chikou'] = ichi['chikou_span']
+        dataframe["tenkan"] = ichi["tenkan_sen"]
+        dataframe["kijun"] = ichi["kijun_sen"]
+        dataframe["senkou_a"] = ichi["senkou_span_a"]
+        dataframe["senkou_b"] = ichi["senkou_span_b"]
+        dataframe["cloud_green"] = ichi["cloud_green"]
+        dataframe["cloud_red"] = ichi["cloud_red"]
+        dataframe["chikou"] = ichi["chikou_span"]
 
         # EMA
         #        dataframe['ema8'] = ta.EMA(dataframe, timeperiod=8)
@@ -70,26 +71,23 @@ class Ichi(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (
-                        (dataframe['open'].shift(1) < dataframe['senkou_b'].shift(1))
-                        & (dataframe['close'].shift(1) > dataframe['senkou_b'].shift(1))
-                        & (dataframe['open'] > dataframe['senkou_b'])
-                        & (dataframe['close'] > dataframe['senkou_b'])
-
-                    #				& (dataframe['cloud_green'] == True)
-                    #				&(dataframe['tenkan'] > dataframe['kijun'])
-                    #				&(dataframe['tenkan'].shift(1) < dataframe['kijun'].shift(1))
-                    #				& (dataframe['close'].shift(-26) > dataframe['close'].shift(26))
-                )
-                #			 &
+                (dataframe["open"].shift(1) < dataframe["senkou_b"].shift(1))
+                & (dataframe["close"].shift(1) > dataframe["senkou_b"].shift(1))
+                & (dataframe["open"] > dataframe["senkou_b"])
+                & (dataframe["close"] > dataframe["senkou_b"])
+                # & (dataframe['cloud_green'] == True)
+                # &(dataframe['tenkan'] > dataframe['kijun'])
+                # &(dataframe['tenkan'].shift(1) < dataframe['kijun'].shift(1))
+                # & (dataframe['close'].shift(-26) > dataframe['close'].shift(26))
+                # &
                 #             (
                 #                (dataframe['ema21'] > dataframe['ema55']) & # Wenn EMA21 > EMA51
                 #                (dataframe['ema13'] > dataframe['ema21']) &
                 #                (dataframe['ema8'] > dataframe['ema13'])
                 #             )
-
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 

@@ -1,7 +1,8 @@
 from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import (IntParameter, IStrategy, CategoricalParameter)
+from freqtrade.strategy import IntParameter, IStrategy, CategoricalParameter
 import numpy as np
+
 
 class FrostAuraRandomStrategy(IStrategy):
     """
@@ -12,17 +13,13 @@ class FrostAuraRandomStrategy(IStrategy):
         Optimized for   : Last 45 days, 1h
         Avg             : 2d - 5d
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
-    minimal_roi = {
-        "0": 0.347,
-        "450": 0.106,
-        "1169": 0.032,
-        "1624": 0
-    }
+    minimal_roi = {"0": 0.347, "450": 0.106, "1169": 0.032, "1624": 0}
 
     # Optimal stoploss designed for the strategy.
     stoploss = -0.231
@@ -31,7 +28,7 @@ class FrostAuraRandomStrategy(IStrategy):
     trailing_stop = False
 
     # Optimal ticker interval for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -46,63 +43,66 @@ class FrostAuraRandomStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'market',
-        'exit': 'market',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "market",
+        "exit": "market",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['random_number'] = np.random.randint(0, 100, dataframe.shape[0])
+        dataframe["random_number"] = np.random.randint(0, 100, dataframe.shape[0])
 
         return dataframe
 
-    buy_prediction_delta_direction = CategoricalParameter(['<', '>'], default='>', space='entry')
-    buy_probability = IntParameter([0, 100], default=76, space='entry')
+    buy_prediction_delta_direction = CategoricalParameter(["<", ">"], default=">", space="entry")
+    buy_probability = IntParameter([0, 100], default=76, space="entry")
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        random_number = dataframe['random_number']
+        random_number = dataframe["random_number"]
 
         dataframe.loc[
             (
-                (random_number < self.buy_probability.value if self.buy_prediction_delta_direction.value == '<' else random_number > self.buy_probability.value)
+                random_number < self.buy_probability.value
+                if self.buy_prediction_delta_direction.value == "<"
+                else random_number > self.buy_probability.value
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
-    sell_prediction_delta_direction = CategoricalParameter(['<', '>'], default='<', space='exit')
-    sell_probability = IntParameter([0, 100], default=0, space='exit')
+    sell_prediction_delta_direction = CategoricalParameter(["<", ">"], default="<", space="exit")
+    sell_probability = IntParameter([0, 100], default=0, space="exit")
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        random_number = dataframe['random_number']
+        random_number = dataframe["random_number"]
 
         dataframe.loc[
             (
-                (random_number < self.sell_probability.value if self.sell_prediction_delta_direction.value == '<' else random_number > self.sell_probability.value)
+                random_number < self.sell_probability.value
+                if self.sell_prediction_delta_direction.value == "<"
+                else random_number > self.sell_probability.value
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

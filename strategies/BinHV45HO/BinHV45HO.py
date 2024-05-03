@@ -6,7 +6,6 @@ import numpy as np
 # --------------------------------
 
 
-
 def bollinger_bands(stock_price, window_size, num_of_std):
     rolling_mean = stock_price.rolling(window=window_size).mean()
     rolling_std = stock_price.rolling(window=window_size).std()
@@ -22,43 +21,48 @@ class BinHV45HO(IStrategy):
         "df_tail_bbdelta": 0.293,
     }
 
-    minimal_roi = {
-        "0": 0.0125
-    }
+    minimal_roi = {"0": 0.0125}
 
     stoploss = -0.19
-    timeframe = '1m'
+    timeframe = "1m"
 
-    df_close_bbdelta = DecimalParameter(0.005, 0.06, default=0.008, space='entry', optimize=False, load=True)
-    df_close_closedelta = DecimalParameter(0.01, 0.03, default=0.0175, space='entry', optimize=False, load=True)
-    df_tail_bbdelta = DecimalParameter(0.15, 0.45, default=0.25, space='entry', optimize=False, load=True)
+    df_close_bbdelta = DecimalParameter(
+        0.005, 0.06, default=0.008, space="entry", optimize=False, load=True
+    )
+    df_close_closedelta = DecimalParameter(
+        0.01, 0.03, default=0.0175, space="entry", optimize=False, load=True
+    )
+    df_tail_bbdelta = DecimalParameter(
+        0.15, 0.45, default=0.25, space="entry", optimize=False, load=True
+    )
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        mid, lower = bollinger_bands(dataframe['close'], window_size=40, num_of_std=2)
-        dataframe['mid'] = np.nan_to_num(mid)
-        dataframe['lower'] = np.nan_to_num(lower)
-        dataframe['bbdelta'] = (dataframe['mid'] - dataframe['lower']).abs()
-        dataframe['pricedelta'] = (dataframe['open'] - dataframe['close']).abs()
-        dataframe['closedelta'] = (dataframe['close'] - dataframe['close'].shift()).abs()
-        dataframe['tail'] = (dataframe['close'] - dataframe['low']).abs()
+        mid, lower = bollinger_bands(dataframe["close"], window_size=40, num_of_std=2)
+        dataframe["mid"] = np.nan_to_num(mid)
+        dataframe["lower"] = np.nan_to_num(lower)
+        dataframe["bbdelta"] = (dataframe["mid"] - dataframe["lower"]).abs()
+        dataframe["pricedelta"] = (dataframe["open"] - dataframe["close"]).abs()
+        dataframe["closedelta"] = (dataframe["close"] - dataframe["close"].shift()).abs()
+        dataframe["tail"] = (dataframe["close"] - dataframe["low"]).abs()
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                dataframe['lower'].shift().gt(0) &
-                dataframe['bbdelta'].gt(dataframe['close'] * self.df_close_bbdelta.value) &
-                dataframe['closedelta'].gt(dataframe['close'] * self.df_close_closedelta.value) &
-                dataframe['tail'].lt(dataframe['bbdelta'] * self.df_tail_bbdelta.value) &
-                dataframe['close'].lt(dataframe['lower'].shift()) &
-                dataframe['close'].le(dataframe['close'].shift())
+                dataframe["lower"].shift().gt(0)
+                & dataframe["bbdelta"].gt(dataframe["close"] * self.df_close_bbdelta.value)
+                & dataframe["closedelta"].gt(dataframe["close"] * self.df_close_closedelta.value)
+                & dataframe["tail"].lt(dataframe["bbdelta"] * self.df_tail_bbdelta.value)
+                & dataframe["close"].lt(dataframe["lower"].shift())
+                & dataframe["close"].le(dataframe["close"].shift())
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         no sell signal
         """
-        dataframe.loc[:, 'exit_long'] = 0
+        dataframe.loc[:, "exit_long"] = 0
         return dataframe

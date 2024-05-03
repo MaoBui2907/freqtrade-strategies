@@ -21,29 +21,27 @@ class ClucMay72018(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.01
-    }
+    minimal_roi = {"0": 0.01}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.05
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=5)
-        rsiframe = DataFrame(dataframe['rsi']).rename(columns={'rsi': 'close'})
-        dataframe['emarsi'] = ta.EMA(rsiframe, timeperiod=5)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=5)
+        rsiframe = DataFrame(dataframe["rsi"]).rename(columns={"rsi": "close"})
+        dataframe["emarsi"] = ta.EMA(rsiframe, timeperiod=5)
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['adx'] = ta.ADX(dataframe)
+        dataframe["macd"] = macd["macd"]
+        dataframe["adx"] = ta.ADX(dataframe)
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe['ema100'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["ema100"] = ta.EMA(dataframe, timeperiod=50)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -54,11 +52,15 @@ class ClucMay72018(IStrategy):
         """
         dataframe.loc[
             (
-                    (dataframe['close'] < dataframe['ema100']) &
-                    (dataframe['close'] < 0.985 * dataframe['bb_lowerband']) &
-                    (dataframe['volume'] < (dataframe['volume'].rolling(window=30).mean().shift(1) * 20))
+                (dataframe["close"] < dataframe["ema100"])
+                & (dataframe["close"] < 0.985 * dataframe["bb_lowerband"])
+                & (
+                    dataframe["volume"]
+                    < (dataframe["volume"].rolling(window=30).mean().shift(1) * 20)
+                )
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -68,9 +70,5 @@ class ClucMay72018(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (
-                (dataframe['close'] > dataframe['bb_middleband'])
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(dataframe["close"] > dataframe["bb_middleband"]), "exit_long"] = 1
         return dataframe

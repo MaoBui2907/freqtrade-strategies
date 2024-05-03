@@ -6,6 +6,7 @@ from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
+
 class WaveTrendStra(IStrategy):
     """
 
@@ -19,17 +20,16 @@ class WaveTrendStra(IStrategy):
     # adjust based on market conditions. We would recommend to keep it low for quick turn arounds
     # This attribute will be overridden if the config file contains "minimal_roi"
     minimal_roi = {
-        "0": 100   #disable roi
+        "0": 100  # disable roi
     }
 
     # Optimal stoploss designed for the strategy
     stoploss = -0.25
 
     # Optimal timeframe for the strategy
-    timeframe = '4h'
+    timeframe = "4h"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         ap = (dataframe["high"] + dataframe["low"] + dataframe["close"]) / 3
 
         esa = ta.EMA(ap, 10)
@@ -43,13 +43,9 @@ class WaveTrendStra(IStrategy):
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[
-            (qtpylib.crossed_above(dataframe["wt1"], dataframe["wt2"]))
-            ,'enter_long'] = 1
+        dataframe.loc[(qtpylib.crossed_above(dataframe["wt1"], dataframe["wt2"])), "enter_long"] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[
-            (qtpylib.crossed_below(dataframe['wt1'], dataframe['wt2']))
-            ,'exit_long'] = 1
+        dataframe.loc[(qtpylib.crossed_below(dataframe["wt1"], dataframe["wt2"])), "exit_long"] = 1
         return dataframe

@@ -30,18 +30,14 @@ class bb_rsi_opt_new(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 0.3,
-        "20": 0.2,
-        "30": 0.1,
-        "100": 0
-    }
+    minimal_roi = {"0": 0.3, "20": 0.2, "30": 0.1, "100": 0}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -54,7 +50,7 @@ class bb_rsi_opt_new(IStrategy):
     trailing_stop_positive_offset = 0.23526  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    ticker_interval = '1h'
+    ticker_interval = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -69,32 +65,29 @@ class bb_rsi_opt_new(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -123,20 +116,20 @@ class bb_rsi_opt_new(IStrategy):
         """
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger Bands
         bollinger1 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
-        dataframe['bb_lowerband1'] = bollinger1['lower']
-        dataframe['bb_middleband1'] = bollinger1['mid']
-        dataframe['bb_upperband1'] = bollinger1['upper']
+        dataframe["bb_lowerband1"] = bollinger1["lower"]
+        dataframe["bb_middleband1"] = bollinger1["mid"]
+        dataframe["bb_upperband1"] = bollinger1["upper"]
 
         bollinger4 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=4)
-        dataframe['bb_lowerband4'] = bollinger4['lower']
-        dataframe['bb_middleband4'] = bollinger4['mid']
-        dataframe['bb_upperband4'] = bollinger4['upper']
+        dataframe["bb_lowerband4"] = bollinger4["lower"]
+        dataframe["bb_middleband4"] = bollinger4["mid"]
+        dataframe["bb_upperband4"] = bollinger4["upper"]
 
-# bb-band here should be 4 stdevs, using 2 to test with container
+        # bb-band here should be 4 stdevs, using 2 to test with container
 
         return dataframe
 
@@ -148,11 +141,9 @@ class bb_rsi_opt_new(IStrategy):
         :return: DataFrame with buy column
         """
         dataframe.loc[
-            (
-                (dataframe['rsi'] > 28) &
-                (dataframe['close'] < dataframe['bb_lowerband4'])
-            ),
-            'enter_long'] = 1
+            ((dataframe["rsi"] > 28) & (dataframe["close"] < dataframe["bb_lowerband4"])),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -166,5 +157,5 @@ class bb_rsi_opt_new(IStrategy):
         """
         no sell signal
         """
-        dataframe['exit_long'] = 0
+        dataframe["exit_long"] = 0
         return dataframe

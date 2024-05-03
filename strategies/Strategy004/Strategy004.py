@@ -1,4 +1,3 @@
-
 # --- Do not remove these libs ---
 from freqtrade.strategy import IStrategy
 from pandas import DataFrame
@@ -8,7 +7,6 @@ import talib.abstract as ta
 
 
 class Strategy004(IStrategy):
-
     """
     Strategy 004
     author@: Gerald Lonlas
@@ -20,19 +18,14 @@ class Strategy004(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "60":  0.01,
-        "30":  0.03,
-        "20":  0.04,
-        "0":  0.05
-    }
+    minimal_roi = {"60": 0.01, "30": 0.03, "20": 0.04, "0": 0.05}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.10
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -49,10 +42,10 @@ class Strategy004(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
@@ -78,30 +71,30 @@ class Strategy004(IStrategy):
         """
 
         # ADX
-        dataframe['adx'] = ta.ADX(dataframe)
-        dataframe['slowadx'] = ta.ADX(dataframe, 35)
+        dataframe["adx"] = ta.ADX(dataframe)
+        dataframe["slowadx"] = ta.ADX(dataframe, 35)
 
         # Commodity Channel Index: values Oversold:<-100, Overbought:>100
-        dataframe['cci'] = ta.CCI(dataframe)
+        dataframe["cci"] = ta.CCI(dataframe)
 
         # Stoch
         stoch = ta.STOCHF(dataframe, 5)
-        dataframe['fastd'] = stoch['fastd']
-        dataframe['fastk'] = stoch['fastk']
-        dataframe['fastk-previous'] = dataframe.fastk.shift(1)
-        dataframe['fastd-previous'] = dataframe.fastd.shift(1)
+        dataframe["fastd"] = stoch["fastd"]
+        dataframe["fastk"] = stoch["fastk"]
+        dataframe["fastk-previous"] = dataframe.fastk.shift(1)
+        dataframe["fastd-previous"] = dataframe.fastd.shift(1)
 
         # Slow Stoch
         slowstoch = ta.STOCHF(dataframe, 50)
-        dataframe['slowfastd'] = slowstoch['fastd']
-        dataframe['slowfastk'] = slowstoch['fastk']
-        dataframe['slowfastk-previous'] = dataframe.slowfastk.shift(1)
-        dataframe['slowfastd-previous'] = dataframe.slowfastd.shift(1)
+        dataframe["slowfastd"] = slowstoch["fastd"]
+        dataframe["slowfastk"] = slowstoch["fastk"]
+        dataframe["slowfastk-previous"] = dataframe.slowfastk.shift(1)
+        dataframe["slowfastd-previous"] = dataframe.slowfastd.shift(1)
 
         # EMA - Exponential Moving Average
-        dataframe['ema5'] = ta.EMA(dataframe, timeperiod=5)
+        dataframe["ema5"] = ta.EMA(dataframe, timeperiod=5)
 
-        dataframe['mean-volume'] = dataframe['volume'].mean()
+        dataframe["mean-volume"] = dataframe["volume"].mean()
 
         return dataframe
 
@@ -113,25 +106,17 @@ class Strategy004(IStrategy):
         """
         dataframe.loc[
             (
-                (
-                    (dataframe['adx'] > 50) |
-                    (dataframe['slowadx'] > 26)
-                ) &
-                (dataframe['cci'] < -100) &
-                (
-                    (dataframe['fastk-previous'] < 20) &
-                    (dataframe['fastd-previous'] < 20)
-                ) &
-                (
-                    (dataframe['slowfastk-previous'] < 30) &
-                    (dataframe['slowfastd-previous'] < 30)
-                ) &
-                (dataframe['fastk-previous'] < dataframe['fastd-previous']) &
-                (dataframe['fastk'] > dataframe['fastd']) &
-                (dataframe['mean-volume'] > 0.75) &
-                (dataframe['close'] > 0.00000100)
+                ((dataframe["adx"] > 50) | (dataframe["slowadx"] > 26))
+                & (dataframe["cci"] < -100)
+                & ((dataframe["fastk-previous"] < 20) & (dataframe["fastd-previous"] < 20))
+                & ((dataframe["slowfastk-previous"] < 30) & (dataframe["slowfastd-previous"] < 30))
+                & (dataframe["fastk-previous"] < dataframe["fastd-previous"])
+                & (dataframe["fastk"] > dataframe["fastd"])
+                & (dataframe["mean-volume"] > 0.75)
+                & (dataframe["close"] > 0.00000100)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -143,10 +128,11 @@ class Strategy004(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['slowadx'] < 25) &
-                ((dataframe['fastk'] > 70) | (dataframe['fastd'] > 70)) &
-                (dataframe['fastk-previous'] < dataframe['fastd-previous']) &
-                (dataframe['close'] > dataframe['ema5'])
+                (dataframe["slowadx"] < 25)
+                & ((dataframe["fastk"] > 70) | (dataframe["fastd"] > 70))
+                & (dataframe["fastk-previous"] < dataframe["fastd-previous"])
+                & (dataframe["close"] > dataframe["ema5"])
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

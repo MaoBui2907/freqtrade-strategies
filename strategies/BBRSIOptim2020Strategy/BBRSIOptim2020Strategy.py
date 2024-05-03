@@ -21,12 +21,7 @@ class BBRSIOptim2020Strategy(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 0.336,
-        "40": 0.072,
-        "218": 0.021,
-        "459": 0
-    }
+    minimal_roi = {"0": 0.336, "40": 0.072, "218": 0.021, "459": 0}
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
     stoploss = -0.331
@@ -38,7 +33,7 @@ class BBRSIOptim2020Strategy(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -53,32 +48,29 @@ class BBRSIOptim2020Strategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -95,34 +87,35 @@ class BBRSIOptim2020Strategy(IStrategy):
         return []
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger Bands
         bollinger_1sd = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
-        dataframe['bb_middleband_1sd'] = bollinger_1sd['mid']
+        dataframe["bb_middleband_1sd"] = bollinger_1sd["mid"]
 
         bollinger_3sd = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=3)
-        dataframe['bb_lowerband_3sd'] = bollinger_3sd['lower']
+        dataframe["bb_lowerband_3sd"] = bollinger_3sd["lower"]
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                # (dataframe['rsi'] > 12) & 
-                (dataframe['close'] < dataframe['bb_lowerband_3sd'])
+                # (dataframe['rsi'] > 12) &
+                dataframe["close"] < dataframe["bb_lowerband_3sd"]
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                # (dataframe['rsi'] > 96) & 
-                (dataframe['close'] > dataframe['bb_middleband_1sd'])
+                # (dataframe['rsi'] > 96) &
+                dataframe["close"] > dataframe["bb_middleband_1sd"]
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

@@ -10,6 +10,7 @@ from freqtrade.strategy import IStrategy
 # Add your lib to import here
 # from freqtrade.strategy.strategy_helper import merge_informative_pair
 
+
 class TenderEnter(IStrategy):
     """
     This is a strategy template to get you started.
@@ -26,6 +27,7 @@ class TenderEnter(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -39,12 +41,7 @@ class TenderEnter(IStrategy):
     #     "240":  0.00,
     #     "0":  0.08 # 8% imidietly
     # }
-    minimal_roi = {
-        "0": 0.21296,
-        "94": 0.13203,
-        "190": 0.04443,
-        "374": 0
-    }
+    minimal_roi = {"0": 0.21296, "94": 0.13203, "190": 0.04443, "374": 0}
     # minimal_roi = {
     #     "180":  0.2, # 5% after 240 min
     #     "200":  0.1,
@@ -70,9 +67,8 @@ class TenderEnter(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Optimal timeframe for the strategy.
-    timeframe = '15m'
-    inf_tf = '15m' #timeframe of second line
-
+    timeframe = "15m"
+    inf_tf = "15m"  # timeframe of second line
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -84,41 +80,36 @@ class TenderEnter(IStrategy):
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 102
-    
-    
+
     # Optional order type mapping.
     order_types = {
-        'entry': 'market',
-        'exit': 'market',
-        'stoploss': 'market',
-        'stoploss_on_exchange': True
+        "entry": "market",
+        "exit": "market",
+        "stoploss": "market",
+        "stoploss_on_exchange": True,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
-    
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
-    
     plot_config = {
         # Main plot indicators (Moving averages, ...)
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             # Subplots - each dict defines one additional plot
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
+
     def informative_pairs(self):
         """
         Define additional, informative pair/interval combinations to be cached from the exchange.
@@ -130,7 +121,7 @@ class TenderEnter(IStrategy):
                             ("BTC/USDT", "15m"),
                             ]
         """
-        
+
         # return [(metadata['pair'], "15m")]
         return []
 
@@ -146,14 +137,14 @@ class TenderEnter(IStrategy):
         :return: a Dataframe with all mandatory indicators for the strategies
         """
         # pairs = self.dp.current_whitelist()
-        
+
         # self.custom_stops = {pair: False for pair in pairs}
         # for pair in pairs:
         #     vals = {}
         #     vals[pair]=False
         #     arr.append(vals)
         #     self.stopsByPair = [{pair: False} for pair in pairs]
-        # print('TT', metadata['pair'])    
+        # print('TT', metadata['pair'])
         # Momentum Indicators
         # ------------------------------------
 
@@ -351,14 +342,11 @@ class TenderEnter(IStrategy):
 
         # Retrieve best bid and best ask from the orderbook
         # ------------------------------------
-        
-     
 
-        
         # informative = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe="15m")
         # dataframe["date"] = df["open_date"] + df["Delta"].map(pd.Timedelta.to_pytimedelta)
         # dataframe = merge_informative_pair(dataframe, informative, self.timeframe, "15m", ffill=True)
-        
+
         # informative = self.dp.get_pair_dataframe(metadata['pair'], inf_tf)
         # informative = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.inf_tf)
         # informative = self.dp.get_pair_dataframe(pair=f"{self.stake_currency}/USDT", timeframe=self.inf_tf)
@@ -373,17 +361,21 @@ class TenderEnter(IStrategy):
         :param metadata: Additional information, like the currently traded pair
         :return: DataFrame with buy column
         """
-    
-        dataframe.loc[(
-            self.compareFields(dataframe, 'close', 1, 1017) &
-            self.compareFields(dataframe, 'close', 2, 1017) &
-            self.compareFields(dataframe, 'volume', 1, 65) &
-            self.compareFields(dataframe, 'volume', 2, 65) &
-            (dataframe['volume'] > 0)),'enter_long'] = 1
+
+        dataframe.loc[
+            (
+                self.compareFields(dataframe, "close", 1, 1017)
+                & self.compareFields(dataframe, "close", 2, 1017)
+                & self.compareFields(dataframe, "volume", 1, 65)
+                & self.compareFields(dataframe, "volume", 2, 65)
+                & (dataframe["volume"] > 0)
+            ),
+            "enter_long",
+        ] = 1
         return dataframe
 
     def compareFields(self, dt, fieldname, shift, ratio=1.034):
-        return dt[fieldname].shift(shift)/dt[fieldname] > ratio/1000
+        return dt[fieldname].shift(shift) / dt[fieldname] > ratio / 1000
 
     # def calcAngle(self, p1, p2, delta_x) -> bool:
     #     delta_y = p2 - p1
@@ -392,7 +384,7 @@ class TenderEnter(IStrategy):
 
     # def confirm_trade_entry(self, pair: str, order_type: str, amount: float, rate: float,
     #                         time_in_force: str, **kwargs) -> bool:
-    #     print('z', metadata["pair"], self.custom_stops[metadata["pair"]])                    
+    #     print('z', metadata["pair"], self.custom_stops[metadata["pair"]])
     #     if self.custom_stops[metadata["pair"]] == False:
     #         self.custom_stops[metadata["pair"]] = True
     #         return True
@@ -415,11 +407,12 @@ class TenderEnter(IStrategy):
             (
                 # False
                 # (dataframe['tema'] < dataframe['tema'].shift(1)) &  # Guard: tema is falling
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                dataframe["volume"] > 0  # Make sure Volume is not 0
             ),
-            'exit_long'] = 0
+            "exit_long",
+        ] = 0
         return dataframe
-    
+
     # def merge_informative_pair(dataframe, informative, minutes, inf_tf, ffill):
     #     print('>>', inf_tf,ffill)
     #     # Shift date by 1 candle
@@ -440,4 +433,4 @@ class TenderEnter(IStrategy):
     #     # FFill to have the 1d value available in every row throughout the day.
     #     # Without this, comparisons would only work once per day.
     #     dataframe = dataframe.ffill()
-    #     return dataframe    
+    #     return dataframe

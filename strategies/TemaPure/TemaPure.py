@@ -28,20 +28,14 @@ class TemaPure(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
     # ROI table:
-    minimal_roi = {
-        "0": 0.40505,
-        "265": 0.24708,
-        "743": 0.05892,
-        "1010": 0
-    }
-
+    minimal_roi = {"0": 0.40505, "265": 0.24708, "743": 0.05892, "1010": 0}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.09754
-    
+
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Trailing stop:
     trailing_stop = True
@@ -56,7 +50,6 @@ class TemaPure(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-
 
     def informative_pairs(self):
         """
@@ -79,42 +72,38 @@ class TemaPure(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['CMO'] = ta.CMO(dataframe, timeperiod = 50)
-        dataframe['TEMA'] = ta.TEMA(dataframe, timeperiod = 25)
+        dataframe["CMO"] = ta.CMO(dataframe, timeperiod=50)
+        dataframe["TEMA"] = ta.TEMA(dataframe, timeperiod=25)
         # Bollinger bands
-        
-        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=25, stds=2.0)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
 
-        
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=25, stds=2.0)
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+
         bollingerTA = ta.BBANDS(dataframe, timeperiod=25, nbdevup=3.5, nbdevdn=1.0, matype=0)
-        
-        dataframe['bb_lowerbandTA'] = bollingerTA['lowerband']
-        dataframe['bb_middlebandTA'] = bollingerTA['middleband']
-        dataframe['bb_upperbandTA'] = bollingerTA['upperband']
+
+        dataframe["bb_lowerbandTA"] = bollingerTA["lowerband"]
+        dataframe["bb_middlebandTA"] = bollingerTA["middleband"]
+        dataframe["bb_upperbandTA"] = bollingerTA["upperband"]
 
         return dataframe
- 
+
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                        
+
         dataframe.loc[
             (
-                  # (qtpylib.crossed_below(dataframe["TEMA"], dataframe["bb_lowerbandTA"]))
-                  
-                         (((dataframe['TEMA']<=dataframe['bb_lowerbandTA']))
-            & 
-              (qtpylib.crossed_above(dataframe['CMO'],0))) 
-                  
-                
+                # (qtpylib.crossed_below(dataframe["TEMA"], dataframe["bb_lowerbandTA"]))
+                (dataframe["TEMA"] <= dataframe["bb_lowerbandTA"])
+                & (qtpylib.crossed_above(dataframe["CMO"], 0))
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -124,24 +113,19 @@ class TemaPure(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                       
+
         dataframe.loc[
             (
-                
                 # (qtpylib.crossed_below(dataframe['close'],dataframe['bb_upperbandTA']))
-                # & 
+                # &
                 #   (dataframe["CMO"]>=35)
-                
-            (qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_upperbandTA"]))
-                  
-            #   (((dataframe['close'].shift(1)<dataframe['bb_lowerband']))
-            # & 
-            #   (qtpylib.crossed_above(dataframe['CMO'],0))) 
-              
+                qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_upperbandTA"])
+                #   (((dataframe['close'].shift(1)<dataframe['bb_lowerband']))
+                # &
+                #   (qtpylib.crossed_above(dataframe['CMO'],0)))
                 # | ((qtpylib.crossed_above(dataframe['close'],dataframe['bb_upperbandTA'])))
-                
-                
             ),
-            'exit_long'] = 1        
-        
+            "exit_long",
+        ] = 1
+
         return dataframe

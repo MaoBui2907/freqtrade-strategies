@@ -5,11 +5,10 @@ from pandas import DataFrame
 
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy as np# noqa
+import numpy as np  # noqa
 
 
 class ema(IStrategy):
-
     max_open_trades = 10
     stake_amount = 50
     # Minimal ROI designed for the strategy.
@@ -19,12 +18,10 @@ class ema(IStrategy):
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -1
 
-    minimal_roi = {
-        "0": 10
-    }
+    minimal_roi = {"0": 10}
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -41,10 +38,10 @@ class ema(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -55,17 +52,17 @@ class ema(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['ema6'] = ta.EMA(dataframe, timeperiod=9)
-        dataframe['ema24'] = ta.EMA(dataframe, timeperiod=18)
+        dataframe["ema6"] = ta.EMA(dataframe, timeperiod=9)
+        dataframe["ema24"] = ta.EMA(dataframe, timeperiod=18)
 
-        dataframe['ema11'] = ta.EMA(dataframe, timeperiod=32)
-        dataframe['ema25'] = ta.EMA(dataframe, timeperiod=64)
+        dataframe["ema11"] = ta.EMA(dataframe, timeperiod=32)
+        dataframe["ema25"] = ta.EMA(dataframe, timeperiod=64)
 
-        dataframe['ema'] =dataframe['ema6']-dataframe['ema24']
-        dataframe['ema2'] = dataframe['ema11'] - dataframe['ema25']
+        dataframe["ema"] = dataframe["ema6"] - dataframe["ema24"]
+        dataframe["ema2"] = dataframe["ema11"] - dataframe["ema25"]
 
-        dataframe['ema']= dataframe['ema']*0.6 + dataframe['ema2']*0.5
-        dataframe['ema2'] = ta.SMA(dataframe['ema'], timeperiod=29)
+        dataframe["ema"] = dataframe["ema"] * 0.6 + dataframe["ema2"] * 0.5
+        dataframe["ema2"] = ta.SMA(dataframe["ema"], timeperiod=29)
 
         return dataframe
 
@@ -77,9 +74,8 @@ class ema(IStrategy):
         """
 
         dataframe.loc[
-            (
-            (qtpylib.crossed_above(dataframe['ema'],dataframe['ema2']))
-            ),'enter_long'] = 1
+            (qtpylib.crossed_above(dataframe["ema"], dataframe["ema2"])), "enter_long"
+        ] = 1
 
         return dataframe
 
@@ -89,6 +85,6 @@ class ema(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[(qtpylib.crossed_below(dataframe['ema'], dataframe['ema2'])),'exit_long'] = 1
+        dataframe.loc[(qtpylib.crossed_below(dataframe["ema"], dataframe["ema2"])), "exit_long"] = 1
 
         return dataframe

@@ -45,19 +45,13 @@ SLOWBRO v100
 
 
 class Slowbro(IStrategy):
-
-    minimal_roi = {
-         "0": 0.10,
-         "1440": 0.20,
-         "2880": 0.30,
-         "10080": 1.0
-    }
+    minimal_roi = {"0": 0.10, "1440": 0.20, "2880": 0.30, "10080": 1.0}
 
     # Stoploss:
     stoploss = -0.99
 
-    timeframe = '1h'
-    inf_timeframe = '1d'
+    timeframe = "1h"
+    inf_timeframe = "1d"
 
     use_exit_signal = True
     exit_profit_only = True
@@ -70,33 +64,38 @@ class Slowbro(IStrategy):
         # add all whitelisted pairs on informative timeframe
         pairs = self.dp.current_whitelist()
         informative_pairs = [(pair, self.inf_timeframe) for pair in pairs]
-        
+
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        informative = self.dp.get_pair_dataframe(
+            pair=metadata["pair"], timeframe=self.inf_timeframe
+        )
+        informative["30d-low"] = informative["close"].rolling(30).min()
+        informative["30d-high"] = informative["close"].rolling(30).max()
 
-        informative = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.inf_timeframe)
-        informative['30d-low'] = informative['close'].rolling(30).min()
-        informative['30d-high'] = informative['close'].rolling(30).max()
-
-        dataframe = merge_informative_pair(dataframe, informative, self.timeframe, self.inf_timeframe, ffill=True)
+        dataframe = merge_informative_pair(
+            dataframe, informative, self.timeframe, self.inf_timeframe, ffill=True
+        )
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                qtpylib.crossed_above(dataframe['close'],dataframe[f"30d-low_{self.inf_timeframe}"])
-            ),
-            'enter_long'] = 1
+            (qtpylib.crossed_above(dataframe["close"], dataframe[f"30d-low_{self.inf_timeframe}"])),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                qtpylib.crossed_above(dataframe['close'],dataframe[f"30d-high_{self.inf_timeframe}"])
+                qtpylib.crossed_above(
+                    dataframe["close"], dataframe[f"30d-high_{self.inf_timeframe}"]
+                )
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

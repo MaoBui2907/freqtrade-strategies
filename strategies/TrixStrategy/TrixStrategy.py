@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -17,7 +22,7 @@ import ta
 # This class is a sample. Feel free to customize it.
 class TrixStrategy(IStrategy):
     """
-    Sources : 
+    Sources :
     Cripto Robot : https://www.youtube.com/watch?v=uE04UROWkjs&list=PLpJ7cz_wOtsrqEQpveLc2xKLjOBgy4NfA&index=4
     Github : https://github.com/CryptoRobotFr/TrueStrategy/blob/main/TrixStrategy/Trix_Complete_backtest.ipynb
 
@@ -73,6 +78,7 @@ class TrixStrategy(IStrategy):
     You should keep:
     - timeframe, minimal_roi, stoploss, trailing_*
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -80,12 +86,12 @@ class TrixStrategy(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
     minimal_roi = {
-        "0": 100 # inactive
+        "0": 100  # inactive
     }
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
-    stoploss = -0.99 # inactive
+    stoploss = -0.99  # inactive
 
     # Trailing stoploss
     trailing_stop = False
@@ -98,7 +104,7 @@ class TrixStrategy(IStrategy):
     sell_stoch_rsi = DecimalParameter(0, 0.5, decimals=3, default=0.2, space="sell")
 
     # Optimal timeframe for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -113,32 +119,29 @@ class TrixStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'trix': {},
+        "main_plot": {
+            "trix": {},
         },
-        'subplots': {
+        "subplots": {
             "STOCH RSI": {
-                'stoch_rsi': {},
+                "stoch_rsi": {},
             },
             "TRIX": {
-                'trix_pct': {},
-                'trix_signal': {},
-                'trix_histo': {},
+                "trix_pct": {},
+                "trix_signal": {},
+                "trix_histo": {},
             },
-        }
+        },
     }
 
     def informative_pairs(self):
@@ -170,7 +173,9 @@ class TrixStrategy(IStrategy):
         # ------------------------------------
 
         # # Stochastic RSI
-        dataframe['stoch_rsi'] = ta.momentum.stochrsi(close=dataframe['close'], window=14, smooth1=3, smooth2=3)
+        dataframe["stoch_rsi"] = ta.momentum.stochrsi(
+            close=dataframe["close"], window=14, smooth1=3, smooth2=3
+        )
 
         # Overlap Studies
         # ------------------------------------
@@ -178,10 +183,16 @@ class TrixStrategy(IStrategy):
         # -- Trix Indicator --
         trixLength = 9
         trixSignal = 21
-        dataframe['trix'] = ta.trend.ema_indicator(ta.trend.ema_indicator(ta.trend.ema_indicator(close=dataframe['close'], window=trixLength), window=trixLength), window=trixLength)
-        dataframe['trix_pct'] = dataframe['trix'].pct_change() * 100
-        dataframe['trix_signal'] = ta.trend.sma_indicator(dataframe['trix_pct'],trixSignal)
-        dataframe['trix_histo'] = dataframe['trix_pct'] - dataframe['trix_signal']
+        dataframe["trix"] = ta.trend.ema_indicator(
+            ta.trend.ema_indicator(
+                ta.trend.ema_indicator(close=dataframe["close"], window=trixLength),
+                window=trixLength,
+            ),
+            window=trixLength,
+        )
+        dataframe["trix_pct"] = dataframe["trix"].pct_change() * 100
+        dataframe["trix_signal"] = ta.trend.sma_indicator(dataframe["trix_pct"], trixSignal)
+        dataframe["trix_histo"] = dataframe["trix_pct"] - dataframe["trix_signal"]
 
         return dataframe
 
@@ -194,11 +205,12 @@ class TrixStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['trix_histo'] > 0) &
-                (dataframe['stoch_rsi'] < self.buy_stoch_rsi.value) &
-                (dataframe['volume'] > 0)
+                (dataframe["trix_histo"] > 0)
+                & (dataframe["stoch_rsi"] < self.buy_stoch_rsi.value)
+                & (dataframe["volume"] > 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -211,9 +223,10 @@ class TrixStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['trix_histo'] < 0) &
-                (dataframe['stoch_rsi'] > self.sell_stoch_rsi.value) &
-                (dataframe['volume'] > 0)
+                (dataframe["trix_histo"] < 0)
+                & (dataframe["stoch_rsi"] > self.sell_stoch_rsi.value)
+                & (dataframe["volume"] > 0)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

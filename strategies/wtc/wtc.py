@@ -18,6 +18,7 @@ import talib.abstract as ta
 from freqtrade.strategy import DecimalParameter
 from freqtrade.strategy import IStrategy
 from pandas import DataFrame
+
 #
 # --- Do not remove these libs ---
 import numpy as np  # noqa
@@ -64,42 +65,30 @@ class wtc(IStrategy):
         "sell_min0": 0.0628,
         "sell_min1": 0.4461,
     }
-    minimal_roi = {
-        "0": 0.30873,
-        "569": 0.16689,
-        "3211": 0.06473,
-        "7617": 0
-    }
+    minimal_roi = {"0": 0.30873, "569": 0.16689, "3211": 0.06473, "7617": 0}
     stoploss = -0.128
     ############################## END SETTINGS ##############################
-    timeframe = '30m'
+    timeframe = "30m"
 
-    buy_max = DecimalParameter(-1, 1, decimals=4, default=0.4393, space='entry')
-    buy_min = DecimalParameter(-1, 1, decimals=4, default=-0.4676, space='entry')
-    sell_max = DecimalParameter(-1, 1, decimals=4,
-                                default=-0.9512, space='exit')
-    sell_min = DecimalParameter(-1, 1, decimals=4,
-                                default=0.6519, space='exit')
+    buy_max = DecimalParameter(-1, 1, decimals=4, default=0.4393, space="entry")
+    buy_min = DecimalParameter(-1, 1, decimals=4, default=-0.4676, space="entry")
+    sell_max = DecimalParameter(-1, 1, decimals=4, default=-0.9512, space="exit")
+    sell_min = DecimalParameter(-1, 1, decimals=4, default=0.6519, space="exit")
 
-    buy_max0 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='entry')
-    buy_min0 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='entry')
-    sell_max0 = DecimalParameter(
-        0, 1, decimals=4, default=-0.9512, space='exit')
-    sell_min0 = DecimalParameter(
-        0, 1, decimals=4, default=0.6519, space='exit')
+    buy_max0 = DecimalParameter(0, 1, decimals=4, default=0.4393, space="entry")
+    buy_min0 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space="entry")
+    sell_max0 = DecimalParameter(0, 1, decimals=4, default=-0.9512, space="exit")
+    sell_min0 = DecimalParameter(0, 1, decimals=4, default=0.6519, space="exit")
 
-    buy_max1 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='entry')
-    buy_min1 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='entry')
-    sell_max1 = DecimalParameter(
-        0, 1, decimals=4, default=-0.9512, space='exit')
-    sell_min1 = DecimalParameter(
-        0, 1, decimals=4, default=0.6519, space='exit')
+    buy_max1 = DecimalParameter(0, 1, decimals=4, default=0.4393, space="entry")
+    buy_min1 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space="entry")
+    sell_max1 = DecimalParameter(0, 1, decimals=4, default=-0.9512, space="exit")
+    sell_min1 = DecimalParameter(0, 1, decimals=4, default=0.6519, space="exit")
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # WAVETREND
         try:
-            ap = (dataframe['high']+dataframe['low'] + dataframe['close'])/3
+            ap = (dataframe["high"] + dataframe["low"] + dataframe["close"]) / 3
 
             esa = ta.EMA(ap, 10)
 
@@ -110,11 +99,11 @@ class wtc(IStrategy):
             wt1 = tci
             wt2 = ta.SMA(np.nan_to_num(wt1), 4)
 
-            dataframe['wt1'], dataframe['wt2'] = wt1, wt2
+            dataframe["wt1"], dataframe["wt2"] = wt1, wt2
 
             stoch = ta.STOCH(dataframe, 14)
-            slowk = stoch['slowk']
-            dataframe['slowk'] = slowk
+            slowk = stoch["slowk"]
+            dataframe["slowk"] = slowk
             # print(dataframe.iloc[:, 6:].keys())
             x = dataframe.iloc[:, 6:].values  # returns a numpy array
             min_max_scaler = preprocessing.MinMaxScaler()
@@ -122,23 +111,27 @@ class wtc(IStrategy):
             dataframe.iloc[:, 6:] = pd.DataFrame(x_scaled)
             # print('wt:\t', dataframe['wt'].min(), dataframe['wt'].max())
             # print('stoch:\t', dataframe['stoch'].min(), dataframe['stoch'].max())
-            dataframe['def'] = dataframe['slowk']-dataframe['wt1']
+            dataframe["def"] = dataframe["slowk"] - dataframe["wt1"]
             # print('def:\t', dataframe['def'].min(), "\t", dataframe['def'].max())
         except:
-            dataframe['wt1'], dataframe['wt2'], dataframe['def'], dataframe['slowk'] = 0, 10, 100, 1000
+            dataframe["wt1"], dataframe["wt2"], dataframe["def"], dataframe["slowk"] = (
+                0,
+                10,
+                100,
+                1000,
+            )
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (qtpylib.crossed_above(dataframe['wt1'], dataframe['wt2']))
-                & (dataframe['wt1'].between(self.buy_min0.value, self.buy_max0.value))
-                & (dataframe['slowk'].between(self.buy_min1.value, self.buy_max1.value))
-                & (dataframe['def'].between(self.buy_min.value, self.buy_max.value))
-
+                (qtpylib.crossed_above(dataframe["wt1"], dataframe["wt2"]))
+                & (dataframe["wt1"].between(self.buy_min0.value, self.buy_max0.value))
+                & (dataframe["slowk"].between(self.buy_min1.value, self.buy_max1.value))
+                & (dataframe["def"].between(self.buy_min.value, self.buy_max.value))
             ),
-
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -146,11 +139,11 @@ class wtc(IStrategy):
         # print(dataframe['slowk']/dataframe['wt1'])
         dataframe.loc[
             (
-                (qtpylib.crossed_below(dataframe['wt1'], dataframe['wt2']))
-                & (dataframe['wt1'].between(self.sell_min0.value, self.sell_max0.value))
-                & (dataframe['slowk'].between(self.sell_min1.value, self.sell_max1.value))
-                & (dataframe['def'].between(self.sell_min.value, self.sell_max.value))
-
+                (qtpylib.crossed_below(dataframe["wt1"], dataframe["wt2"]))
+                & (dataframe["wt1"].between(self.sell_min0.value, self.sell_max0.value))
+                & (dataframe["slowk"].between(self.sell_min1.value, self.sell_max1.value))
+                & (dataframe["def"].between(self.sell_min.value, self.sell_max.value))
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

@@ -1,6 +1,7 @@
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
+
 # --------------------------------
 import numpy as np
 from functools import reduce
@@ -18,36 +19,59 @@ def MOST(dataframe, length=8, percent=2, MAtype=1):
     data = dataframe.copy()
 
     # Compute basic upper and lower bands
-    if MAtype==1:
-        data['exma']=ta.EMA(data, timeperiod = length)
-    elif MAtype==2:
-        data['exma']=ta.DEMA(data, timeperiod = length)
-    elif MAtype==3:
-        data['exma']=ta.T3(data, timeperiod = length)
+    if MAtype == 1:
+        data["exma"] = ta.EMA(data, timeperiod=length)
+    elif MAtype == 2:
+        data["exma"] = ta.DEMA(data, timeperiod=length)
+    elif MAtype == 3:
+        data["exma"] = ta.T3(data, timeperiod=length)
 
-    data['basic_ub'] = data['exma'] * (1+percent/100)
-    data['basic_lb'] = data['exma'] * (1-percent/100)
+    data["basic_ub"] = data["exma"] * (1 + percent / 100)
+    data["basic_lb"] = data["exma"] * (1 - percent / 100)
 
     # Compute final upper and lower bands
-    data['final_ub'] = 0.00
-    data['final_lb'] = 0.00
+    data["final_ub"] = 0.00
+    data["final_lb"] = 0.00
     for i in range(length, len(data)):
-        data['final_ub'].iat[i] = data['basic_ub'].iat[i] if data['basic_ub'].iat[i] < data['final_ub'].iat[i - 1] or data['exma'].iat[i - 1] > data['final_ub'].iat[i - 1] else data['final_ub'].iat[i - 1]
-        data['final_lb'].iat[i] = data['basic_lb'].iat[i] if data['basic_lb'].iat[i] > data['final_lb'].iat[i - 1] or data['exma'].iat[i - 1] < data['final_lb'].iat[i - 1] else data['final_lb'].iat[i - 1]
+        data["final_ub"].iat[i] = (
+            data["basic_ub"].iat[i]
+            if data["basic_ub"].iat[i] < data["final_ub"].iat[i - 1]
+            or data["exma"].iat[i - 1] > data["final_ub"].iat[i - 1]
+            else data["final_ub"].iat[i - 1]
+        )
+        data["final_lb"].iat[i] = (
+            data["basic_lb"].iat[i]
+            if data["basic_lb"].iat[i] > data["final_lb"].iat[i - 1]
+            or data["exma"].iat[i - 1] < data["final_lb"].iat[i - 1]
+            else data["final_lb"].iat[i - 1]
+        )
 
     # Set the MOST value
-    data['most'] = 0.00
+    data["most"] = 0.00
     for i in range(length, len(data)):
-        data['most'].iat[i] = data['final_ub'].iat[i] if data['most'].iat[i - 1] == data['final_ub'].iat[i - 1] and data['exma'].iat[i] <= data['final_ub'].iat[i] else \
-                        data['final_lb'].iat[i] if data['most'].iat[i - 1] == data['final_ub'].iat[i - 1] and data['exma'].iat[i] >  data['final_ub'].iat[i] else \
-                        data['final_lb'].iat[i] if data['most'].iat[i - 1] == data['final_lb'].iat[i - 1] and data['exma'].iat[i] >= data['final_lb'].iat[i] else \
-                        data['final_ub'].iat[i] if data['most'].iat[i - 1] == data['final_lb'].iat[i - 1] and data['exma'].iat[i] <  data['final_lb'].iat[i] else 0.00
+        data["most"].iat[i] = (
+            data["final_ub"].iat[i]
+            if data["most"].iat[i - 1] == data["final_ub"].iat[i - 1]
+            and data["exma"].iat[i] <= data["final_ub"].iat[i]
+            else data["final_lb"].iat[i]
+            if data["most"].iat[i - 1] == data["final_ub"].iat[i - 1]
+            and data["exma"].iat[i] > data["final_ub"].iat[i]
+            else data["final_lb"].iat[i]
+            if data["most"].iat[i - 1] == data["final_lb"].iat[i - 1]
+            and data["exma"].iat[i] >= data["final_lb"].iat[i]
+            else data["final_ub"].iat[i]
+            if data["most"].iat[i - 1] == data["final_lb"].iat[i - 1]
+            and data["exma"].iat[i] < data["final_lb"].iat[i]
+            else 0.00
+        )
 
     # Mark the trend direction up/down
-    data['trend'] = np.where((data['most'] > 0.00), np.where((data['exma'] < data['most']), 0, 1), np.NaN)
+    data["trend"] = np.where(
+        (data["most"] > 0.00), np.where((data["exma"] < data["most"]), 0, 1), np.NaN
+    )
 
     # Remove basic and final bands from the columns
-    data.drop(['basic_ub', 'basic_lb', 'final_ub', 'final_lb'], inplace=True, axis=1)
+    data.drop(["basic_ub", "basic_lb", "final_ub", "final_lb"], inplace=True, axis=1)
     data.fillna(0, inplace=True)
 
     return data
@@ -55,12 +79,12 @@ def MOST(dataframe, length=8, percent=2, MAtype=1):
 
 class MostOfAll(IStrategy):
     """
-        My second humble strategy using a MOST alike indicator
-        Changelog:
-            0.9 Initial version, improvements needed
+    My second humble strategy using a MOST alike indicator
+    Changelog:
+        0.9 Initial version, improvements needed
 
-        https://github.com/cyberjunky/freqtrade-strategies
-        https://www.tradingview.com/scripts/most/
+    https://github.com/cyberjunky/freqtrade-strategies
+    https://www.tradingview.com/scripts/most/
 
     """
 
@@ -86,49 +110,45 @@ class MostOfAll(IStrategy):
     use_custom_stoploss = True
 
     # Optimal timeframe for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.08,
-        "36": 0.031,
-        "50": 0.021,
-        "60": 0.01,
-        "70": 0
-    }
+    minimal_roi = {"0": 0.08, "36": 0.031, "50": 0.021, "60": 0.01, "70": 0}
 
     @property
     def plot_config(self):
         """Buildin plot config."""
         return {
             # Main plot indicators (Moving averages, ...)
-            'main_plot': {
-                    'most': {'color': 'darkpurple'},
-                    'exma': {'color': 'green'}
-            },
-            'subplots': {
+            "main_plot": {"most": {"color": "darkpurple"}, "exma": {"color": "green"}},
+            "subplots": {
                 # Subplots - each dict defines one additional plot
-                "trend": {
-                    'trend': {'color': 'blue'}
-                }
-            }
+                "trend": {"trend": {"color": "blue"}}
+            },
         }
 
     # hard stoploss profit
-    pHSL = DecimalParameter(-0.500, -0.040, default=-0.99, decimals=3, space='exit', load=True)
+    pHSL = DecimalParameter(-0.500, -0.040, default=-0.99, decimals=3, space="exit", load=True)
 
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.009, decimals=3, space='exit', load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space="exit", load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.009, decimals=3, space="exit", load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.040, decimals=3, space='exit', load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.020, decimals=3, space='exit', load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.040, decimals=3, space="exit", load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.020, decimals=3, space="exit", load=True)
 
     # Custom stoploss
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-                        current_rate: float, current_profit: float, **kwargs) -> float:
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
         """Custom stoploss calculation with thresholds and based on linear curve."""
 
         # hard stoploss profit
@@ -155,7 +175,6 @@ class MostOfAll(IStrategy):
 
         return stoploss_from_open(sl_profit, current_profit)
 
-
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Adds several different TA indicators to the given DataFrame
@@ -170,12 +189,11 @@ class MostOfAll(IStrategy):
 
         # MOST
         most_df = MOST(dataframe, length=14)
-        dataframe['most'] = most_df['most']
-        dataframe['exma'] = most_df['exma']
-        dataframe['trend'] = most_df['trend']
+        dataframe["most"] = most_df["most"]
+        dataframe["exma"] = most_df["exma"]
+        dataframe["trend"] = most_df["trend"]
 
         return dataframe
-
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
@@ -187,18 +205,15 @@ class MostOfAll(IStrategy):
         conditions = []
         conditions.append(
             (
-                (qtpylib.crossed_above(dataframe['most'], dataframe['exma'])) &
-                (dataframe['volume'] > 0)
+                (qtpylib.crossed_above(dataframe["most"], dataframe["exma"]))
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'entry']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "entry"] = 1
 
         return dataframe
-
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
@@ -210,14 +225,12 @@ class MostOfAll(IStrategy):
         conditions = []
         conditions.append(
             (
-                (qtpylib.crossed_above(dataframe['exma'], dataframe['most'])) &
-                (dataframe['volume'] > 0)
+                (qtpylib.crossed_above(dataframe["exma"], dataframe["most"]))
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
 
         return dataframe

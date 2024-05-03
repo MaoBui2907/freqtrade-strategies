@@ -5,23 +5,17 @@ import talib.abstract as ta
 # --------------------------------
 
 
-
-
 class RSIv2(IStrategy):
-
-
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0":  0.01
-    }
+    minimal_roi = {"0": 0.01}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.99
     custom_stop = -0.1
     # Optimal timeframe for the strategy
-    timeframe = '15m'
+    timeframe = "15m"
     startup_candle_count = 20
 
     # trailing stoploss
@@ -39,24 +33,20 @@ class RSIv2(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
         return []
 
-
-
-    @informative('30m')
+    @informative("30m")
     def populate_indicators_30m(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['rperc'] = ta.WILLR(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rperc"] = ta.WILLR(dataframe, timeperiod=14)
         return dataframe
-
-
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
@@ -65,8 +55,8 @@ class RSIv2(IStrategy):
         you are using. Let uncomment only the indicator you are using in your strategies
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['rperc'] = ta.WILLR(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rperc"] = ta.WILLR(dataframe, timeperiod=14)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -76,9 +66,13 @@ class RSIv2(IStrategy):
         :return: DataFrame with buy column
         """
         # rsi_cond = dataframe['rsi_15m'].iloc[-1] <30 and dataframe['rsi_15m'].iloc[-2]<30
-        dataframe.loc[(dataframe['rsi']<30) &
-                            (dataframe['rperc']<-80) & (dataframe['rsi'].shift(1)<30) &
-                            (dataframe['rperc'].shift(1)<-80),'enter_long'] = 1
+        dataframe.loc[
+            (dataframe["rsi"] < 30)
+            & (dataframe["rperc"] < -80)
+            & (dataframe["rsi"].shift(1) < 30)
+            & (dataframe["rperc"].shift(1) < -80),
+            "enter_long",
+        ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -87,7 +81,11 @@ class RSIv2(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[(dataframe['rsi_30m']>70) &
-                            (dataframe['rperc_30m']>-20) & (dataframe['rsi_30m'].shift(1)>70) &
-                            (dataframe['rperc_30m'].shift(1)>-20) ,'exit_long'] = 1
+        dataframe.loc[
+            (dataframe["rsi_30m"] > 70)
+            & (dataframe["rperc_30m"] > -20)
+            & (dataframe["rsi_30m"].shift(1) > 70)
+            & (dataframe["rperc_30m"].shift(1) > -20),
+            "exit_long",
+        ] = 1
         return dataframe

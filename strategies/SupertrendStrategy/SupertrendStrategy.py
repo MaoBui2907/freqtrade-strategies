@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -18,7 +23,7 @@ import pandas_ta as pda
 # This class is a sample. Feel free to customize it.
 class SupertrendStrategy(IStrategy):
     """
-    Sources : 
+    Sources :
     Cripto Robot : https://www.youtube.com/watch?v=rl00g3-Iv5A
     Github : https://github.com/CryptoRobotFr/TrueStrategy/tree/main/3SuperTrend
 
@@ -74,6 +79,7 @@ class SupertrendStrategy(IStrategy):
     You should keep:
     - timeframe, minimal_roi, stoploss, trailing_*
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -81,12 +87,12 @@ class SupertrendStrategy(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
     minimal_roi = {
-        "0": 100 # inactive
+        "0": 100  # inactive
     }
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
-    stoploss = -0.99 # inactive
+    stoploss = -0.99  # inactive
 
     # Trailing stoploss
     trailing_stop = False
@@ -99,7 +105,7 @@ class SupertrendStrategy(IStrategy):
     sell_stoch_rsi = DecimalParameter(0, 0.5, decimals=3, default=0.2, space="sell")
 
     # Optimal timeframe for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -114,35 +120,32 @@ class SupertrendStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'ema90':{},
-            'supertrend_1':{},
-            'supertrend_2':{},
-            'supertrend_3':{},
+        "main_plot": {
+            "ema90": {},
+            "supertrend_1": {},
+            "supertrend_2": {},
+            "supertrend_3": {},
         },
-        'subplots': {
+        "subplots": {
             "SUPERTREND DIRECTION": {
-                'supertrend_direction_1': {},
-                'supertrend_direction_2': {},
-                'supertrend_direction_3': {},
+                "supertrend_direction_1": {},
+                "supertrend_direction_2": {},
+                "supertrend_direction_3": {},
             },
             "STOCH RSI": {
-                'stoch_rsi': {},
-            }
-        }
+                "stoch_rsi": {},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -174,32 +177,62 @@ class SupertrendStrategy(IStrategy):
         # ------------------------------------
 
         # # Stochastic RSI
-        dataframe['stoch_rsi']=ta.momentum.stochrsi(dataframe['close'])
+        dataframe["stoch_rsi"] = ta.momentum.stochrsi(dataframe["close"])
 
         # Overlap Studies
         # ------------------------------------
 
         # # EMA - Exponential Moving Average
-        dataframe['ema90'] = ta.trend.ema_indicator(dataframe['close'], 90)
+        dataframe["ema90"] = ta.trend.ema_indicator(dataframe["close"], 90)
 
         # Supertrend
         supertrend_length = 20
         supertrend_multiplier = 3.0
-        superTrend = pda.supertrend(dataframe['high'], dataframe['low'], dataframe['close'], length=supertrend_length, multiplier=supertrend_multiplier)
-        dataframe['supertrend_1'] = superTrend['SUPERT_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
-        dataframe['supertrend_direction_1'] = superTrend['SUPERTd_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
-        
+        superTrend = pda.supertrend(
+            dataframe["high"],
+            dataframe["low"],
+            dataframe["close"],
+            length=supertrend_length,
+            multiplier=supertrend_multiplier,
+        )
+        dataframe["supertrend_1"] = superTrend[
+            "SUPERT_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
+        dataframe["supertrend_direction_1"] = superTrend[
+            "SUPERTd_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
+
         supertrend_length = 20
         supertrend_multiplier = 4.0
-        superTrend = pda.supertrend(dataframe['high'], dataframe['low'], dataframe['close'], length=supertrend_length, multiplier=supertrend_multiplier)
-        dataframe['supertrend_2'] = superTrend['SUPERT_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
-        dataframe['supertrend_direction_2'] = superTrend['SUPERTd_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
-        
+        superTrend = pda.supertrend(
+            dataframe["high"],
+            dataframe["low"],
+            dataframe["close"],
+            length=supertrend_length,
+            multiplier=supertrend_multiplier,
+        )
+        dataframe["supertrend_2"] = superTrend[
+            "SUPERT_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
+        dataframe["supertrend_direction_2"] = superTrend[
+            "SUPERTd_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
+
         supertrend_length = 40
         supertrend_multiplier = 8.0
-        superTrend = pda.supertrend(dataframe['high'], dataframe['low'], dataframe['close'], length=supertrend_length, multiplier=supertrend_multiplier)
-        dataframe['supertrend_3'] = superTrend['SUPERT_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
-        dataframe['supertrend_direction_3'] = superTrend['SUPERTd_' + str(supertrend_length) + "_" + str(supertrend_multiplier)]
+        superTrend = pda.supertrend(
+            dataframe["high"],
+            dataframe["low"],
+            dataframe["close"],
+            length=supertrend_length,
+            multiplier=supertrend_multiplier,
+        )
+        dataframe["supertrend_3"] = superTrend[
+            "SUPERT_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
+        dataframe["supertrend_direction_3"] = superTrend[
+            "SUPERTd_" + str(supertrend_length) + "_" + str(supertrend_multiplier)
+        ]
 
         return dataframe
 
@@ -212,12 +245,20 @@ class SupertrendStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                ((dataframe['supertrend_direction_1'] + dataframe['supertrend_direction_2'] + dataframe['supertrend_direction_3']) >= 1) &
-                (dataframe['stoch_rsi'] < self.buy_stoch_rsi.value) &
-                (dataframe['close'] > dataframe['ema90']) &
-                (dataframe['volume'] > 0)
+                (
+                    (
+                        dataframe["supertrend_direction_1"]
+                        + dataframe["supertrend_direction_2"]
+                        + dataframe["supertrend_direction_3"]
+                    )
+                    >= 1
+                )
+                & (dataframe["stoch_rsi"] < self.buy_stoch_rsi.value)
+                & (dataframe["close"] > dataframe["ema90"])
+                & (dataframe["volume"] > 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -230,9 +271,17 @@ class SupertrendStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                ((dataframe['supertrend_direction_1'] + dataframe['supertrend_direction_2'] + dataframe['supertrend_direction_3']) < 1) &
-                (dataframe['stoch_rsi'] > self.sell_stoch_rsi.value) &
-                (dataframe['volume'] > 0)
+                (
+                    (
+                        dataframe["supertrend_direction_1"]
+                        + dataframe["supertrend_direction_2"]
+                        + dataframe["supertrend_direction_3"]
+                    )
+                    < 1
+                )
+                & (dataframe["stoch_rsi"] > self.sell_stoch_rsi.value)
+                & (dataframe["volume"] > 0)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

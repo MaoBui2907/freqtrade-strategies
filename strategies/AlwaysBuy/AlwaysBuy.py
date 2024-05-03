@@ -3,7 +3,6 @@ from pandas import DataFrame
 
 
 class AlwaysBuy(IStrategy):
-
     INTERFACE_VERSION = 3
 
     # ROI table:
@@ -30,15 +29,12 @@ class AlwaysBuy(IStrategy):
     # #################### END OF RESULT PLACE ####################
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[:, ["enter_long", "enter_tag"]] = (1, "entry_reason")
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         return dataframe

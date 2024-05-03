@@ -47,22 +47,13 @@ class StochRSITEMA(IStrategy):
     # 47/50:     19 trades. 7/6/6 Wins/Draws/Losses. Avg profit  -0.35%. Median profit   0.00%. Total profit -0.00006706 BTC (  -6.69Î£%). Avg duration  80.3 min. Objective: 1.98291
 
     # Buy hyperspace params:
-    buy_params = {
-     'rsi-lower-band': 36, 'rsi-period': 15, 'stoch-lower-band': 48
-    }
+    buy_params = {"rsi-lower-band": 36, "rsi-period": 15, "stoch-lower-band": 48}
 
     # Sell hyperspace params:
-    sell_params = {
-     'tema-period': 5, 'tema-trigger': 'close'
-    }
+    sell_params = {"tema-period": 5, "tema-trigger": "close"}
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.19503,
-        "13": 0.09149,
-        "36": 0.02891,
-        "64": 0
-    }
+    minimal_roi = {"0": 0.19503, "13": 0.09149, "36": 0.02891, "64": 0}
 
     # Stoploss:
     stoploss = -0.02205
@@ -72,7 +63,6 @@ class StochRSITEMA(IStrategy):
     trailing_stop_positive = 0.17251
     trailing_stop_positive_offset = 0.2516
     trailing_only_offset_is_reached = False
-
 
     """
     END HYPEROPT
@@ -95,7 +85,7 @@ class StochRSITEMA(IStrategy):
     exit_profit_offset = 0.01
     ignore_roi_if_entry_signal = False
 
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -107,20 +97,24 @@ class StochRSITEMA(IStrategy):
     """
     Populate all of the indicators we need (note: indicators are separate for buy/sell)
     """
-    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
+    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         for rsip in range(self.rsiStart, (self.rsiEnd + 1)):
-            dataframe[f'rsi({rsip})'] = ta.RSI(dataframe, timeperiod=rsip)
+            dataframe[f"rsi({rsip})"] = ta.RSI(dataframe, timeperiod=rsip)
 
         for temap in range(self.temaStart, (self.temaEnd + 1)):
-            dataframe[f'tema({temap})'] = ta.TEMA(dataframe, timeperiod=temap)
+            dataframe[f"tema({temap})"] = ta.TEMA(dataframe, timeperiod=temap)
 
         # Stochastic Slow
         # fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
-        stoch_slow = ta.STOCH(dataframe, fastk_period=self.fastkPeriod,
-                              slowk_period=self.slowkPeriod, slowd_period=self.slowdPeriod)
-        dataframe['stoch-slowk'] = stoch_slow['slowk']
-        dataframe['stoch-slowd'] = stoch_slow['slowd']
+        stoch_slow = ta.STOCH(
+            dataframe,
+            fastk_period=self.fastkPeriod,
+            slowk_period=self.slowkPeriod,
+            slowd_period=self.slowdPeriod,
+        )
+        dataframe["stoch-slowk"] = stoch_slow["slowk"]
+        dataframe["stoch-slowd"] = stoch_slow["slowd"]
 
         return dataframe
 
@@ -129,22 +123,20 @@ class StochRSITEMA(IStrategy):
 
         conditions = []
 
+        conditions.append(dataframe[f"rsi({params['rsi-period']})"] > params["rsi-lower-band"])
         conditions.append(
-            dataframe[f"rsi({params['rsi-period']})"] > params['rsi-lower-band'])
-        conditions.append(qtpylib.crossed_above(
-            dataframe['stoch-slowd'], params['stoch-lower-band']))
-        conditions.append(qtpylib.crossed_above(
-            dataframe['stoch-slowk'], params['stoch-lower-band']))
-        conditions.append(qtpylib.crossed_above(
-            dataframe['stoch-slowk'], dataframe['stoch-slowd']))
+            qtpylib.crossed_above(dataframe["stoch-slowd"], params["stoch-lower-band"])
+        )
+        conditions.append(
+            qtpylib.crossed_above(dataframe["stoch-slowk"], params["stoch-lower-band"])
+        )
+        conditions.append(qtpylib.crossed_above(dataframe["stoch-slowk"], dataframe["stoch-slowd"]))
 
         # Check that the candle had volume
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'enter_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         return dataframe
 
@@ -152,23 +144,24 @@ class StochRSITEMA(IStrategy):
         params = self.sell_params
 
         conditions = []
-        
-        if params.get('tema-trigger') == 'close':
+
+        if params.get("tema-trigger") == "close":
+            conditions.append(dataframe["close"] < dataframe[f"tema({params['tema-period']})"])
+        if params.get("tema-trigger") == "both":
             conditions.append(
-                dataframe['close'] < dataframe[f"tema({params['tema-period']})"])
-        if params.get('tema-trigger') == 'both':
-            conditions.append((dataframe['close'] < dataframe[f"tema({params['tema-period']})"]) & (
-                dataframe['open'] < dataframe[f"tema({params['tema-period']})"]))
-        if params.get('tema-trigger') == 'average':
+                (dataframe["close"] < dataframe[f"tema({params['tema-period']})"])
+                & (dataframe["open"] < dataframe[f"tema({params['tema-period']})"])
+            )
+        if params.get("tema-trigger") == "average":
             conditions.append(
-                ((dataframe['close'] + dataframe['open']) / 2) < dataframe[f"tema({params['tema-period']})"])
+                ((dataframe["close"] + dataframe["open"]) / 2)
+                < dataframe[f"tema({params['tema-period']})"]
+            )
 
         # Check that the candle had volume
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
 
         return dataframe

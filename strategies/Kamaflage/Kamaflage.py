@@ -8,28 +8,15 @@ from technical.indicators import RMI
 
 
 class Kamaflage(IStrategy):
-
     """
     PASTE OUTPUT FROM HYPEROPT HERE
     """
 
-    buy_params = {
-        'macd': 0,
-        'macdhist': 0,
-        'rmi': 50
-    }
+    buy_params = {"macd": 0, "macdhist": 0, "rmi": 50}
 
-    sell_params = {
+    sell_params = {}
 
-    }
-
-    minimal_roi = {
-        "0": 0.15,
-        "10": 0.10,
-        "20": 0.05,
-        "30": 0.025,
-        "60": 0.01
-    }
+    minimal_roi = {"0": 0.15, "10": 0.10, "20": 0.05, "30": 0.025, "60": 0.01}
 
     # Stoploss:
     stoploss = -1
@@ -44,7 +31,7 @@ class Kamaflage(IStrategy):
     END HYPEROPT
     """
 
-    timeframe = '5m'
+    timeframe = "5m"
 
     use_exit_signal = True
     exit_profit_only = False
@@ -55,21 +42,19 @@ class Kamaflage(IStrategy):
 
     startup_candle_count: int = 20
 
-    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:        
-
-        dataframe['sar'] = ta.SAR(dataframe)
-        dataframe['rmi'] = RMI(dataframe)
-        dataframe['kama-3'] = ta.KAMA(dataframe, timeperiod=3)
-        dataframe['kama-21'] = ta.KAMA(dataframe, timeperiod=21)
+    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe["sar"] = ta.SAR(dataframe)
+        dataframe["rmi"] = RMI(dataframe)
+        dataframe["kama-3"] = ta.KAMA(dataframe, timeperiod=3)
+        dataframe["kama-21"] = ta.KAMA(dataframe, timeperiod=21)
 
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
-        dataframe['volume_ma'] = dataframe['volume'].rolling(window=24).mean()
+        dataframe["volume_ma"] = dataframe["volume"].rolling(window=24).mean()
 
-        
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -77,27 +62,30 @@ class Kamaflage(IStrategy):
         conditions = []
 
         active_trade = False
-        if self.config['runmode'].value in ('live', 'dry_run'):
-            active_trade = Trade.get_trades([Trade.pair == metadata['pair'], Trade.is_open.is_(True),]).all()
+        if self.config["runmode"].value in ("live", "dry_run"):
+            active_trade = Trade.get_trades(
+                [
+                    Trade.pair == metadata["pair"],
+                    Trade.is_open.is_(True),
+                ]
+            ).all()
 
-        if not active_trade:     
-            conditions.append(dataframe['kama-3'] > dataframe['kama-21'])
-            conditions.append(dataframe['macd'] > dataframe['macdsignal'])
-            conditions.append(dataframe['macd'] > params['macd'])
-            conditions.append(dataframe['macdhist'] > params['macdhist'])
-            conditions.append(dataframe['rmi'] > dataframe['rmi'].shift())
-            conditions.append(dataframe['rmi'] > params['rmi'])
-            conditions.append(dataframe['volume'] < (dataframe['volume_ma'] * 20))
+        if not active_trade:
+            conditions.append(dataframe["kama-3"] > dataframe["kama-21"])
+            conditions.append(dataframe["macd"] > dataframe["macdsignal"])
+            conditions.append(dataframe["macd"] > params["macd"])
+            conditions.append(dataframe["macdhist"] > params["macdhist"])
+            conditions.append(dataframe["rmi"] > dataframe["rmi"].shift())
+            conditions.append(dataframe["rmi"] > params["rmi"])
+            conditions.append(dataframe["volume"] < (dataframe["volume_ma"] * 20))
         else:
-            conditions.append(dataframe['close'] > dataframe['sar'])
-            conditions.append(dataframe['rmi'] >= 75)
+            conditions.append(dataframe["close"] > dataframe["sar"])
+            conditions.append(dataframe["rmi"] >= 75)
 
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'enter_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         return dataframe
 
@@ -106,49 +94,54 @@ class Kamaflage(IStrategy):
         conditions = []
 
         active_trade = False
-        if self.config['runmode'].value in ('live', 'dry_run'):
-            active_trade = Trade.get_trades([Trade.pair == metadata['pair'], Trade.is_open.is_(True),]).all()
-        
+        if self.config["runmode"].value in ("live", "dry_run"):
+            active_trade = Trade.get_trades(
+                [
+                    Trade.pair == metadata["pair"],
+                    Trade.is_open.is_(True),
+                ]
+            ).all()
+
         if active_trade:
-            ob = self.dp.orderbook(metadata['pair'], 1)
-            current_price = ob['asks'][0][0]
+            ob = self.dp.orderbook(metadata["pair"], 1)
+            current_price = ob["asks"][0][0]
             current_profit = active_trade[0].calc_profit_ratio(rate=current_price)
 
             conditions.append(
-                (dataframe['entry'] == 0) &
-                (dataframe['rmi'] < 30) &
-                (current_profit > -0.03) &
-                (dataframe['volume'].gt(0))
+                (dataframe["entry"] == 0)
+                & (dataframe["rmi"] < 30)
+                & (current_profit > -0.03)
+                & (dataframe["volume"].gt(0))
             )
-        
+
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
         else:
-            dataframe['exit_long'] = 0
-      
+            dataframe["exit_long"] = 0
+
         return dataframe
-    
+
     def check_buy_timeout(self, pair: str, trade: Trade, order: dict, **kwargs) -> bool:
         ob = self.dp.orderbook(pair, 1)
-        current_price = ob['bids'][0][0]
+        current_price = ob["bids"][0][0]
         # Cancel buy order if price is more than 1% above the order.
-        if current_price > order['price'] * 1.01:
+        if current_price > order["price"] * 1.01:
             return True
         return False
 
     def check_sell_timeout(self, pair: str, trade: Trade, order: dict, **kwargs) -> bool:
         ob = self.dp.orderbook(pair, 1)
-        current_price = ob['asks'][0][0]
+        current_price = ob["asks"][0][0]
         # Cancel sell order if price is more than 1% below the order.
-        if current_price < order['price'] * 0.99:
+        if current_price < order["price"] * 0.99:
             return True
         return False
 
-    def confirm_trade_entry(self, pair: str, order_type: str, amount: float, rate: float, time_in_force: str, **kwargs) -> bool:
+    def confirm_trade_entry(
+        self, pair: str, order_type: str, amount: float, rate: float, time_in_force: str, **kwargs
+    ) -> bool:
         ob = self.dp.orderbook(pair, 1)
-        current_price = ob['asks'][0][0]
+        current_price = ob["asks"][0][0]
         # Cancel buy order if price is more than 1% above the order.
         if current_price > rate * 1.01:
             return False

@@ -9,7 +9,8 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 
 # These libs are for hyperopt
-from freqtrade.strategy import (IStrategy)
+from freqtrade.strategy import IStrategy
+
 
 class keltnerchannel(IStrategy):
     timeframe = "6h"
@@ -19,14 +20,14 @@ class keltnerchannel(IStrategy):
 
     plot_config = {
         "main_plot": {
-            "kc_upperband" : {"color": "purple",'plotly': {'opacity': 0.4}},
-            "kc_middleband" : {"color": "blue"},
-            "kc_lowerband" : {"color": "purple",'plotly': {'opacity': 0.4}}
+            "kc_upperband": {"color": "purple", "plotly": {"opacity": 0.4}},
+            "kc_middleband": {"color": "blue"},
+            "kc_lowerband": {"color": "purple", "plotly": {"opacity": 0.4}},
         },
         "subplots": {
             "RSI": {
                 "rsi": {"color": "orange"},
-                "hline": {"color": "grey","plotly": {"opacity": 0.4}}
+                "hline": {"color": "grey", "plotly": {"opacity": 0.4}},
             },
         },
     }
@@ -43,7 +44,7 @@ class keltnerchannel(IStrategy):
 
         # Horizontal RSI line
         hline = 55
-        dataframe['hline'] = hline
+        dataframe["hline"] = hline
 
         # Print stuff for debugging dataframe
         # print(metadata)
@@ -52,10 +53,10 @@ class keltnerchannel(IStrategy):
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (qtpylib.crossed_above(dataframe['close'], dataframe['kc_upperband'])
-            & (dataframe["rsi"] > dataframe['hline'])
+            (
+                qtpylib.crossed_above(dataframe["close"], dataframe["kc_upperband"])
+                & (dataframe["rsi"] > dataframe["hline"])
             ),
-
             "buy",
         ] = 1
 
@@ -63,8 +64,7 @@ class keltnerchannel(IStrategy):
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (qtpylib.crossed_below(dataframe['close'], dataframe['kc_middleband'])),
-
+            (qtpylib.crossed_below(dataframe["close"], dataframe["kc_middleband"])),
             "sell",
         ] = 1
         return dataframe

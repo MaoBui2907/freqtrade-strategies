@@ -29,6 +29,7 @@ class BB_Strategy04(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -39,7 +40,7 @@ class BB_Strategy04(IStrategy):
         "0": 0.22597784040439192,
         "180": 0.06269048445164815,
         "613": 0.037662786960331776,
-        "2004": 0
+        "2004": 0,
     }
 
     # Optimal stoploss designed for the strategy.
@@ -53,7 +54,7 @@ class BB_Strategy04(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    ticker_interval = '1h'
+    ticker_interval = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -68,25 +69,22 @@ class BB_Strategy04(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
         # Main plot indicators (Moving averages, ...)
-        'main_plot': {
-            'bb_lowerband2': {'color': 'red'},
-            'bb_lowerband1': {'color': 'green'},
-            'bb_middleband1': {'color': 'orange'},
-            'bb_upperband1': {'color': 'green'},
+        "main_plot": {
+            "bb_lowerband2": {"color": "red"},
+            "bb_lowerband1": {"color": "green"},
+            "bb_middleband1": {"color": "orange"},
+            "bb_upperband1": {"color": "green"},
             # 'ma': {'color': 'blue'}
         }
     }
@@ -116,14 +114,14 @@ class BB_Strategy04(IStrategy):
         :return: a Dataframe with all mandatory indicators for the strategies
         """
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         for std in [1, 2]:
             # Bollinger bands
-            bollinger = qtpylib.bollinger_bands(dataframe['close'], window=24*3, stds=std)
-            dataframe[f'bb_lowerband{std}'] = bollinger['lower']
-            dataframe[f'bb_middleband{std}'] = bollinger['mid']
-            dataframe[f'bb_upperband{std}'] = bollinger['upper']
+            bollinger = qtpylib.bollinger_bands(dataframe["close"], window=24 * 3, stds=std)
+            dataframe[f"bb_lowerband{std}"] = bollinger["lower"]
+            dataframe[f"bb_middleband{std}"] = bollinger["mid"]
+            dataframe[f"bb_upperband{std}"] = bollinger["upper"]
 
         return dataframe
 
@@ -137,12 +135,12 @@ class BB_Strategy04(IStrategy):
         dataframe.loc[
             (
                 # (qtpylib.crossed_above(dataframe['close'], dataframe['bb_lowerband1']))
-                (dataframe['close'] < dataframe['bb_lowerband2']) &
-                (dataframe['close'] > dataframe['bb_lowerband2']*(1 + self.stoploss))
-
+                (dataframe["close"] < dataframe["bb_lowerband2"])
+                & (dataframe["close"] > dataframe["bb_lowerband2"] * (1 + self.stoploss))
                 # (dataframe['volume'] > self.config['stake_amount'])
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -156,10 +154,11 @@ class BB_Strategy04(IStrategy):
         dataframe.loc[
             (
                 # (qtpylib.crossed_above(dataframe['close'], dataframe['bb_upperband1']))
-                (dataframe['close'] > dataframe['bb_upperband2'])
+                dataframe["close"] > dataframe["bb_upperband2"]
                 # (dataframe['close'] < dataframe['bb_lowerband1.5'])
                 # (dataframe['volume'] > self.config['stake_amount'])
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

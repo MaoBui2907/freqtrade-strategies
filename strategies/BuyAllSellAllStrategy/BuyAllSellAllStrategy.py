@@ -7,7 +7,7 @@ import numpy as np
 
 class BuyAllSellAllStrategy(IStrategy):
     stoploss = -0.25
-    timeframe = '5m'
+    timeframe = "5m"
 
     use_exit_signal = True
     exit_profit_only = False
@@ -25,10 +25,16 @@ class BuyAllSellAllStrategy(IStrategy):
         return dataframe
 
     def custom_exit(
-        self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: "datetime",
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
     ) -> float:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
-        if (last_candle is not None):
+        if last_candle is not None:
             return True
         return None

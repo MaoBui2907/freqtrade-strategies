@@ -30,12 +30,7 @@ class MultiMa(IStrategy):
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.523,
-        "1553": 0.123,
-        "2332": 0.076,
-        "3169": 0
-    }
+    minimal_roi = {"0": 0.523, "1553": 0.123, "2332": 0.076, "3169": 0}
 
     # Stoploss:
     stoploss = -0.345
@@ -61,11 +56,9 @@ class MultiMa(IStrategy):
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         for count in range(self.count_max):
             for gap in range(self.gap_max):
-                if count*gap > 1 and count*gap not in dataframe.keys():
-                    dataframe[count*gap] = ta.TEMA(
-                        dataframe, timeperiod=int(count*gap)
-                    )
-        print(" ", metadata['pair'], end="\t\r")
+                if count * gap > 1 and count * gap not in dataframe.keys():
+                    dataframe[count * gap] = ta.TEMA(dataframe, timeperiod=int(count * gap))
+        print(" ", metadata["pair"], end="\t\r")
 
         return dataframe
 
@@ -75,8 +68,8 @@ class MultiMa(IStrategy):
         # Cuz it returns range(7,8) but we need range(8) for all modes hyperopt, backtest and etc
 
         for ma_count in range(self.buy_ma_count.value):
-            key = ma_count*self.buy_ma_gap.value
-            past_key = (ma_count-1)*self.buy_ma_gap.value
+            key = ma_count * self.buy_ma_gap.value
+            past_key = (ma_count - 1) * self.buy_ma_gap.value
             if past_key > 1 and key in dataframe.keys() and past_key in dataframe.keys():
                 conditions.append(dataframe[key] < dataframe[past_key])
 
@@ -88,8 +81,8 @@ class MultiMa(IStrategy):
         conditions = []
 
         for ma_count in range(self.sell_ma_count.value):
-            key = ma_count*self.sell_ma_gap.value
-            past_key = (ma_count-1)*self.sell_ma_gap.value
+            key = ma_count * self.sell_ma_gap.value
+            past_key = (ma_count - 1) * self.sell_ma_gap.value
             if past_key > 1 and key in dataframe.keys() and past_key in dataframe.keys():
                 conditions.append(dataframe[key] > dataframe[past_key])
 

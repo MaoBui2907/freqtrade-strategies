@@ -30,17 +30,14 @@ class ForexSignal(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "60": 0.01,
-        "30": 0.03,
-        "0": 0.04
-    }
+    minimal_roi = {"60": 0.01, "30": 0.03, "0": 0.04}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -53,7 +50,7 @@ class ForexSignal(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -68,71 +65,66 @@ class ForexSignal(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
-
         # get access to all pairs available in whitelist.
         pairs = self.dp.current_whitelist()
         # Assign tf to each pair so they can be downloaded and cached for strategy.
-        informative_pairs = [(pair, '1h') for pair in pairs]
+        informative_pairs = [(pair, "1h") for pair in pairs]
         # Optionally Add additional "static" pairs
-        
+
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        
         if not self.dp:
             # Don't do anything if DataProvider is not available.
             return dataframe
 
-        inf_tf = '1h'
+        inf_tf = "1h"
         # Get the informative pair
-        informative = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=inf_tf)
-        
-        informative['ema8'] = ta.EMA(informative, timeperiod=8)
-        informative['ema21'] = ta.EMA(informative, timeperiod=21)
-        
+        informative = self.dp.get_pair_dataframe(pair=metadata["pair"], timeframe=inf_tf)
+
+        informative["ema8"] = ta.EMA(informative, timeperiod=8)
+        informative["ema21"] = ta.EMA(informative, timeperiod=21)
+
         # Use the helper function merge_informative_pair to safely merge the pair
         # Automatically renames the columns and merges a shorter timeframe dataframe and a longer timeframe informative pair
         # use ffill to have the 1d value available in every row throughout the day.
         # Without this, comparisons between columns of the original and the informative pair would only work once per day.
         # Full documentation of this method, see below
-        dataframe = merge_informative_pair(dataframe, informative, self.timeframe, inf_tf, ffill=True)
+        dataframe = merge_informative_pair(
+            dataframe, informative, self.timeframe, inf_tf, ffill=True
+        )
 
-        
-       
         # # EMA - Exponential Moving Average for 5m timeframe
-        dataframe['ema8'] = ta.EMA(dataframe, timeperiod=8)
-        dataframe['ema13'] = ta.EMA(dataframe, timeperiod=13)
-        dataframe['ema21'] = ta.EMA(dataframe, timeperiod=21)
-        
+        dataframe["ema8"] = ta.EMA(dataframe, timeperiod=8)
+        dataframe["ema13"] = ta.EMA(dataframe, timeperiod=13)
+        dataframe["ema21"] = ta.EMA(dataframe, timeperiod=21)
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -144,20 +136,16 @@ class ForexSignal(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['ema8_1h'] > dataframe['ema21_1h']) &  # Onko nousutrendi
-                (dataframe['ema8'] > dataframe['ema13']) &  
-                (dataframe['ema13'] > dataframe['ema21']) &
-                (dataframe['low'] < dataframe['ema8']) 
+                (dataframe["ema8_1h"] > dataframe["ema21_1h"])  # Onko nousutrendi
+                & (dataframe["ema8"] > dataframe["ema13"])
+                & (dataframe["ema13"] > dataframe["ema21"])
+                & (dataframe["low"] < dataframe["ema8"])
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        
-        dataframe.loc[
-            (
-                (dataframe['ema8'] < dataframe['ema8'].shift(1))
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(dataframe["ema8"] < dataframe["ema8"].shift(1)), "exit_long"] = 1
         return dataframe

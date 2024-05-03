@@ -12,6 +12,7 @@ from freqtrade.strategy.interface import IStrategy
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
+
 class bbrsi(IStrategy):
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
@@ -23,7 +24,7 @@ class bbrsi(IStrategy):
         "0": 0.21547444718127343,
         "21": 0.054918778723794665,
         "48": 0.013037720775643222,
-        "125": 0
+        "125": 0,
     }
 
     # Optimal stoploss designed for the strategy.
@@ -37,7 +38,7 @@ class bbrsi(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    timeframe = '4h'
+    timeframe = "4h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -52,17 +53,14 @@ class bbrsi(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     # plot_config = {
     #     'main_plot': {
@@ -95,34 +93,30 @@ class bbrsi(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger bands
         bollinger_1sd = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
-        dataframe['bb_upperband_1sd'] = bollinger_1sd['upper']
-        dataframe['bb_lowerband_1sd'] = bollinger_1sd['lower']
+        dataframe["bb_upperband_1sd"] = bollinger_1sd["upper"]
+        dataframe["bb_lowerband_1sd"] = bollinger_1sd["lower"]
 
         bollinger_4sd = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=4)
-        dataframe['bb_lowerband_4sd'] = bollinger_4sd['lower']
+        dataframe["bb_lowerband_4sd"] = bollinger_4sd["lower"]
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['rsi'] > 25) &
-                (dataframe['close'] < dataframe['bb_lowerband_1sd'])
-            ),
-            'enter_long'] = 1
+            ((dataframe["rsi"] > 25) & (dataframe["close"] < dataframe["bb_lowerband_1sd"])),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['rsi'] > 95) &
-                (dataframe['close'] > dataframe['bb_upperband_1sd'])
-            ),
-            'exit_long'] = 1
+            ((dataframe["rsi"] > 95) & (dataframe["close"] > dataframe["bb_upperband_1sd"])),
+            "exit_long",
+        ] = 1
 
         return dataframe

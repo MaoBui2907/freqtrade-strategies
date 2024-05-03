@@ -28,20 +28,14 @@ class TemaPureTwo(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
     # ROI table:
-    minimal_roi = {
-        "0": 0.12607,
-        "331": 0.12606,
-        "865": 0.12605,
-        "1945": 0.01
-    }
-
+    minimal_roi = {"0": 0.12607, "331": 0.12606, "865": 0.12605, "1945": 0.01}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.11
-    
+
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Trailing stop:
     trailing_stop = True
@@ -56,7 +50,6 @@ class TemaPureTwo(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-
 
     def informative_pairs(self):
         """
@@ -79,33 +72,33 @@ class TemaPureTwo(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['CMO'] = ta.CMO(dataframe, timeperiod = 50)
-        dataframe['TEMA'] = ta.TEMA(dataframe, timeperiod = 18)
-      
+        dataframe["CMO"] = ta.CMO(dataframe, timeperiod=50)
+        dataframe["TEMA"] = ta.TEMA(dataframe, timeperiod=18)
+
         # Bollinger bands
         bollingerTA1 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=1.0, nbdevdn=1.0, matype=0)
-        
-        dataframe['bb_lowerbandTA1'] = bollingerTA1['lowerband']
-        dataframe['bb_middlebandTA1'] = bollingerTA1['middleband']
-        dataframe['bb_upperbandTA1'] = bollingerTA1['upperband']
-        
+
+        dataframe["bb_lowerbandTA1"] = bollingerTA1["lowerband"]
+        dataframe["bb_middlebandTA1"] = bollingerTA1["middleband"]
+        dataframe["bb_upperbandTA1"] = bollingerTA1["upperband"]
+
         bollingerTA2 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=2.0, nbdevdn=2.0, matype=0)
-        
-        dataframe['bb_lowerbandTA2'] = bollingerTA2['lowerband']
-        dataframe['bb_middlebandTA2'] = bollingerTA2['middleband']
-        dataframe['bb_upperbandTA2'] = bollingerTA2['upperband']
-        
+
+        dataframe["bb_lowerbandTA2"] = bollingerTA2["lowerband"]
+        dataframe["bb_middlebandTA2"] = bollingerTA2["middleband"]
+        dataframe["bb_upperbandTA2"] = bollingerTA2["upperband"]
+
         bollingerTA3 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=3.0, nbdevdn=3.0, matype=0)
-        
-        dataframe['bb_lowerbandTA3'] = bollingerTA3['lowerband']
-        dataframe['bb_middlebandTA3'] = bollingerTA3['middleband']
-        dataframe['bb_upperbandTA3'] = bollingerTA3['upperband']
-        
+
+        dataframe["bb_lowerbandTA3"] = bollingerTA3["lowerband"]
+        dataframe["bb_middlebandTA3"] = bollingerTA3["middleband"]
+        dataframe["bb_upperbandTA3"] = bollingerTA3["upperband"]
+
         bollingerTA4 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=4.0, nbdevdn=4.0, matype=0)
-        
-        dataframe['bb_lowerbandTA4'] = bollingerTA4['lowerband']
-        dataframe['bb_middlebandTA4'] = bollingerTA4['middleband']
-        dataframe['bb_upperbandTA4'] = bollingerTA4['upperband']
+
+        dataframe["bb_lowerbandTA4"] = bollingerTA4["lowerband"]
+        dataframe["bb_middlebandTA4"] = bollingerTA4["middleband"]
+        dataframe["bb_upperbandTA4"] = bollingerTA4["upperband"]
 
         return dataframe
 
@@ -115,18 +108,15 @@ class TemaPureTwo(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                        
+
         dataframe.loc[
             (
-            # (qtpylib.crossed_below(dataframe["TEMA"], dataframe["bb_lowerbandTA"]))
-                  
-            (qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_lowerbandTA1"]))
-            & 
-              (dataframe['CMO']>-0) 
-                  
-                
+                # (qtpylib.crossed_below(dataframe["TEMA"], dataframe["bb_lowerbandTA"]))
+                (qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_lowerbandTA1"]))
+                & (dataframe["CMO"] > -0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -136,22 +126,18 @@ class TemaPureTwo(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                       
+
         dataframe.loc[
             (
-                
-
-            ((qtpylib.crossed_below(dataframe["CMO"],-25)) 
-               # & (dataframe["TEMA"]>=dataframe["bb_lowerbandTA2"])
-               ) 
-            # |
-            # ((qtpylib.crossed_below(dataframe["CMO"],40)) 
-            #   & (dataframe["TEMA"]>=dataframe["bb_lowerbandTA1"])) 
-            # ((qtpylib.crossed_below(dataframe["CMO"],25)) 
-            #   & (dataframe["TEMA"]<=dataframe["bb_middlebandTA1"]))
-                
-                
+                qtpylib.crossed_below(dataframe["CMO"], -25)
+                # & (dataframe["TEMA"]>=dataframe["bb_lowerbandTA2"])
+                # |
+                # ((qtpylib.crossed_below(dataframe["CMO"],40))
+                #   & (dataframe["TEMA"]>=dataframe["bb_lowerbandTA1"]))
+                # ((qtpylib.crossed_below(dataframe["CMO"],25))
+                #   & (dataframe["TEMA"]<=dataframe["bb_middlebandTA1"]))
             ),
-            'exit_long'] = 1        
-        
+            "exit_long",
+        ] = 1
+
         return dataframe

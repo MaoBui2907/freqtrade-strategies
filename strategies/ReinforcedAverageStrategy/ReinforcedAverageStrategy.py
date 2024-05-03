@@ -20,16 +20,14 @@ class ReinforcedAverageStrategy(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.5
-    }
+    minimal_roi = {"0": 0.5}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.2
 
     # Optimal timeframe for the strategy
-    timeframe = '4h'
+    timeframe = "4h"
 
     # trailing stoploss
     trailing_stop = False
@@ -46,18 +44,17 @@ class ReinforcedAverageStrategy(IStrategy):
     ignore_roi_if_entry_signal = False
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        dataframe['maShort'] = ta.EMA(dataframe, timeperiod=8)
-        dataframe['maMedium'] = ta.EMA(dataframe, timeperiod=21)
+        dataframe["maShort"] = ta.EMA(dataframe, timeperiod=8)
+        dataframe["maMedium"] = ta.EMA(dataframe, timeperiod=21)
         ##################################################################################
         # required for graphing
-        bollinger = qtpylib.bollinger_bands(dataframe['close'], window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe['bb_middleband'] = bollinger['mid']
+        bollinger = qtpylib.bollinger_bands(dataframe["close"], window=20, stds=2)
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_middleband"] = bollinger["mid"]
         self.resample_interval = timeframe_to_minutes(self.timeframe) * 12
         dataframe_long = resample_to_interval(dataframe, self.resample_interval)
-        dataframe_long['sma'] = ta.SMA(dataframe_long, timeperiod=50, price='close')
+        dataframe_long["sma"] = ta.SMA(dataframe_long, timeperiod=50, price="close")
         dataframe = resampled_merge(dataframe, dataframe_long, fill_na=True)
 
         return dataframe
@@ -71,11 +68,12 @@ class ReinforcedAverageStrategy(IStrategy):
 
         dataframe.loc[
             (
-                qtpylib.crossed_above(dataframe['maShort'], dataframe['maMedium']) &
-                (dataframe['close'] > dataframe[f'resample_{self.resample_interval}_sma']) &
-                (dataframe['volume'] > 0)
+                qtpylib.crossed_above(dataframe["maShort"], dataframe["maMedium"])
+                & (dataframe["close"] > dataframe[f"resample_{self.resample_interval}_sma"])
+                & (dataframe["volume"] > 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -87,8 +85,9 @@ class ReinforcedAverageStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                qtpylib.crossed_above(dataframe['maMedium'], dataframe['maShort']) &
-                (dataframe['volume'] > 0)
+                qtpylib.crossed_above(dataframe["maMedium"], dataframe["maShort"])
+                & (dataframe["volume"] > 0)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

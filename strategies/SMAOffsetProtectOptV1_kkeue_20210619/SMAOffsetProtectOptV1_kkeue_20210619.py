@@ -18,12 +18,11 @@ from freqtrade.strategy import DecimalParameter, IntParameter
 #########################################################################################
 
 
-
 def EWO(dataframe, ema_length=5, ema2_length=35):
-    #df = dataframe.copy()
+    # df = dataframe.copy()
     ema1 = ta.EMA(dataframe, timeperiod=ema_length)
     ema2 = ta.EMA(dataframe, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / dataframe['close'] * 100
+    emadif = (ema1 - ema2) / dataframe["close"] * 100
     return emadif
 
 
@@ -47,35 +46,35 @@ class SMAOffsetProtectOptV1_kkeue_20210619(IStrategy):
 
     # Modified ROI - 20210620
     # ROI table:
-    minimal_roi = {
-        "0": 0.028,
-        "10": 0.018,
-        "30": 0.010,
-        "40": 0.005
-    }
+    minimal_roi = {"0": 0.028, "10": 0.018, "30": 0.010, "40": 0.005}
 
     # Stoploss:
     stoploss = -0.5
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+        5, 80, default=buy_params["base_nb_candles_buy"], space="entry", optimize=True
+    )
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+        5, 80, default=sell_params["base_nb_candles_sell"], space="exit", optimize=True
+    )
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+        0.9, 0.99, default=buy_params["low_offset"], space="entry", optimize=True
+    )
     high_offset = DecimalParameter(
-        0.99, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+        0.99, 1.1, default=sell_params["high_offset"], space="exit", optimize=True
+    )
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
-    ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_low = DecimalParameter(
+        -20.0, -8.0, default=buy_params["ewo_low"], space="entry", optimize=True
+    )
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
-
+        2.0, 12.0, default=buy_params["ewo_high"], space="entry", optimize=True
+    )
+    rsi_buy = IntParameter(30, 70, default=buy_params["rsi_buy"], space="entry", optimize=True)
 
     # Trailing stop:
     trailing_stop = False
@@ -90,50 +89,48 @@ class SMAOffsetProtectOptV1_kkeue_20210619(IStrategy):
     ignore_roi_if_entry_signal = False
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
-    informative_timeframe = '1h'
+    timeframe = "5m"
+    informative_timeframe = "1h"
 
     process_only_new_candles = True
     startup_candle_count: int = 30
 
     plot_config = {
-        'main_plot': {
-            'ma_buy': {'color': 'orange'},
-            'ma_sell': {'color': 'orange'},
+        "main_plot": {
+            "ma_buy": {"color": "orange"},
+            "ma_sell": {"color": "orange"},
         },
     }
 
     use_custom_stoploss = False
 
     def informative_pairs(self):
-
         pairs = self.dp.current_whitelist()
         informative_pairs = [(pair, self.informative_timeframe) for pair in pairs]
 
         return informative_pairs
 
     def get_informative_indicators(self, metadata: dict):
-
         dataframe = self.dp.get_pair_dataframe(
-            pair=metadata['pair'], timeframe=self.informative_timeframe)
+            pair=metadata["pair"], timeframe=self.informative_timeframe
+        )
 
         return dataframe
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # Calculate all ma_buy values
         for val in self.base_nb_candles_buy.range:
-            dataframe[f'ma_buy_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_buy_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Calculate all ma_sell values
         for val in self.base_nb_candles_sell.range:
-            dataframe[f'ma_sell_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_sell_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Elliot
-        dataframe['EWO'] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
-        
+        dataframe["EWO"] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
+
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
         return dataframe
 
@@ -142,26 +139,35 @@ class SMAOffsetProtectOptV1_kkeue_20210619(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] > self.ewo_high.value) &
-                (dataframe['rsi'] < self.rsi_buy.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] > self.ewo_high.value)
+                & (dataframe["rsi"] < self.rsi_buy.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] < self.ewo_low.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] < self.ewo_low.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'entry'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "entry"] = 1
 
         return dataframe
 
@@ -170,25 +176,27 @@ class SMAOffsetProtectOptV1_kkeue_20210619(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'exit'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "exit"] = 1
 
         return dataframe
-        
-        
+
+
 class SMAOffsetProtectOptV1_1(SMAOffsetProtectOptV1_kkeue_20210619):
-    #Epoch details:
+    # Epoch details:
 
-    #271/512:    468 trades. 453/0/15 Wins/Draws/Losses. Avg profit   1.11%. Median profit   1.14%. Total profit  129.62363315 BUSD ( 103.70%). Avg duration 2:07:00 min. Objective: -50137.47104
-
+    # 271/512:    468 trades. 453/0/15 Wins/Draws/Losses. Avg profit   1.11%. Median profit   1.14%. Total profit  129.62363315 BUSD ( 103.70%). Avg duration 2:07:00 min. Objective: -50137.47104
 
     # Buy hyperspace params:
     buy_params = {
@@ -206,12 +214,7 @@ class SMAOffsetProtectOptV1_1(SMAOffsetProtectOptV1_kkeue_20210619):
     }
 
     # ROI table:  # value loaded from strategy
-    minimal_roi = {
-        "0": 0.028,
-        "10": 0.018,
-        "30": 0.01,
-        "40": 0.005
-    }
+    minimal_roi = {"0": 0.028, "10": 0.018, "30": 0.01, "40": 0.005}
 
     # Stoploss:
     stoploss = -0.5  # value loaded from strategy

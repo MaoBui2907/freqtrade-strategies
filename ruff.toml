@@ -1,7 +1,12 @@
-line-length = 120
+line-length = 100
 
 [format]
 quote-style = "double"
 
+[lint.isort]
+split-on-trailing-comma = true
+
 [lint]
-extend-safe-fixes = ['E712']
+extend-safe-fixes = ['E712', 'F601', 'E711']
+
+ignore = ['F821', 'F841', 'E402', 'E722', 'F601', 'F811']

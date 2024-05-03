@@ -6,6 +6,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 # --------------------------------
 import pandas as pd  # noqa
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 import technical.indicators as ftt
@@ -13,7 +14,7 @@ import technical.indicators as ftt
 
 # Obelisk_TradeProIM v1 - 2021-03-25
 #
-# by Obelisk 
+# by Obelisk
 # https://twitter.com/brookmiles
 #
 # Based on "Crazy Results Best Ichimoku Cloud Trading Strategy Proven 100 Trades" by Trade Pro
@@ -21,10 +22,10 @@ import technical.indicators as ftt
 #
 # Does not attempt to emulate the risk/reward take-profit/stop-loss, so the sell criteria are mine.
 
-class Obelisk_TradePro_Ichi_v1_1(IStrategy):
 
+class Obelisk_TradePro_Ichi_v1_1(IStrategy):
     # Optimal timeframe for the strategy
-    timeframe = '1h'
+    timeframe = "1h"
 
     startup_candle_count = 120
     process_only_new_candles = True
@@ -39,113 +40,110 @@ class Obelisk_TradePro_Ichi_v1_1(IStrategy):
 
     plot_config = {
         # Main plot indicators (Moving averages, ...)
-        'main_plot': {
-            'senkou_a': {
-                'color': 'green',
-                'fill_to': 'senkou_b',
-                'fill_label': 'Ichimoku Cloud',
-                'fill_color': 'rgba(0,0,0,0.2)',
+        "main_plot": {
+            "senkou_a": {
+                "color": "green",
+                "fill_to": "senkou_b",
+                "fill_label": "Ichimoku Cloud",
+                "fill_color": "rgba(0,0,0,0.2)",
             },
             # plot senkou_b, too. Not only the area to it.
-            'senkou_b': {
-                'color': 'red',
+            "senkou_b": {
+                "color": "red",
             },
-            'tenkan_sen': { 'color': 'orange' },
-            'kijun_sen': { 'color': 'blue' },
-
-            'chikou_span': { 'color': 'lightgreen' },
+            "tenkan_sen": {"color": "orange"},
+            "kijun_sen": {"color": "blue"},
+            "chikou_span": {"color": "lightgreen"},
         },
-        'subplots': {
+        "subplots": {
             "Signals": {
-                'go_long': {'color': 'blue'},
-                'future_green': {'color': 'green'},
-                'chikou_high': {'color': 'lightgreen'},
+                "go_long": {"color": "blue"},
+                "future_green": {"color": "green"},
+                "chikou_high": {"color": "lightgreen"},
             },
-        }
+        },
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # # Standard Settings
         # displacement = 26
-        # ichimoku = ftt.ichimoku(dataframe, 
-        #     conversion_line_period=9, 
+        # ichimoku = ftt.ichimoku(dataframe,
+        #     conversion_line_period=9,
         #     base_line_periods=26,
-        #     laggin_span=52, 
+        #     laggin_span=52,
         #     displacement=displacement
         #     )
 
         # Crypto Settings
         displacement = 30
-        ichimoku = ftt.ichimoku(dataframe, 
-            conversion_line_period=20, 
+        ichimoku = ftt.ichimoku(
+            dataframe,
+            conversion_line_period=20,
             base_line_periods=60,
-            laggin_span=120, 
-            displacement=displacement
-            )
+            laggin_span=120,
+            displacement=displacement,
+        )
 
-        dataframe['chikou_span'] = ichimoku['chikou_span']
+        dataframe["chikou_span"] = ichimoku["chikou_span"]
 
         # cross indicators
-        dataframe['tenkan_sen'] = ichimoku['tenkan_sen']
-        dataframe['kijun_sen'] = ichimoku['kijun_sen']
+        dataframe["tenkan_sen"] = ichimoku["tenkan_sen"]
+        dataframe["kijun_sen"] = ichimoku["kijun_sen"]
 
         # cloud, green a > b, red a < b
-        dataframe['senkou_a'] = ichimoku['senkou_span_a']
-        dataframe['senkou_b'] = ichimoku['senkou_span_b']
-        dataframe['leading_senkou_span_a'] = ichimoku['leading_senkou_span_a']
-        dataframe['leading_senkou_span_b'] = ichimoku['leading_senkou_span_b']
-        dataframe['cloud_green'] = ichimoku['cloud_green'] * 1
-        dataframe['cloud_red'] = ichimoku['cloud_red'] * -1
+        dataframe["senkou_a"] = ichimoku["senkou_span_a"]
+        dataframe["senkou_b"] = ichimoku["senkou_span_b"]
+        dataframe["leading_senkou_span_a"] = ichimoku["leading_senkou_span_a"]
+        dataframe["leading_senkou_span_b"] = ichimoku["leading_senkou_span_b"]
+        dataframe["cloud_green"] = ichimoku["cloud_green"] * 1
+        dataframe["cloud_red"] = ichimoku["cloud_red"] * -1
 
         # DANGER ZONE START
 
         # NOTE: Not actually the future, present data that is normally shifted forward for display as the cloud
-        dataframe['future_green'] = (dataframe['leading_senkou_span_a'] > dataframe['leading_senkou_span_b']).astype('int') * 2
+        dataframe["future_green"] = (
+            dataframe["leading_senkou_span_a"] > dataframe["leading_senkou_span_b"]
+        ).astype("int") * 2
 
         # The chikou_span is shifted into the past, so we need to be careful not to read the
         # current value.  But if we shift it forward again by displacement it should be safe to use.
         # We're effectively "looking back" at where it normally appears on the chart.
-        dataframe['chikou_high'] = (
-                (dataframe['chikou_span'] > dataframe['senkou_a']) &
-                (dataframe['chikou_span'] > dataframe['senkou_b'])
-            ).shift(displacement).fillna(0).astype('int')
+        dataframe["chikou_high"] = (
+            (
+                (dataframe["chikou_span"] > dataframe["senkou_a"])
+                & (dataframe["chikou_span"] > dataframe["senkou_b"])
+            )
+            .shift(displacement)
+            .fillna(0)
+            .astype("int")
+        )
 
         # DANGER ZONE END
 
-        dataframe['go_long'] = (
-                (dataframe['tenkan_sen'] > dataframe['kijun_sen']) &
-                (dataframe['close'] > dataframe['senkou_a']) &
-                (dataframe['close'] > dataframe['senkou_b']) &
-                (dataframe['future_green'] > 0) &
-                (dataframe['chikou_high'] > 0)
-                ).astype('int') * 3
-
+        dataframe["go_long"] = (
+            (dataframe["tenkan_sen"] > dataframe["kijun_sen"])
+            & (dataframe["close"] > dataframe["senkou_a"])
+            & (dataframe["close"] > dataframe["senkou_b"])
+            & (dataframe["future_green"] > 0)
+            & (dataframe["chikou_high"] > 0)
+        ).astype("int") * 3
 
         return dataframe
 
-
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        dataframe.loc[
-
-            qtpylib.crossed_above(dataframe['go_long'], 0),
-
-        'enter_long'] = 1
+        dataframe.loc[qtpylib.crossed_above(dataframe["go_long"], 0), "enter_long"] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[
-
-            qtpylib.crossed_below(dataframe['tenkan_sen'], dataframe['kijun_sen']) 
-            | 
-            qtpylib.crossed_below(dataframe['close'], dataframe['kijun_sen']),
-
-        'exit_long'] = 1
+            qtpylib.crossed_below(dataframe["tenkan_sen"], dataframe["kijun_sen"])
+            | qtpylib.crossed_below(dataframe["close"], dataframe["kijun_sen"]),
+            "exit_long",
+        ] = 1
 
         return dataframe
+
 
 #
 # Fun with outliers.

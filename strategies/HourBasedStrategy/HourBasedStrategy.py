@@ -62,44 +62,31 @@ class HourBasedStrategy(IStrategy):
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.528,
-        "169": 0.113,
-        "528": 0.089,
-        "1837": 0
-    }
+    minimal_roi = {"0": 0.528, "169": 0.113, "528": 0.089, "1837": 0}
 
     # Stoploss:
     stoploss = -0.10
 
     # Optimal timeframe
-    timeframe = '1h'
+    timeframe = "1h"
 
-    buy_hour_min = IntParameter(0, 24, default=1, space='entry')
-    buy_hour_max = IntParameter(0, 24, default=0, space='entry')
+    buy_hour_min = IntParameter(0, 24, default=1, space="entry")
+    buy_hour_max = IntParameter(0, 24, default=0, space="entry")
 
-    sell_hour_min = IntParameter(0, 24, default=1, space='exit')
-    sell_hour_max = IntParameter(0, 24, default=0, space='exit')
+    sell_hour_min = IntParameter(0, 24, default=1, space="exit")
+    sell_hour_max = IntParameter(0, 24, default=0, space="exit")
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['hour'] = dataframe['date'].dt.hour
+        dataframe["hour"] = dataframe["date"].dt.hour
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         min, max = self.buy_hour_min.value, self.buy_hour_max.value
-        dataframe.loc[
-            (
-                (dataframe['hour'].between(min, max))
-            ),
-            'enter_long'] = 1
+        dataframe.loc[(dataframe["hour"].between(min, max)), "enter_long"] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         min, max = self.sell_hour_min.value, self.sell_hour_max.value
-        dataframe.loc[
-            (
-                (dataframe['hour'].between(min, max))
-            ),
-            'enter_long'] = 1
+        dataframe.loc[(dataframe["hour"].between(min, max)), "enter_long"] = 1
         return dataframe

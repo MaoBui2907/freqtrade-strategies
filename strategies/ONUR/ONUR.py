@@ -8,11 +8,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
 class ONUR(IStrategy):
-    minimal_roi = {
-        "0": 0.131,
-        "109": 0.08,
-        "226": 0.03
-    }
+    minimal_roi = {"0": 0.131, "109": 0.08, "226": 0.03}
 
     stoploss = -0.99
     trailing_stop = True
@@ -20,7 +16,7 @@ class ONUR(IStrategy):
     trailing_stop_positive_offset = 0.362
     trailing_only_offset_is_reached = True
 
-    timeframe = '15m'
+    timeframe = "15m"
 
     order_types = {
         "buy": "limit",
@@ -36,23 +32,21 @@ class ONUR(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
         # Bollinger Bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['rsi'] < 74)
-                & (dataframe['close'] > dataframe['bb_middleband'])
-            ),
-            'enter_long'] = 1
+            ((dataframe["rsi"] < 74) & (dataframe["close"] > dataframe["bb_middleband"])),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -61,6 +55,7 @@ class ONUR(IStrategy):
             (
                 # (dataframe['close'] > dataframe['bb_upperband'])
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

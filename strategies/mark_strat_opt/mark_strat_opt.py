@@ -4,12 +4,14 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
+
 # --------------------------------
 # Add your lib to import here
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
-class mark_strat_opt (IStrategy):
+
+class mark_strat_opt(IStrategy):
     """
     This is a strategy template to get you started.
     More information in https://github.com/freqtrade/freqtrade/blob/develop/docs/bot-optimization.md
@@ -23,37 +25,33 @@ class mark_strat_opt (IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
     # minimal_roi = {
-    #     "0": 0.50503, 
-    #     "304": 0.13111, 
-    #     "669": 0.03614, 
+    #     "0": 0.50503,
+    #     "304": 0.13111,
+    #     "669": 0.03614,
     #     "1039": 0
     #     }
-    minimal_roi = {
-        "0": 0.06965, 
-        "8": 0.01125, 
-        "19": 0.00498, 
-        "34": 0
-        }
+    minimal_roi = {"0": 0.06965, "8": 0.01125, "19": 0.00498, "34": 0}
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
     stoploss = -0.20206
-# {   'trailing_only_offset_is_reached': False,
-#     'trailing_stop': True,
-#     'trailing_stop_positive': 0.0916,
-#     'trailing_stop_positive_offset': 0.11514}
+    # {   'trailing_only_offset_is_reached': False,
+    #     'trailing_stop': True,
+    #     'trailing_stop_positive': 0.0916,
+    #     'trailing_stop_positive_offset': 0.11514}
     # Trailing stoploss
     trailing_stop = True
     trailing_only_offset_is_reached = False
     trailing_stop_positive = 0.07573
-    trailing_stop_positive_offset = 0.09805  
+    trailing_stop_positive_offset = 0.09805
     # Optimal ticker interval for the strategy.
-    ticker_interval = '1m'
+    ticker_interval = "1m"
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
     # These values can be overridden in the "exit_pricing" section in the config.
@@ -64,33 +62,31 @@ class mark_strat_opt (IStrategy):
     startup_candle_count: int = 20
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
     plot_config = {
         # Main plot indicators (Moving averages, ...)
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             # Subplots - each dict defines one additional plot
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
+
     def informative_pairs(self):
         """
         Define additional, informative pair/interval combinations to be cached from the exchange.
@@ -103,6 +99,7 @@ class mark_strat_opt (IStrategy):
                             ]
         """
         return []
+
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Adds several different TA indicators to the given DataFrame
@@ -115,16 +112,16 @@ class mark_strat_opt (IStrategy):
         """
         # Momentum Indicators
         # ------------------------------------
-        dataframe['adx'] = ta.ADX(dataframe)
-        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe["adx"] = ta.ADX(dataframe)
+        dataframe["sar"] = ta.SAR(dataframe)
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
-        dataframe['mfi'] = ta.MFI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
+        dataframe["mfi"] = ta.MFI(dataframe)
         stoch_fast = ta.STOCHF(dataframe)
-        dataframe['fastd'] = stoch_fast['fastd']
+        dataframe["fastd"] = stoch_fast["fastd"]
         # Bollinger Bands 1 STD
         bollinger1 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
-        dataframe['bb_lowerband1'] = bollinger1['lower']
+        dataframe["bb_lowerband1"] = bollinger1["lower"]
         # dataframe['bb_middleband1'] = bollinger1['mid']
         # dataframe['bb_upperband1'] = bollinger1['upper']
         # bollinger2 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
@@ -137,13 +134,14 @@ class mark_strat_opt (IStrategy):
         # dataframe['bb_upperband3'] = bollinger3['upper']
         # Bollinger Bands 4 STD
         bollinger4 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=4)
-        dataframe['bb_lowerband4'] = bollinger4['lower']
+        dataframe["bb_lowerband4"] = bollinger4["lower"]
         # dataframe['bb_middleband4'] = bollinger4['mid']
         # dataframe['bb_upperband4'] = bollinger4['upper']
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
         return dataframe
+
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
@@ -153,14 +151,16 @@ class mark_strat_opt (IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['adx'] > 49) &
-                (dataframe['fastd'] < 30) &
-                (dataframe['mfi'] < 23) &
-                (dataframe['rsi'] < 34) &
-                (dataframe['close'] < dataframe['bb_lowerband4'])
+                (dataframe["adx"] > 49)
+                & (dataframe["fastd"] < 30)
+                & (dataframe["mfi"] < 23)
+                & (dataframe["rsi"] < 34)
+                & (dataframe["close"] < dataframe["bb_lowerband4"])
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
         return dataframe
+
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
@@ -170,10 +170,11 @@ class mark_strat_opt (IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['adx'] < 95) &
-                (dataframe['fastd'] > 70) &
-                (dataframe['rsi'] > 94) &
-                (qtpylib.crossed_above(dataframe['sar'], dataframe['close']))
+                (dataframe["adx"] < 95)
+                & (dataframe["fastd"] > 70)
+                & (dataframe["rsi"] > 94)
+                & (qtpylib.crossed_above(dataframe["sar"], dataframe["close"]))
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

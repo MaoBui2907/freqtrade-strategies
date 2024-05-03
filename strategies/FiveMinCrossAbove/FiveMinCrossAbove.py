@@ -20,18 +20,14 @@ class FiveMinCrossAbove(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.015,
-		"25": 0.01,
-		"100": 0.005
-    }
+    minimal_roi = {"0": 0.015, "25": 0.01, "100": 0.005}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.99
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     # trailing_stop = True
@@ -49,10 +45,10 @@ class FiveMinCrossAbove(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'market',
-        'exit': 'market',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "market",
+        "exit": "market",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
@@ -77,11 +73,11 @@ class FiveMinCrossAbove(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
         # bollinger dataframe
-        #bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        #dataframe['bb_lowerband'] = bollinger['lower']
+        # bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        # dataframe['bb_lowerband'] = bollinger['lower']
 
         # RSI for last 8 candle
-        dataframe['rsi8'] = ta.RSI(dataframe, timeperiod=8)
+        dataframe["rsi8"] = ta.RSI(dataframe, timeperiod=8)
 
         return dataframe
 
@@ -94,11 +90,9 @@ class FiveMinCrossAbove(IStrategy):
         """
         dataframe.loc[
             # Prod
-            (
-                    (qtpylib.crossed_above(dataframe['rsi8'], 30)) &
-					(dataframe['rsi8'] < 41)
-            ),
-            'enter_long'] = 1
+            ((qtpylib.crossed_above(dataframe["rsi8"], 30)) & (dataframe["rsi8"] < 41)),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -111,9 +105,6 @@ class FiveMinCrossAbove(IStrategy):
         """
         dataframe.loc[
             # Prod
-            (
-                    (dataframe['close'] > 9999999999)
-            ),
-
-            'exit_long'] = 1
+            (dataframe["close"] > 9999999999), "exit_long"
+        ] = 1
         return dataframe

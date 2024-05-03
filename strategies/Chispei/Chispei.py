@@ -21,41 +21,35 @@ import talib.abstract as ta
 class Chispei(IStrategy):
     # Minimal ROI designed for the strategy.
     minimal_roi = {
-	    "5127": 0,
-	    "1836": 0.676,
-	    "2599": 0.079,
+        "5127": 0,
+        "1836": 0.676,
+        "2599": 0.079,
         "120": 0.10,
-	    "60": 0.10,
+        "60": 0.10,
         "30": 0.05,
         "20": 0.05,
-        "0": 0.04
+        "0": 0.04,
     }
 
     stoploss = -0.32336
-    ticker_interval = '4h'
+    ticker_interval = "4h"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # SMA - Simple Moving Average
-        dataframe['fastMA'] = ta.SMA(dataframe, timeperiod=13)
-        dataframe['slowMA'] = ta.SMA(dataframe, timeperiod=25)
-        dataframe['mom'] = ta.MOM(dataframe, timeperiod=21)
+        dataframe["fastMA"] = ta.SMA(dataframe, timeperiod=13)
+        dataframe["slowMA"] = ta.SMA(dataframe, timeperiod=25)
+        dataframe["mom"] = ta.MOM(dataframe, timeperiod=21)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['mom'] < 15) &
-                (dataframe['fastMA'] > dataframe['slowMA'])
-            ),
-            'enter_long'] = 1
+            ((dataframe["mom"] < 15) & (dataframe["fastMA"] > dataframe["slowMA"])), "enter_long"
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['mom'] < 80) &
-                (dataframe['fastMA'] < dataframe['slowMA'])
-            ),
-            'exit_long'] = 1
+            ((dataframe["mom"] < 80) & (dataframe["fastMA"] < dataframe["slowMA"])), "exit_long"
+        ] = 1
         return dataframe

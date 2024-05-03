@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -33,18 +38,17 @@ class BBandsRSI(IStrategy):
     You should keep:
     - timeframe, minimal_roi, stoploss, trailing_*
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Optimal timeframe for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 0.0
-    }
+    minimal_roi = {"0": 0.0}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -73,35 +77,32 @@ class BBandsRSI(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
-    
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
+
     @property
     def plot_config(self):
         return {
             # Main plot indicators (Moving averages, ...)
-            'main_plot': {
-                'bb_upperband': {'color': 'grey'},
-                'bb_middleband': {'color': 'red'},
-                'bb_lowerband': {'color': 'grey'}
+            "main_plot": {
+                "bb_upperband": {"color": "grey"},
+                "bb_middleband": {"color": "red"},
+                "bb_lowerband": {"color": "grey"},
             },
-            'subplots': {
+            "subplots": {
                 # Subplots - each dict defines one additional plot
                 "RSI": {
-                    'rsi': {'color': 'blue'},
-                    'overbought': {'color': 'red'},
-                    'oversold': {'color': 'green'}
+                    "rsi": {"color": "blue"},
+                    "overbought": {"color": "red"},
+                    "oversold": {"color": "green"},
                 }
-            }
+            },
         }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -115,30 +116,29 @@ class BBandsRSI(IStrategy):
         :param metadata: Additional information, like the currently traded pair
         :return: a Dataframe with all mandatory indicators for the strategies
         """
-        
+
         # Momentum Indicators
         # ------------------------------------
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
-        dataframe['overbought'] = 70
-        dataframe['oversold'] = 30
+        dataframe["rsi"] = ta.RSI(dataframe)
+        dataframe["overbought"] = 70
+        dataframe["oversold"] = 30
 
         # Overlap Studies
         # ------------------------------------
 
         # Bollinger Bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe["bb_percent"] = (
-            (dataframe["close"] - dataframe["bb_lowerband"]) /
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"])
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_percent"] = (dataframe["close"] - dataframe["bb_lowerband"]) / (
+            dataframe["bb_upperband"] - dataframe["bb_lowerband"]
         )
-        dataframe["bb_width"] = (
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe["bb_middleband"]
-        )
+        dataframe["bb_width"] = (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe[
+            "bb_middleband"
+        ]
 
         return dataframe
 
@@ -151,11 +151,12 @@ class BBandsRSI(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['rsi'] < 30) &
-                (dataframe['close'] < dataframe['bb_lowerband']) &
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                (dataframe["rsi"] < 30)
+                & (dataframe["close"] < dataframe["bb_lowerband"])
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -168,9 +169,8 @@ class BBandsRSI(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['rsi'] > 70) &
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                (dataframe["rsi"] > 70) & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe
-    

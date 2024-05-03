@@ -93,23 +93,17 @@ class MontrealStrategy(IStrategy):
         dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger Bands
-        bollinger1 = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=1
-        )
+        bollinger1 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
         dataframe["bb1_lowerband"] = bollinger1["lower"]
         dataframe["bb1_middleband"] = bollinger1["mid"]
         dataframe["bb1_upperband"] = bollinger1["upper"]
 
-        bollinger2 = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=2
-        )
+        bollinger2 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
         dataframe["bb2_lowerband"] = bollinger2["lower"]
         dataframe["bb2_middleband"] = bollinger2["mid"]
         dataframe["bb2_upperband"] = bollinger2["upper"]
 
-        bollinger4 = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=4
-        )
+        bollinger4 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=4)
         dataframe["bb4_lowerband"] = bollinger4["lower"]
         dataframe["bb4_middleband"] = bollinger4["mid"]
         dataframe["bb4_upperband"] = bollinger4["upper"]
@@ -142,10 +136,7 @@ class MontrealStrategy(IStrategy):
         :return: DataFrame with buy column
         """
         dataframe.loc[
-            (
-                (dataframe["close"] > dataframe["bb2_upperband"])
-                & (dataframe["volume"] > 0)
-            ),
+            ((dataframe["close"] > dataframe["bb2_upperband"]) & (dataframe["volume"] > 0)),
             "sell",
         ] = 1
 

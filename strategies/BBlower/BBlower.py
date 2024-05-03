@@ -28,20 +28,14 @@ class BBlower(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
     # ROI table:
-    minimal_roi = {
-        "0": 0.32477,
-        "220": 0.13561,
-        "962": 0.10732,
-        "2115": 0
-    }
-
+    minimal_roi = {"0": 0.32477, "220": 0.13561, "962": 0.10732, "2115": 0}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.13912
-    
+
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Trailing stop:
     trailing_stop = True
@@ -56,7 +50,6 @@ class BBlower(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-
 
     def informative_pairs(self):
         """
@@ -79,34 +72,34 @@ class BBlower(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['CMO'] = ta.CMO(dataframe, timeperiod = 25)
-        dataframe['RSI'] = ta.RSI(dataframe, timeperiod = 25)
-        dataframe['TEMA'] = ta.TEMA(dataframe, timeperiod = 50)
-      
+        dataframe["CMO"] = ta.CMO(dataframe, timeperiod=25)
+        dataframe["RSI"] = ta.RSI(dataframe, timeperiod=25)
+        dataframe["TEMA"] = ta.TEMA(dataframe, timeperiod=50)
+
         # Bollinger bands
         bollingerTA1 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=1.0, nbdevdn=1.0, matype=0)
-        
-        dataframe['bb_lowerbandTA1'] = bollingerTA1['lowerband']
-        dataframe['bb_middlebandTA1'] = bollingerTA1['middleband']
-        dataframe['bb_upperbandTA1'] = bollingerTA1['upperband']
-        
+
+        dataframe["bb_lowerbandTA1"] = bollingerTA1["lowerband"]
+        dataframe["bb_middlebandTA1"] = bollingerTA1["middleband"]
+        dataframe["bb_upperbandTA1"] = bollingerTA1["upperband"]
+
         bollingerTA2 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=2.0, nbdevdn=2.0, matype=0)
-        
-        dataframe['bb_lowerbandTA2'] = bollingerTA2['lowerband']
-        dataframe['bb_middlebandTA2'] = bollingerTA2['middleband']
-        dataframe['bb_upperbandTA2'] = bollingerTA2['upperband']
-        
+
+        dataframe["bb_lowerbandTA2"] = bollingerTA2["lowerband"]
+        dataframe["bb_middlebandTA2"] = bollingerTA2["middleband"]
+        dataframe["bb_upperbandTA2"] = bollingerTA2["upperband"]
+
         bollingerTA3 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=3.0, nbdevdn=3.0, matype=0)
-        
-        dataframe['bb_lowerbandTA3'] = bollingerTA3['lowerband']
-        dataframe['bb_middlebandTA3'] = bollingerTA3['middleband']
-        dataframe['bb_upperbandTA3'] = bollingerTA3['upperband']
-        
+
+        dataframe["bb_lowerbandTA3"] = bollingerTA3["lowerband"]
+        dataframe["bb_middlebandTA3"] = bollingerTA3["middleband"]
+        dataframe["bb_upperbandTA3"] = bollingerTA3["upperband"]
+
         bollingerTA4 = ta.BBANDS(dataframe, timeperiod=25, nbdevup=4.0, nbdevdn=4.0, matype=0)
-        
-        dataframe['bb_lowerbandTA4'] = bollingerTA4['lowerband']
-        dataframe['bb_middlebandTA4'] = bollingerTA4['middleband']
-        dataframe['bb_upperbandTA4'] = bollingerTA4['upperband']
+
+        dataframe["bb_lowerbandTA4"] = bollingerTA4["lowerband"]
+        dataframe["bb_middlebandTA4"] = bollingerTA4["middleband"]
+        dataframe["bb_upperbandTA4"] = bollingerTA4["upperband"]
 
         return dataframe
 
@@ -116,28 +109,20 @@ class BBlower(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                        
+
         dataframe.loc[
             (
                 # (dataframe['TEMA'] < dataframe['bb_upperbandTA1'])
                 # &
-                (dataframe['RSI'] > dataframe['RSI'].shift(1))
-                &
-                (dataframe['RSI'].shift(1) > dataframe['RSI'].shift(2))
-                &
-                (dataframe['RSI'].shift(2) > dataframe['RSI'].shift(3))
-                &
-                (dataframe['RSI'].shift(3) > dataframe['RSI'].shift(4))
-                &
-                (dataframe['RSI'] < 50)
-                &
-                (qtpylib.crossed_above(
-                        dataframe['TEMA'], dataframe['bb_lowerbandTA1']
-                    ))
-                  
-                
+                (dataframe["RSI"] > dataframe["RSI"].shift(1))
+                & (dataframe["RSI"].shift(1) > dataframe["RSI"].shift(2))
+                & (dataframe["RSI"].shift(2) > dataframe["RSI"].shift(3))
+                & (dataframe["RSI"].shift(3) > dataframe["RSI"].shift(4))
+                & (dataframe["RSI"] < 50)
+                & (qtpylib.crossed_above(dataframe["TEMA"], dataframe["bb_lowerbandTA1"]))
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -147,19 +132,16 @@ class BBlower(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                       
+
         dataframe.loc[
             (
-                
-            #     (dataframe['CMO'] > 23) 
-            # & 
-            #   (dataframe['RSI'] > 98) 
-            #       &
+                #     (dataframe['CMO'] > 23)
+                # &
+                #   (dataframe['RSI'] > 98)
+                #       &
                 # (dataframe['TEMA'] > dataframe['bb_upperbandTA2'])
-           
-                
-                
             ),
-            'exit_long'] = 1        
-        
+            "exit_long",
+        ] = 1
+
         return dataframe

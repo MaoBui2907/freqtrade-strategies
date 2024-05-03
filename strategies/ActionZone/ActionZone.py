@@ -15,6 +15,7 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import datetime
 
+
 class ActionZone(IStrategy):
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
@@ -22,9 +23,7 @@ class ActionZone(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 100000
-    }
+    minimal_roi = {"0": 100000}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -37,9 +36,8 @@ class ActionZone(IStrategy):
     # trailing_stop_positive = 0.01
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
-
     # Optimal timeframe for the strategy.
-    timeframe = '1d'
+    timeframe = "1d"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -56,40 +54,45 @@ class ActionZone(IStrategy):
     min_price_period: int = 14
 
     # max loss able for calculation position size
-    max_loss_per_trade = 10 # USD
+    max_loss_per_trade = 10  # USD
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'fastMA': {
-                'color': 'red',
-                'fill_to': 'slowMA',
-                'fill_color': 'rgba(232, 232, 232,0.2)'
-            }, 
-            'slowMA': {
-                'color': 'blue',
+        "main_plot": {
+            "fastMA": {
+                "color": "red",
+                "fill_to": "slowMA",
+                "fill_color": "rgba(232, 232, 232,0.2)",
+            },
+            "slowMA": {
+                "color": "blue",
             },
         },
     }
 
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime, current_rate: float, current_profit: float, **kwargs) -> float:
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
 
-        stoploss_price = last_candle['lowest']
+        stoploss_price = last_candle["lowest"]
 
         # Convert absolute price to percentage relative to current_rate
         if stoploss_price < current_rate:
@@ -97,12 +100,21 @@ class ActionZone(IStrategy):
 
         # return maximum stoploss value, keeping current stoploss price unchanged
         return 1
-    
-    def custom_stake_amount(self, pair: str, current_time: datetime, current_rate: float, proposed_stake: float, min_stake: float, max_stake: float, **kwargs) -> float:
+
+    def custom_stake_amount(
+        self,
+        pair: str,
+        current_time: datetime,
+        current_rate: float,
+        proposed_stake: float,
+        min_stake: float,
+        max_stake: float,
+        **kwargs,
+    ) -> float:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
 
-        stop_price = last_candle['lowest']
+        stop_price = last_candle["lowest"]
         volume_for_buy = self.max_loss_per_trade / (current_rate - stop_price)
         use_money = volume_for_buy * current_rate
 
@@ -135,14 +147,13 @@ class ActionZone(IStrategy):
 
         # MIN - Lowest value over a specified period
         lowest = ta.MIN(dataframe, timeperiod=self.min_price_period)
-        dataframe['lowest'] = lowest
+        dataframe["lowest"] = lowest
 
         # EMA - Exponential Moving Average
         fastEMA = ta.EMA(dataframe, timeperiod=12)
         slowEMA = ta.EMA(dataframe, timeperiod=26)
-        dataframe['fastMA'] = fastEMA
-        dataframe['slowMA'] = slowEMA
-
+        dataframe["fastMA"] = fastEMA
+        dataframe["slowMA"] = slowEMA
 
         return dataframe
 
@@ -155,11 +166,12 @@ class ActionZone(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['fastMA'] > dataframe['slowMA']) &  # Bull
-                (dataframe['close'] > dataframe['fastMA'] ) & # Price Cross Up
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                (dataframe["fastMA"] > dataframe["slowMA"])  # Bull
+                & (dataframe["close"] > dataframe["fastMA"])  # Price Cross Up
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -172,12 +184,10 @@ class ActionZone(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['fastMA'] < dataframe['slowMA']) & # Bear
-                (dataframe['close'] < dataframe['fastMA'] ) & # Price Cross Down
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                (dataframe["fastMA"] < dataframe["slowMA"])  # Bear
+                & (dataframe["close"] < dataframe["fastMA"])  # Price Cross Down
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe
-    
-    
-

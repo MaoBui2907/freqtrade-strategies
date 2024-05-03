@@ -9,21 +9,13 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
 class MACD_TRIPLE_MA(IStrategy):
-   
-    
     # Minimal ROI designed for the strategy.
     # adjust based on market conditions. We would recommend to keep it low for quick turn arounds
     # This attribute will be overridden if the config file contains "minimal_roi"
-    
+
     # Optimal stoploss designed for the strategy
     # ROI table:
-    minimal_roi = {
-        "0": 0.15825,
-        "28": 0.08491,
-        "45": 0.04,
-        "88": 0.0194,
-        "120": 0
-    }
+    minimal_roi = {"0": 0.15825, "28": 0.08491, "45": 0.04, "88": 0.0194, "120": 0}
 
     # Stoploss:
     stoploss = -0.03
@@ -35,48 +27,46 @@ class MACD_TRIPLE_MA(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 26
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         SMA6 = 6
         SMA14 = 14
-        SMA26 =26
-        # MACD 
+        SMA26 = 26
+        # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
-       
-        # SMA - Simple Moving Average
-        dataframe['sma6'] = ta.SMA(dataframe, timeperiod=SMA6)
-        dataframe['sma26'] = ta.SMA(dataframe, timeperiod=SMA26)
-        dataframe['sma14'] = ta.SMA(dataframe, timeperiod=SMA14)
-        
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
+        # SMA - Simple Moving Average
+        dataframe["sma6"] = ta.SMA(dataframe, timeperiod=SMA6)
+        dataframe["sma26"] = ta.SMA(dataframe, timeperiod=SMA26)
+        dataframe["sma14"] = ta.SMA(dataframe, timeperiod=SMA14)
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal']) &
-                qtpylib.crossed_above(dataframe['sma6'], dataframe['sma14']) &
-                (dataframe['sma26'] > dataframe['sma6']) 
-
+                qtpylib.crossed_above(dataframe["macd"], dataframe["macdsignal"])
+                & qtpylib.crossed_above(dataframe["sma6"], dataframe["sma14"])
+                & (dataframe["sma26"] > dataframe["sma6"])
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                     qtpylib.crossed_below(dataframe['macd'], dataframe['macdsignal']) &
-                qtpylib.crossed_below(dataframe['sma6'], dataframe['sma14']) &
-                (dataframe['sma26'] < dataframe['sma6']) &
-                (dataframe['sma26'] < dataframe['sma14'])
-
+                qtpylib.crossed_below(dataframe["macd"], dataframe["macdsignal"])
+                & qtpylib.crossed_below(dataframe["sma6"], dataframe["sma14"])
+                & (dataframe["sma26"] < dataframe["sma6"])
+                & (dataframe["sma26"] < dataframe["sma14"])
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

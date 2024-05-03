@@ -8,11 +8,11 @@ import talib.abstract as ta
 from freqtrade.strategy import DecimalParameter, IntParameter, CategoricalParameter
 
 
-SMA = 'SMA'
-EMA = 'EMA'
+SMA = "SMA"
+EMA = "EMA"
 
 # Buy hyperspace params:
-#buy_params = {
+# buy_params = {
 #    "base_nb_candles_buy": 20,
 #    "ewo_high": 6,
 #    "fast_ewo": 50,
@@ -22,7 +22,7 @@ EMA = 'EMA'
 #    "ewo_high": 2.0,
 #    "ewo_low": -16.062,
 #    "rsi_buy": 51,
-#}
+# }
 
 buy_params = {
     "base_nb_candles_buy": 20,
@@ -32,16 +32,15 @@ buy_params = {
     "rsi_buy": 67,
     "buy_trigger": "EMA",  # value loaded from strategy
     "fast_ewo": 50,  # value loaded from strategy
-    "slow_ewo": 200,  # value loaded from strategy
-    "buy_trigger": "EMA",
+    "slow_ewo": 200,
 }
 
 # Sell hyperspace params:
-#sell_params = {
+# sell_params = {
 #    "base_nb_candles_sell": 20,
 #    "high_offset": 1.012,
 #    "sell_trigger": "EMA",
-#}
+# }
 
 # Sell hyperspace params:
 sell_params = {
@@ -51,12 +50,11 @@ sell_params = {
 }
 
 
-
 def EWO(dataframe, ema_length=5, ema2_length=35):
     df = dataframe.copy()
     ema1 = ta.EMA(df, timeperiod=ema_length)
     ema2 = ta.EMA(df, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / df['close'] * 100
+    emadif = (ema1 - ema2) / df["close"] * 100
     return emadif
 
 
@@ -64,37 +62,41 @@ class SMAOffsetProtectOptV0(IStrategy):
     INTERFACE_VERSION = 2
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.01
-    }
+    minimal_roi = {"0": 0.01}
 
     # Stoploss:
     stoploss = -0.5
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+        5, 80, default=buy_params["base_nb_candles_buy"], space="entry", optimize=True
+    )
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+        5, 80, default=sell_params["base_nb_candles_sell"], space="exit", optimize=True
+    )
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+        0.9, 0.99, default=buy_params["low_offset"], space="entry", optimize=True
+    )
     high_offset = DecimalParameter(
-        0.99, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+        0.99, 1.1, default=sell_params["high_offset"], space="exit", optimize=True
+    )
     buy_trigger = CategoricalParameter(
-        [SMA, EMA], default=buy_params['buy_trigger'], space='entry', optimize=False)
+        [SMA, EMA], default=buy_params["buy_trigger"], space="entry", optimize=False
+    )
     sell_trigger = CategoricalParameter(
-        [SMA, EMA], default=sell_params['sell_trigger'], space='exit', optimize=False)
+        [SMA, EMA], default=sell_params["sell_trigger"], space="exit", optimize=False
+    )
 
     # Protection
-    ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_low = DecimalParameter(
+        -20.0, -8.0, default=buy_params["ewo_low"], space="entry", optimize=True
+    )
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
-    fast_ewo = IntParameter(
-        10, 50, default=buy_params['fast_ewo'], space='entry', optimize=False)
-    slow_ewo = IntParameter(
-        100, 200, default=buy_params['slow_ewo'], space='entry', optimize=False)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
+        2.0, 12.0, default=buy_params["ewo_high"], space="entry", optimize=True
+    )
+    fast_ewo = IntParameter(10, 50, default=buy_params["fast_ewo"], space="entry", optimize=False)
+    slow_ewo = IntParameter(100, 200, default=buy_params["slow_ewo"], space="entry", optimize=False)
+    rsi_buy = IntParameter(30, 70, default=buy_params["rsi_buy"], space="entry", optimize=True)
     # slow_ema = IntParameter(
     #     10, 50, default=buy_params['fast_ewo'], space='entry', optimize=True)
     # fast_ema = IntParameter(
@@ -113,8 +115,8 @@ class SMAOffsetProtectOptV0(IStrategy):
     ignore_roi_if_entry_signal = True
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
-    informative_timeframe = '1h'
+    timeframe = "5m"
+    informative_timeframe = "1h"
 
     use_exit_signal = True
     exit_profit_only = False
@@ -123,36 +125,36 @@ class SMAOffsetProtectOptV0(IStrategy):
     startup_candle_count = 30
 
     plot_config = {
-        'main_plot': {
-            'ma_offset_buy': {'color': 'orange'},
-            'ma_offset_sell': {'color': 'orange'},
+        "main_plot": {
+            "ma_offset_buy": {"color": "orange"},
+            "ma_offset_sell": {"color": "orange"},
         },
     }
 
     use_custom_stoploss = False
 
     def informative_pairs(self):
-
         pairs = self.dp.current_whitelist()
         informative_pairs = [(pair, self.informative_timeframe) for pair in pairs]
 
         # EMA
-        informative_pairs['ema_50'] = ta.EMA(informative_pairs, timeperiod=50)
-        informative_pairs['ema_100'] = ta.EMA(informative_pairs, timeperiod=100)
-        informative_pairs['ema_200'] = ta.EMA(informative_pairs, timeperiod=200)
+        informative_pairs["ema_50"] = ta.EMA(informative_pairs, timeperiod=50)
+        informative_pairs["ema_100"] = ta.EMA(informative_pairs, timeperiod=100)
+        informative_pairs["ema_200"] = ta.EMA(informative_pairs, timeperiod=200)
         # SMA
-        informative_pairs['sma_200'] = ta.SMA(informative_pairs, timeperiod=200)
-        informative_pairs['sma_200_dec'] = informative_pairs['sma_200'] < informative_pairs['sma_200'].shift(
-            20)
+        informative_pairs["sma_200"] = ta.SMA(informative_pairs, timeperiod=200)
+        informative_pairs["sma_200_dec"] = informative_pairs["sma_200"] < informative_pairs[
+            "sma_200"
+        ].shift(20)
         # RSI
-        informative_pairs['rsi'] = ta.RSI(informative_pairs, timeperiod=14)
+        informative_pairs["rsi"] = ta.RSI(informative_pairs, timeperiod=14)
 
         return informative_pairs
 
     def get_informative_indicators(self, metadata: dict):
-
         dataframe = self.dp.get_pair_dataframe(
-            pair=metadata['pair'], timeframe=self.informative_timeframe)
+            pair=metadata["pair"], timeframe=self.informative_timeframe
+        )
 
         return dataframe
 
@@ -163,35 +165,33 @@ class SMAOffsetProtectOptV0(IStrategy):
 
         # Calculate all base_nb_candles_buy values
         for val in self.base_nb_candles_buy.range:
-            dataframe[f'ma_buy_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_buy_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Calculate all base_nb_candles_buy values
         for val in self.base_nb_candles_sell.range:
-            dataframe[f'ma_sell_{val}'] = ta.EMA(dataframe, timeperiod=val)
-
+            dataframe[f"ma_sell_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # ---------------- original code -------------------
         ##SMAOffset
-        #if self.buy_trigger.value == 'EMA':
+        # if self.buy_trigger.value == 'EMA':
         #    dataframe['ma_buy'] = ta.EMA(dataframe, timeperiod=self.base_nb_candles_buy.value)
-        #else:
+        # else:
         #    dataframe['ma_buy'] = ta.SMA(dataframe, timeperiod=self.base_nb_candles_buy.value)
         #
-        #if self.sell_trigger.value == 'EMA':
+        # if self.sell_trigger.value == 'EMA':
         #    dataframe['ma_sell'] = ta.EMA(dataframe, timeperiod=self.base_nb_candles_sell.value)
-        #else:
+        # else:
         #    dataframe['ma_sell'] = ta.SMA(dataframe, timeperiod=self.base_nb_candles_sell.value)
         #
-        #dataframe['ma_offset_buy'] = dataframe['ma_buy'] * self.low_offset.value
-        #dataframe['ma_offset_sell'] = dataframe['ma_sell'] * self.high_offset.value
+        # dataframe['ma_offset_buy'] = dataframe['ma_buy'] * self.low_offset.value
+        # dataframe['ma_offset_sell'] = dataframe['ma_sell'] * self.high_offset.value
         # ------------ end original code --------------------
 
         # Elliot
-        dataframe['EWO'] = EWO(dataframe, self.fast_ewo.value, self.slow_ewo.value)
-        
-        
+        dataframe["EWO"] = EWO(dataframe, self.fast_ewo.value, self.slow_ewo.value)
+
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
         return dataframe
 
@@ -200,45 +200,54 @@ class SMAOffsetProtectOptV0(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] > self.ewo_high.value) &
-                (dataframe['rsi'] < self.rsi_buy.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] > self.ewo_high.value)
+                & (dataframe["rsi"] < self.rsi_buy.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] < self.ewo_low.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] < self.ewo_low.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         # ---------------- original code -------------------
-        #conditions.append(
+        # conditions.append(
         #    (
         #        (dataframe['close'] < dataframe['ma_offset_buy']) &
         #        (dataframe['EWO'] > self.ewo_high.value) &
         #        (dataframe['rsi'] < self.rsi_buy.value) &
         #        (dataframe['volume'] > 0)
         #    )
-        #)
+        # )
 
-        #conditions.append(
+        # conditions.append(
         #    (
         #        (dataframe['close'] < dataframe['ma_offset_buy']) &
         #        (dataframe['EWO'] < self.ewo_low.value) &
         #        (dataframe['volume'] > 0)
         #    )
-        #)
+        # )
         # ------------ end original code --------------------
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'entry'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "entry"] = 1
 
         return dataframe
 
@@ -247,25 +256,27 @@ class SMAOffsetProtectOptV0(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
+                & (dataframe["volume"] > 0)
             )
         )
 
-
         # ---------------- original code -------------------
-        #conditions.append(
+        # conditions.append(
         #    (
         #        (dataframe['close'] > dataframe['ma_offset_sell']) &
         #        (dataframe['volume'] > 0)
         #    )
-        #)
+        # )
         # ------------ end original code --------------------
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'exit'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "exit"] = 1
 
         return dataframe

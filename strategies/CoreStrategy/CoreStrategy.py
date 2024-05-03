@@ -13,6 +13,7 @@ from freqtrade.strategy import (
 )
 from functools import reduce
 import logging
+
 # -------------------------------------------------------------------------------------------------
 # --- logger for parameter merging output, only remove if you remove it further down too! ---------
 logger = logging.getLogger(__name__)
@@ -56,15 +57,15 @@ class CoreStrategy(IStrategy):
         # Enable/Disable conditions
         "smaoffset_buy_condition_0_enable": True,
         "smaoffset_buy_condition_1_enable": True,
-        "v6_buy_condition_0_enable": False, # avg 0.47 dd 27%
-        "v6_buy_condition_1_enable": True, # no trade
+        "v6_buy_condition_0_enable": False,  # avg 0.47 dd 27%
+        "v6_buy_condition_1_enable": True,  # no trade
         "v6_buy_condition_2_enable": True,  # avg 2.32
-        "v6_buy_condition_3_enable": True, # avg 1.12 dd 6%
-        "v8_buy_condition_0_enable": True, # avg 0.74
+        "v6_buy_condition_3_enable": True,  # avg 1.12 dd 6%
+        "v8_buy_condition_0_enable": True,  # avg 0.74
         "v8_buy_condition_1_enable": False,  # avg 0.41 dd 37%
-        "v8_buy_condition_2_enable": True,   # avg 1.37
+        "v8_buy_condition_2_enable": True,  # avg 1.37
         "v8_buy_condition_3_enable": False,  # avg 0.41
-        "v8_buy_condition_4_enable": True,   # avg 1.29
+        "v8_buy_condition_4_enable": True,  # avg 1.29
         "v9_buy_condition_0_enable": False,
         "v9_buy_condition_1_enable": False,
         "v9_buy_condition_2_enable": False,
@@ -86,13 +87,10 @@ class CoreStrategy(IStrategy):
         "smaoffset_sell_condition_0_enable": False,
     }
     plot_config = {
-        'main_plot': {
-             },
-        'subplots': {
-            "buy tag": {
-                'buy_tag': {'color': 'green'}
-            },
-        }
+        "main_plot": {},
+        "subplots": {
+            "buy tag": {"buy_tag": {"color": "green"}},
+        },
     }
 
     # if you want to see which buy conditions were met
@@ -113,29 +111,15 @@ class CoreStrategy(IStrategy):
         [True, False], default=True, space="sell", optimize=False, load=True
     )
     # hyperopt parameters for SMAOffsetProtectOpt
-    base_nb_candles_buy = IntParameter(
-        5, 80, default=20, space="buy", optimize=False, load=True
-    )
-    base_nb_candles_sell = IntParameter(
-        5, 80, default=24, space="sell", optimize=False, load=True
-    )
-    low_offset = DecimalParameter(
-        0.9, 0.99, default=0.975, space="buy", optimize=True, load=True
-    )
-    high_offset = DecimalParameter(
-        0.99, 1.1, default=1.012, space="sell", optimize=True, load=True
-    )
+    base_nb_candles_buy = IntParameter(5, 80, default=20, space="buy", optimize=False, load=True)
+    base_nb_candles_sell = IntParameter(5, 80, default=24, space="sell", optimize=False, load=True)
+    low_offset = DecimalParameter(0.9, 0.99, default=0.975, space="buy", optimize=True, load=True)
+    high_offset = DecimalParameter(0.99, 1.1, default=1.012, space="sell", optimize=True, load=True)
     # Protection
     fast_ewo = IntParameter(10, 50, default=50, space="buy", optimize=False, load=True)
-    slow_ewo = IntParameter(
-        100, 200, default=200, space="buy", optimize=False, load=True
-    )
-    ewo_low = DecimalParameter(
-        -20.0, -8.0, default=-19.881, space="buy", optimize=True, load=True
-    )
-    ewo_high = DecimalParameter(
-        2.0, 12.0, default=5.499, space="buy", optimize=True, load=True
-    )
+    slow_ewo = IntParameter(100, 200, default=200, space="buy", optimize=False, load=True)
+    ewo_low = DecimalParameter(-20.0, -8.0, default=-19.881, space="buy", optimize=True, load=True)
+    ewo_high = DecimalParameter(2.0, 12.0, default=5.499, space="buy", optimize=True, load=True)
     rsi_buy = IntParameter(30, 70, default=50, space="buy", optimize=True, load=True)
     # Buy CombinedBinHClucAndMADV6
 
@@ -202,9 +186,7 @@ class CoreStrategy(IStrategy):
     buy_bb20_close_bblowerband = DecimalParameter(
         0.8, 1.1, default=0.992, space="buy", optimize=False, load=True
     )
-    buy_bb20_volume = IntParameter(
-        18, 36, default=29, space="buy", optimize=False, load=True
-    )
+    buy_bb20_volume = IntParameter(18, 36, default=29, space="buy", optimize=False, load=True)
     buy_rsi_diff = DecimalParameter(
         34.0, 60.0, default=50.48, space="buy", decimals=2, optimize=False, load=True
     )
@@ -354,12 +336,16 @@ class CoreStrategy(IStrategy):
         0.01, 0.09, default=0.03, space="buy", decimals=2, optimize=False, load=True
     )
     # minimum conditions to match in buy
-    buy_minimum_conditions = IntParameter(
-        1, 2, default=1, space="buy", optimize=False, load=True
-    )
+    buy_minimum_conditions = IntParameter(1, 2, default=1, space="buy", optimize=False, load=True)
 
     def custom_stoploss(
-        self, pair: str, trade: "Trade", current_time: datetime, current_rate: float, current_profit: float, **kwargs
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
     ) -> float:
         # Manage losing trades and open room for better ones.
 
@@ -372,9 +358,10 @@ class CoreStrategy(IStrategy):
             # Let's try to minimize the loss
 
             if current_time > trade_time_50:
-
                 try:
-                    number_of_candle_shift = int((current_time - trade_time_50).total_seconds() / 300)
+                    number_of_candle_shift = int(
+                        (current_time - trade_time_50).total_seconds() / 300
+                    )
                     dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
                     candle = dataframe.iloc[-number_of_candle_shift].squeeze()
                     if (candle["sma_200_dec"]) & (candle["sma_200_dec_1h"]):
@@ -392,13 +379,10 @@ class CoreStrategy(IStrategy):
                         return 0.01
 
                 except IndexError:
-
                     # Whoops, set stoploss at 10%
                     return 0.1
 
         return 0.99
-
-
 
     def custom_exit(
         self,
@@ -465,9 +449,7 @@ class CoreStrategy(IStrategy):
         informative_pairs = [(pair, self.informative_timeframe) for pair in pairs]
         return informative_pairs
 
-    def informative_1h_indicators(
-        self, dataframe: DataFrame, metadata: dict
-    ) -> DataFrame:
+    def informative_1h_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         assert self.dp, "DataProvider is required for multiple timeframes."
         # Get the informative pair
         informative_1h = self.dp.get_pair_dataframe(
@@ -479,9 +461,9 @@ class CoreStrategy(IStrategy):
         informative_1h["ema_200"] = ta.EMA(informative_1h, timeperiod=200)
         # SMA
         informative_1h["sma_200"] = ta.SMA(informative_1h, timeperiod=200)
-        informative_1h["sma_200_dec"] = informative_1h["sma_200"] < informative_1h[
-            "sma_200"
-        ].shift(20)
+        informative_1h["sma_200_dec"] = informative_1h["sma_200"] < informative_1h["sma_200"].shift(
+            20
+        )
         # RSI
         informative_1h["rsi"] = ta.RSI(informative_1h, timeperiod=14)
 
@@ -499,14 +481,10 @@ class CoreStrategy(IStrategy):
         dataframe["lower"] = bb_40["lower"]
         dataframe["mid"] = bb_40["mid"]
         dataframe["bbdelta"] = (bb_40["mid"] - dataframe["lower"]).abs()
-        dataframe["closedelta"] = (
-            dataframe["close"] - dataframe["close"].shift()
-        ).abs()
+        dataframe["closedelta"] = (dataframe["close"] - dataframe["close"].shift()).abs()
         dataframe["tail"] = (dataframe["close"] - dataframe["low"]).abs()
         # strategy ClucMay72018
-        bollinger = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=2
-        )
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
         dataframe["bb_lowerband"] = bollinger["lower"]
         dataframe["bb_middleband"] = bollinger["mid"]
         dataframe["bb_upperband"] = bollinger["upper"]
@@ -585,11 +563,10 @@ class CoreStrategy(IStrategy):
         dataframe.loc[:, "smaoffset_buy_condition_0_enable"] = False
         dataframe.loc[:, "smaoffset_buy_condition_1_enable"] = False
         dataframe.loc[:, "conditions_count"] = 0
-        dataframe.loc[:, 'buy_tag'] = ''
+        dataframe.loc[:, "buy_tag"] = ""
 
         dataframe["ma_buy"] = (
-            dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
-            * self.low_offset.value
+            dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"] * self.low_offset.value
         )
 
         dataframe.loc[
@@ -599,8 +576,8 @@ class CoreStrategy(IStrategy):
                 & (dataframe["rsi"] < self.rsi_buy.value)
                 & (self.smaoffset_buy_condition_0_enable.value is True)
             ),
-            ['smaoffset_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_smaoffset_0')
-
+            ["smaoffset_buy_condition_0_enable", "buy_tag"],
+        ] = (1, "buy_signal_smaoffset_0")
 
         dataframe.loc[
             (
@@ -608,8 +585,8 @@ class CoreStrategy(IStrategy):
                 & (dataframe["EWO"] < self.ewo_low.value)
                 & (self.smaoffset_buy_condition_1_enable.value is True)
             ),
-            ['smaoffset_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_smaoffset_1')
-
+            ["smaoffset_buy_condition_1_enable", "buy_tag"],
+        ] = (1, "buy_signal_smaoffset_1")
 
         dataframe.loc[
             (
@@ -617,10 +594,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["ema_50"] > dataframe["ema_200"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
                 & (
-                    (
-                        (dataframe["open"].rolling(2).max() - dataframe["close"])
-                        / dataframe["close"]
-                    )
+                    ((dataframe["open"].rolling(2).max() - dataframe["close"]) / dataframe["close"])
                     < self.buy_dip_threshold_1.value
                 )
                 & (
@@ -631,21 +605,17 @@ class CoreStrategy(IStrategy):
                     < self.buy_dip_threshold_2.value
                 )
                 & dataframe["lower"].shift().gt(0)
-                & dataframe["bbdelta"].gt(
-                    dataframe["close"] * self.buy_bb40_bbdelta_close.value
-                )
+                & dataframe["bbdelta"].gt(dataframe["close"] * self.buy_bb40_bbdelta_close.value)
                 & dataframe["closedelta"].gt(
                     dataframe["close"] * self.buy_bb40_closedelta_close.value
                 )
-                & dataframe["tail"].lt(
-                    dataframe["bbdelta"] * self.buy_bb40_tail_bbdelta.value
-                )
+                & dataframe["tail"].lt(dataframe["bbdelta"] * self.buy_bb40_tail_bbdelta.value)
                 & dataframe["close"].lt(dataframe["lower"].shift())
                 & dataframe["close"].le(dataframe["close"].shift())
                 & (self.v8_buy_condition_0_enable.value is True)
             ),
-            ['v8_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_v8_0')
-
+            ["v8_buy_condition_0_enable", "buy_tag"],
+        ] = (1, "buy_signal_v8_0")
 
         dataframe.loc[
             (
@@ -654,10 +624,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["ema_50_1h"] > dataframe["ema_100_1h"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
                 & (
-                    (
-                        (dataframe["open"].rolling(2).max() - dataframe["close"])
-                        / dataframe["close"]
-                    )
+                    ((dataframe["open"].rolling(2).max() - dataframe["close"]) / dataframe["close"])
                     < self.buy_dip_threshold_1.value
                 )
                 & (
@@ -674,14 +641,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["volume"]
-                    < (
-                        dataframe["volume_mean_slow"].shift(1)
-                        * self.buy_bb20_volume.value
-                    )
+                    < (dataframe["volume_mean_slow"].shift(1) * self.buy_bb20_volume.value)
                 )
                 & (self.v8_buy_condition_1_enable.value is True)
             ),
-            ['v8_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v8_1')
+            ["v8_buy_condition_1_enable", "buy_tag"],
+        ] = (1, "buy_signal_v8_1")
 
         dataframe.loc[
             (
@@ -690,10 +655,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["ema_50"] > dataframe["ema_200"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
                 & (
-                    (
-                        (dataframe["open"].rolling(2).max() - dataframe["close"])
-                        / dataframe["close"]
-                    )
+                    ((dataframe["open"].rolling(2).max() - dataframe["close"]) / dataframe["close"])
                     < self.buy_dip_threshold_1.value
                 )
                 & (
@@ -713,19 +675,15 @@ class CoreStrategy(IStrategy):
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - self.buy_rsi_diff.value)
                 & (self.v8_buy_condition_2_enable.value is True)
             ),
-            ['v8_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v8_2')
-
-
+            ["v8_buy_condition_2_enable", "buy_tag"],
+        ] = (1, "buy_signal_v8_2")
 
         dataframe.loc[
             (
                 (dataframe["sma_200"] > dataframe["sma_200"].shift(20))
                 & (dataframe["sma_200_1h"] > dataframe["sma_200_1h"].shift(16))
                 & (
-                    (
-                        (dataframe["open"].rolling(2).max() - dataframe["close"])
-                        / dataframe["close"]
-                    )
+                    ((dataframe["open"].rolling(2).max() - dataframe["close"]) / dataframe["close"])
                     < self.buy_dip_threshold_1.value
                 )
                 & (
@@ -754,18 +712,15 @@ class CoreStrategy(IStrategy):
                 & (dataframe["mfi"] < self.buy_mfi.value)
                 & (self.v8_buy_condition_3_enable.value is True)
             ),
-            ['v8_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v8_3')
-
+            ["v8_buy_condition_3_enable", "buy_tag"],
+        ] = (1, "buy_signal_v8_3")
 
         dataframe.loc[
             (
                 (dataframe["close"] > dataframe["ema_100_1h"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_100_1h"])
                 & (
-                    (
-                        (dataframe["open"].rolling(2).max() - dataframe["close"])
-                        / dataframe["close"]
-                    )
+                    ((dataframe["open"].rolling(2).max() - dataframe["close"]) / dataframe["close"])
                     < self.buy_dip_threshold_1.value
                 )
                 & (
@@ -798,7 +753,8 @@ class CoreStrategy(IStrategy):
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
                 & (self.v8_buy_condition_4_enable.value is True)
             ),
-            ['v8_buy_condition_4_enable', 'buy_tag']] = (1, 'buy_signal_v8_4')
+            ["v8_buy_condition_4_enable", "buy_tag"],
+        ] = (1, "buy_signal_v8_4")
 
         # start from here
         dataframe.loc[
@@ -807,13 +763,11 @@ class CoreStrategy(IStrategy):
                 & (dataframe["close"] > dataframe["ema_200_1h"])
                 & (
                     dataframe["close"]
-                    < dataframe["bb_lowerband"]
-                    * self.buy_bb20_close_bblowerband_safe_1.value
+                    < dataframe["bb_lowerband"] * self.buy_bb20_close_bblowerband_safe_1.value
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (
                     dataframe["volume"]
@@ -821,25 +775,23 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["open"] - dataframe["close"]
-                    < dataframe["bb_upperband"].shift(2)
-                    - dataframe["bb_lowerband"].shift(2)
+                    < dataframe["bb_upperband"].shift(2) - dataframe["bb_lowerband"].shift(2)
                 )
                 & (self.v9_buy_condition_1_enable.value is True)
             ),
-            ['v9_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v9_1')
+            ["v9_buy_condition_1_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_1")
 
         dataframe.loc[
             (
                 (dataframe["close"] > dataframe["ema_200"])
                 & (
                     dataframe["close"]
-                    < dataframe["bb_lowerband"]
-                    * self.buy_bb20_close_bblowerband_safe_2.value
+                    < dataframe["bb_lowerband"] * self.buy_bb20_close_bblowerband_safe_2.value
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (
                     dataframe["volume"]
@@ -847,12 +799,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["open"] - dataframe["close"]
-                    < dataframe["bb_upperband"].shift(2)
-                    - dataframe["bb_lowerband"].shift(2)
+                    < dataframe["bb_upperband"].shift(2) - dataframe["bb_lowerband"].shift(2)
                 )
                 & (self.v9_buy_condition_2_enable.value is True)
             ),
-            ['v9_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v9_2')
+            ["v9_buy_condition_2_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_2")
 
         dataframe.loc[
             (
@@ -865,7 +817,8 @@ class CoreStrategy(IStrategy):
                 )
                 & (self.v9_buy_condition_3_enable.value is True)
             ),
-            ['v9_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v9_3')
+            ["v9_buy_condition_3_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_3")
 
         dataframe.loc[
             (
@@ -877,7 +830,8 @@ class CoreStrategy(IStrategy):
                 )
                 & (self.v9_buy_condition_4_enable.value is True)
             ),
-            ['v9_buy_condition_4_enable', 'buy_tag']] = (1, 'buy_signal_v9_4')
+            ["v9_buy_condition_4_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_4")
         dataframe.loc[
             (
                 (dataframe["close"] > dataframe["ema_200"])
@@ -898,12 +852,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (self.v9_buy_condition_5_enable.value is True)
             ),
-            ['v9_buy_condition_5_enable', 'buy_tag']] = (1, 'buy_signal_v9_5')
+            ["v9_buy_condition_5_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_5")
         dataframe.loc[
             (
                 (dataframe["ema_26"] > dataframe["ema_12"])
@@ -922,7 +876,8 @@ class CoreStrategy(IStrategy):
                 )
                 & (self.v9_buy_condition_6_enable.value is True)
             ),
-            ['v9_buy_condition_6_enable', 'buy_tag']] = (1, 'buy_signal_v9_6')
+            ["v9_buy_condition_6_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_6")
         dataframe.loc[
             (
                 (dataframe["rsi_1h"] < self.buy_rsi_1h_2.value)
@@ -941,12 +896,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (self.v9_buy_condition_7_enable.value is True)
             ),
-            ['v9_buy_condition_7_enable', 'buy_tag']] = (1, 'buy_signal_v9_7')
+            ["v9_buy_condition_7_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_7")
         dataframe.loc[
             (
                 (dataframe["rsi_1h"] < self.buy_rsi_1h_3.value)
@@ -957,12 +912,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (self.v9_buy_condition_8_enable.value is True)
             ),
-            ['v9_buy_condition_8_enable', 'buy_tag']] = (1, 'buy_signal_v9_8')
+            ["v9_buy_condition_8_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_8")
         dataframe.loc[
             (
                 (dataframe["rsi_1h"] < self.buy_rsi_1h_4.value)
@@ -973,12 +928,12 @@ class CoreStrategy(IStrategy):
                 )
                 & (
                     dataframe["volume_mean_slow"]
-                    > dataframe["volume_mean_slow"].shift(30)
-                    * self.buy_volume_pump_1.value
+                    > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value
                 )
                 & (self.v9_buy_condition_9_enable.value is True)
             ),
-            ['v9_buy_condition_9_enable', 'buy_tag']] = (1, 'buy_signal_v9_9')
+            ["v9_buy_condition_9_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_9")
         dataframe.loc[
             (
                 (dataframe["close"] < dataframe["sma_5"])
@@ -987,7 +942,8 @@ class CoreStrategy(IStrategy):
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - 43.276)
                 & (self.v9_buy_condition_10_enable.value is True)
             ),
-            ['v9_buy_condition_10_enable', 'buy_tag']] = (1, 'buy_signal_v9_10')
+            ["v9_buy_condition_10_enable", "buy_tag"],
+        ] = (1, "buy_signal_v9_10")
         dataframe.loc[
             (
                 (dataframe["close"] > dataframe["ema_200"])
@@ -995,10 +951,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["close"] < dataframe["ema_50"])
                 & (dataframe["close"] < 0.99 * dataframe["bb_lowerband"])
                 & (
-                    (
-                        dataframe["volume"]
-                        < (dataframe["volume_mean_slow"].shift(1) * 21)
-                    )
+                    (dataframe["volume"] < (dataframe["volume_mean_slow"].shift(1) * 21))
                     | (
                         dataframe["volume_mean_slow"]
                         > (dataframe["volume_mean_slow"].shift(30) * 0.4)
@@ -1006,17 +959,15 @@ class CoreStrategy(IStrategy):
                 )
                 & (self.v6_buy_condition_0_enable.value is True)
             ),
-            ['v6_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_v6_0')
+            ["v6_buy_condition_0_enable", "buy_tag"],
+        ] = (1, "buy_signal_v6_0")
 
         dataframe.loc[
             (
                 (dataframe["close"] < dataframe["ema_50"])
                 & (dataframe["close"] < 0.975 * dataframe["bb_lowerband"])
                 & (
-                    (
-                        dataframe["volume"]
-                        < (dataframe["volume_mean_slow"].shift(1) * 20)
-                    )
+                    (dataframe["volume"] < (dataframe["volume_mean_slow"].shift(1) * 20))
                     | (
                         dataframe["volume_mean_slow"]
                         > dataframe["volume_mean_slow"].shift(30) * 0.4
@@ -1026,18 +977,15 @@ class CoreStrategy(IStrategy):
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
                 & (self.v6_buy_condition_1_enable.value is True)
             ),
-            ['v6_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v6_1')
-
+            ["v6_buy_condition_1_enable", "buy_tag"],
+        ] = (1, "buy_signal_v6_1")
 
         dataframe.loc[
             (
                 (dataframe["close"] > dataframe["ema_200"])
                 & (dataframe["close"] > dataframe["ema_200_1h"])
                 & (dataframe["ema_26"] > dataframe["ema_12"])
-                & (
-                    (dataframe["ema_26"] - dataframe["ema_12"])
-                    > (dataframe["open"] * 0.02)
-                )
+                & ((dataframe["ema_26"] - dataframe["ema_12"]) > (dataframe["open"] * 0.02))
                 & (
                     (dataframe["ema_26"].shift() - dataframe["ema_12"].shift())
                     > (dataframe["open"] / 100)
@@ -1052,15 +1000,13 @@ class CoreStrategy(IStrategy):
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
                 & (self.v6_buy_condition_2_enable.value is True)
             ),
-            ['v6_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v6_2')
+            ["v6_buy_condition_2_enable", "buy_tag"],
+        ] = (1, "buy_signal_v6_2")
 
         dataframe.loc[
             (
                 (dataframe["ema_26"] > dataframe["ema_12"])
-                & (
-                    (dataframe["ema_26"] - dataframe["ema_12"])
-                    > (dataframe["open"] * 0.03)
-                )
+                & ((dataframe["ema_26"] - dataframe["ema_12"]) > (dataframe["open"] * 0.03))
                 & (
                     (dataframe["ema_26"].shift() - dataframe["ema_12"].shift())
                     > (dataframe["open"] / 100)
@@ -1069,8 +1015,8 @@ class CoreStrategy(IStrategy):
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
                 & (self.v6_buy_condition_3_enable.value is True)
             ),
-            ['v6_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v6_3')
-
+            ["v6_buy_condition_3_enable", "buy_tag"],
+        ] = (1, "buy_signal_v6_3")
 
         # count the amount of conditions met
         dataframe.loc[:, "conditions_count"] = (
@@ -1098,9 +1044,7 @@ class CoreStrategy(IStrategy):
         )
 
         # append the minimum amount of conditions to be met
-        conditions.append(
-            dataframe["conditions_count"] >= self.buy_minimum_conditions.value
-        )
+        conditions.append(dataframe["conditions_count"] >= self.buy_minimum_conditions.value)
         conditions.append(dataframe["volume"].gt(0))
 
         if conditions:
@@ -1121,8 +1065,7 @@ class CoreStrategy(IStrategy):
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dataframe["ma_sell"] = (
-            dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
-            * self.high_offset.value
+            dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"] * self.high_offset.value
         )
         if self.smaoffset_sell_condition_0_enable.value:
             conditions.append(
@@ -1152,10 +1095,7 @@ class CoreStrategy(IStrategy):
             )
         if self.v8_sell_condition_1_enable.value:
             conditions.append(
-                (
-                    (dataframe["rsi_1h"] > self.v8_sell_rsi_main.value)
-                    & (dataframe["volume"] > 0)
-                )
+                ((dataframe["rsi_1h"] > self.v8_sell_rsi_main.value) & (dataframe["volume"] > 0))
             )
 
         if conditions:
@@ -1226,15 +1166,15 @@ class BinClucMadv1(CoreStrategy):
         "buy_minimum_conditions": 1,
         "smaoffset_buy_condition_0_enable": False,
         "smaoffset_buy_condition_1_enable": False,
-        "v6_buy_condition_0_enable": False, # avg 0.47 dd 27%
-        "v6_buy_condition_1_enable": True, # no trade
+        "v6_buy_condition_0_enable": False,  # avg 0.47 dd 27%
+        "v6_buy_condition_1_enable": True,  # no trade
         "v6_buy_condition_2_enable": True,  # avg 2.32
-        "v6_buy_condition_3_enable": True, # avg 1.12 dd 6%
-        "v8_buy_condition_0_enable": True, # avg 0.74
+        "v6_buy_condition_3_enable": True,  # avg 1.12 dd 6%
+        "v8_buy_condition_0_enable": True,  # avg 0.74
         "v8_buy_condition_1_enable": False,  # avg 0.41 dd 37%
-        "v8_buy_condition_2_enable": True,   # avg 1.37
+        "v8_buy_condition_2_enable": True,  # avg 1.37
         "v8_buy_condition_3_enable": False,  # avg 0.41
-        "v8_buy_condition_4_enable": True,   # avg 1.29
+        "v8_buy_condition_4_enable": True,  # avg 1.29
         "v9_buy_condition_0_enable": False,
         "v9_buy_condition_1_enable": True,
         "v9_buy_condition_2_enable": True,
@@ -1246,7 +1186,6 @@ class BinClucMadv1(CoreStrategy):
         "v9_buy_condition_8_enable": False,
         "v9_buy_condition_9_enable": False,
         "v9_buy_condition_10_enable": False,
-
     }
 
 
@@ -1266,15 +1205,15 @@ class BinClucMadv2(CoreStrategy):
         "buy_minimum_conditions": 1,
         "smaoffset_buy_condition_0_enable": False,
         "smaoffset_buy_condition_1_enable": False,
-        "v6_buy_condition_0_enable": False, # avg 0.47 dd 27%
-        "v6_buy_condition_1_enable": True, # no trade
+        "v6_buy_condition_0_enable": False,  # avg 0.47 dd 27%
+        "v6_buy_condition_1_enable": True,  # no trade
         "v6_buy_condition_2_enable": True,  # avg 2.32
-        "v6_buy_condition_3_enable": True, # avg 1.12 dd 6%
-        "v8_buy_condition_0_enable": True, # avg 0.74
+        "v6_buy_condition_3_enable": True,  # avg 1.12 dd 6%
+        "v8_buy_condition_0_enable": True,  # avg 0.74
         "v8_buy_condition_1_enable": False,  # avg 0.41 dd 37%
-        "v8_buy_condition_2_enable": True,   # avg 1.37
+        "v8_buy_condition_2_enable": True,  # avg 1.37
         "v8_buy_condition_3_enable": False,  # avg 0.41
-        "v8_buy_condition_4_enable": True,   # avg 1.29
+        "v8_buy_condition_4_enable": True,  # avg 1.29
         "v9_buy_condition_0_enable": False,
         "v9_buy_condition_1_enable": False,
         "v9_buy_condition_2_enable": False,
@@ -1286,15 +1225,11 @@ class BinClucMadv2(CoreStrategy):
         "v9_buy_condition_8_enable": False,
         "v9_buy_condition_9_enable": False,
         "v9_buy_condition_10_enable": False,
-
     }
-
 
 
 class BinClucMadSMAv1(CoreStrategy):
-
     INTERFACE_VERSION = 2
-
 
     stoploss = -0.228  # effectively disabled.
     # Custom stoploss
@@ -1308,15 +1243,15 @@ class BinClucMadSMAv1(CoreStrategy):
         "buy_minimum_conditions": 1,
         "smaoffset_buy_condition_0_enable": True,
         "smaoffset_buy_condition_1_enable": True,
-        "v6_buy_condition_0_enable": False, # avg 0.47 dd 27%
-        "v6_buy_condition_1_enable": True, # no trade
+        "v6_buy_condition_0_enable": False,  # avg 0.47 dd 27%
+        "v6_buy_condition_1_enable": True,  # no trade
         "v6_buy_condition_2_enable": True,  # avg 2.32
-        "v6_buy_condition_3_enable": True, # avg 1.12 dd 6%
-        "v8_buy_condition_0_enable": True, # avg 0.74
+        "v6_buy_condition_3_enable": True,  # avg 1.12 dd 6%
+        "v8_buy_condition_0_enable": True,  # avg 0.74
         "v8_buy_condition_1_enable": False,  # avg 0.41 dd 37%
-        "v8_buy_condition_2_enable": True,   # avg 1.37
+        "v8_buy_condition_2_enable": True,  # avg 1.37
         "v8_buy_condition_3_enable": False,  # avg 0.41
-        "v8_buy_condition_4_enable": True,   # avg 1.29
+        "v8_buy_condition_4_enable": True,  # avg 1.29
         "v9_buy_condition_0_enable": False,
         "v9_buy_condition_1_enable": False,
         "v9_buy_condition_2_enable": False,
@@ -1328,15 +1263,10 @@ class BinClucMadSMAv1(CoreStrategy):
         "v9_buy_condition_8_enable": False,
         "v9_buy_condition_9_enable": False,
         "v9_buy_condition_10_enable": False,
-
-
     }
 
 
-
-
 class BinClucMadSMAv2(CoreStrategy):
-
     INTERFACE_VERSION = 2
 
     stoploss = -0.228  # effectively disabled.
@@ -1349,18 +1279,17 @@ class BinClucMadSMAv2(CoreStrategy):
 
     buy_params = {
         "buy_minimum_conditions": 1,
-
         "smaoffset_buy_condition_0_enable": True,
         "smaoffset_buy_condition_1_enable": True,
-        "v6_buy_condition_0_enable": False, # avg 0.47 dd 27%
-        "v6_buy_condition_1_enable": True, # no trade
+        "v6_buy_condition_0_enable": False,  # avg 0.47 dd 27%
+        "v6_buy_condition_1_enable": True,  # no trade
         "v6_buy_condition_2_enable": True,  # avg 2.32
-        "v6_buy_condition_3_enable": True, # avg 1.12 dd 6%
-        "v8_buy_condition_0_enable": True, # avg 0.74
+        "v6_buy_condition_3_enable": True,  # avg 1.12 dd 6%
+        "v8_buy_condition_0_enable": True,  # avg 0.74
         "v8_buy_condition_1_enable": False,  # avg 0.41 dd 37%
-        "v8_buy_condition_2_enable": True,   # avg 1.37
+        "v8_buy_condition_2_enable": True,  # avg 1.37
         "v8_buy_condition_3_enable": False,  # avg 0.41
-        "v8_buy_condition_4_enable": True,   # avg 1.29
+        "v8_buy_condition_4_enable": True,  # avg 1.29
         "v9_buy_condition_0_enable": False,
         "v9_buy_condition_1_enable": True,
         "v9_buy_condition_2_enable": True,
@@ -1372,8 +1301,4 @@ class BinClucMadSMAv2(CoreStrategy):
         "v9_buy_condition_8_enable": False,
         "v9_buy_condition_9_enable": False,
         "v9_buy_condition_10_enable": False,
-
     }
-
-
-

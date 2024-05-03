@@ -27,19 +27,14 @@ class PrawnstarOBV(IStrategy):
     INTERFACE_VERSION = 2
 
     # Optimal timeframe for the strategy
-    timeframe = '1h'
+    timeframe = "1h"
 
     # ROI table:
-    #minimal_roi = {
+    # minimal_roi = {
     #    "0": 0.8
-    #}
+    # }
 
-    minimal_roi = {
-        "0": 0.296,
-        "179": 0.137,
-        "810": 0.025,
-        "1024": 0
-    }
+    minimal_roi = {"0": 0.296, "179": 0.137, "810": 0.025, "1024": 0}
 
     # Stoploss:
     stoploss = -0.15
@@ -64,10 +59,10 @@ class PrawnstarOBV(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
@@ -76,11 +71,11 @@ class PrawnstarOBV(IStrategy):
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # Momentum Indicators
         # ------------------------------------
-        
+
         # Momentum
-        dataframe['rsi'] = ta.RSI(dataframe)
-        dataframe['obv'] = ta.OBV(dataframe)
-        dataframe['obvSma'] = ta.SMA(dataframe['obv'], timeperiod=7)
+        dataframe["rsi"] = ta.RSI(dataframe)
+        dataframe["obv"] = ta.OBV(dataframe)
+        dataframe["obvSma"] = ta.SMA(dataframe["obv"], timeperiod=7)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -91,14 +86,15 @@ class PrawnstarOBV(IStrategy):
         """
         dataframe.loc[
             (
-                (qtpylib.crossed_above(dataframe['obv'], dataframe['obvSma'])) &
-                (dataframe['rsi'] < 50) |
-                ((dataframe['obvSma'] - dataframe['close']) / dataframe['obvSma'] > 0.1) |
-                (dataframe['obv'] > dataframe['obv'].shift(1)) &
-                (dataframe['obvSma'] > dataframe['obvSma'].shift(5)) &
-                (dataframe['rsi'] < 50)
+                (qtpylib.crossed_above(dataframe["obv"], dataframe["obvSma"]))
+                & (dataframe["rsi"] < 50)
+                | ((dataframe["obvSma"] - dataframe["close"]) / dataframe["obvSma"] > 0.1)
+                | (dataframe["obv"] > dataframe["obv"].shift(1))
+                & (dataframe["obvSma"] > dataframe["obvSma"].shift(5))
+                & (dataframe["rsi"] < 50)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -108,9 +104,6 @@ class PrawnstarOBV(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(), "exit_long"] = 1
 
         return dataframe

@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -15,31 +20,24 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 
-   
-    # https://www.tradingview.com/script/zUaR3Vbb-robotrading-body/  
-    # translated for freqtrade: viksal1982  viktors.s@gmail.com
-    #  A timeframe of 4 hours to 1 day
-
+# https://www.tradingview.com/script/zUaR3Vbb-robotrading-body/
+# translated for freqtrade: viksal1982  viktors.s@gmail.com
+#  A timeframe of 4 hours to 1 day
 
 
 class RobotradingBody(IStrategy):
-   
     INTERFACE_VERSION = 2
 
-   
-    minimal_roi = {
-        "0": 0.9
-    }
+    minimal_roi = {"0": 0.9}
 
- 
     stoploss = -0.99
 
-    for_mult = IntParameter(1, 20, default=3, space='entry', optimize=True)
-    for_sma_length = IntParameter(20, 200, default=100, space='entry', optimize=True)
+    for_mult = IntParameter(1, 20, default=3, space="entry", optimize=True)
+    for_sma_length = IntParameter(20, 200, default=100, space="entry", optimize=True)
 
     trailing_stop = False
 
-    timeframe = '4h'
+    timeframe = "4h"
 
     process_only_new_candles = False
 
@@ -53,49 +51,40 @@ class RobotradingBody(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
-    
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     def informative_pairs(self):
-       
         return []
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        
-        dataframe['body'] = (dataframe['close'] - dataframe['open']).abs()
-        dataframe['body_sma'] = (ta.SMA(dataframe['body'], timeperiod=int(self.for_sma_length.value))) * int(self.for_mult.value)
+        dataframe["body"] = (dataframe["close"] - dataframe["open"]).abs()
+        dataframe["body_sma"] = (
+            ta.SMA(dataframe["body"], timeperiod=int(self.for_sma_length.value))
+        ) * int(self.for_mult.value)
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[
             (
-                (dataframe['open'] > dataframe['close'] ) &   
-                (dataframe['body'] > dataframe['body_sma'] ) &   
-                (dataframe['volume'] > 0)  
+                (dataframe["open"] > dataframe["close"])
+                & (dataframe["body"] > dataframe["body_sma"])
+                & (dataframe["volume"] > 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[
-            (
-                (dataframe['close'] > dataframe['open'] ) &   
-                (dataframe['volume'] > 0) 
-            ),
-            'exit_long'] = 1
+            ((dataframe["close"] > dataframe["open"]) & (dataframe["volume"] > 0)), "exit_long"
+        ] = 1
         return dataframe
-    

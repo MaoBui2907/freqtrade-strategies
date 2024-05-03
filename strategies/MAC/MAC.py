@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -33,18 +38,17 @@ class MAC(IStrategy):
     You should keep:
     - timeframe, minimal_roi, stoploss, trailing_*
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Optimal timeframe for the strategy.
-    timeframe = '1d'
+    timeframe = "1d"
 
     # Minimal ROI designed for the strategy.
     # # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 10
-    }
+    minimal_roi = {"0": 10}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -73,29 +77,26 @@ class MAC(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
-    
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
+
     @property
     def plot_config(self):
         return {
             # Main plot indicators (Moving averages, ...)
-            'main_plot': {
-                'ema50': {'color': 'blue'},
-                'ema200': {'color': 'orange'},
+            "main_plot": {
+                "ema50": {"color": "blue"},
+                "ema200": {"color": "orange"},
             },
-            'subplots': {
+            "subplots": {
                 # Subplots - each dict defines one additional plot
-            }
+            },
         }
 
     def informative_pairs(self):
@@ -112,24 +113,23 @@ class MAC(IStrategy):
         return []
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # # EMA - Exponential Moving Average
         # dataframe['ema3'] = ta.EMA(dataframe, timeperiod=3)
         # dataframe['ema5'] = ta.EMA(dataframe, timeperiod=5)
         # dataframe['ema10'] = ta.EMA(dataframe, timeperiod=10)
         # dataframe['ema21'] = ta.EMA(dataframe, timeperiod=21)
-        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
         # dataframe['ema100'] = ta.EMA(dataframe, timeperiod=100)
-        dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
+        dataframe["ema200"] = ta.EMA(dataframe, timeperiod=200)
 
         # # SMA - Simple Moving Average
         # dataframe['sma3'] = ta.SMA(dataframe, timeperiod=3)
@@ -150,12 +150,13 @@ class MAC(IStrategy):
         """
         dataframe.loc[
             (
-                # (dataframe['rsi'] < 30) &  
-                (dataframe['ema50'] > dataframe['ema200']) &  
-                (dataframe['ema50'].shift() < dataframe['ema200'].shift()) &  
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                # (dataframe['rsi'] < 30) &
+                (dataframe["ema50"] > dataframe["ema200"])
+                & (dataframe["ema50"].shift() < dataframe["ema200"].shift())
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -169,10 +170,10 @@ class MAC(IStrategy):
         dataframe.loc[
             (
                 # (dataframe['rsi'] > 70) &
-                (dataframe['ema50'] < dataframe['ema200']) &  
-                (dataframe['ema50'].shift() > dataframe['ema200'].shift()) &  
-                (dataframe['volume'] > 0)  # Make sure Volume is not 0
+                (dataframe["ema50"] < dataframe["ema200"])
+                & (dataframe["ema50"].shift() > dataframe["ema200"].shift())
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe
-    

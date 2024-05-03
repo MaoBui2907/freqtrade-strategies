@@ -29,18 +29,14 @@ class bbrsi4Freq(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "0": 0.18656,
-        "21": 0.09694,
-        "73": 0.03081,
-        "180": 0
-    }
+    minimal_roi = {"0": 0.18656, "21": 0.09694, "73": 0.03081, "180": 0}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -53,7 +49,7 @@ class bbrsi4Freq(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Optimal ticker interval for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -68,32 +64,29 @@ class bbrsi4Freq(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -121,20 +114,19 @@ class bbrsi4Freq(IStrategy):
         :return: a Dataframe with all mandatory indicators for the strategies
         """
 
-
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger Bands
         bollinger1 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=1)
-        dataframe['bb_lowerband1'] = bollinger1['lower']
-        dataframe['bb_middleband1'] = bollinger1['mid']
-        dataframe['bb_upperband1'] = bollinger1['upper']
+        dataframe["bb_lowerband1"] = bollinger1["lower"]
+        dataframe["bb_middleband1"] = bollinger1["mid"]
+        dataframe["bb_upperband1"] = bollinger1["upper"]
 
         bollinger3 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=3)
-        dataframe['bb_lowerband3'] = bollinger3['lower']
-        dataframe['bb_middleband3'] = bollinger3['mid']
-        dataframe['bb_upperband3'] = bollinger3['upper']
+        dataframe["bb_lowerband3"] = bollinger3["lower"]
+        dataframe["bb_middleband3"] = bollinger3["mid"]
+        dataframe["bb_upperband3"] = bollinger3["upper"]
 
         # dataframe["bb_percent"] = (
         #     (dataframe["close"] - dataframe["bb_lowerband"]) /
@@ -156,9 +148,10 @@ class bbrsi4Freq(IStrategy):
         dataframe.loc[
             (
                 # (dataframe['rsi'] > 8) &
-                (dataframe["close"] < dataframe['bb_lowerband3'])
+                dataframe["close"] < dataframe["bb_lowerband3"]
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -172,8 +165,9 @@ class bbrsi4Freq(IStrategy):
         dataframe.loc[
             (
                 # (dataframe['rsi'] > 46) &
-                (dataframe["close"] > dataframe['bb_lowerband1'])
+                dataframe["close"] > dataframe["bb_lowerband1"]
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

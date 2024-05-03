@@ -8,43 +8,39 @@ import numpy as np
 
 
 class Minmax(IStrategy):
-
-    minimal_roi = {
-        "0":  10
-    }
+    minimal_roi = {"0": 10}
 
     stoploss = -0.05
 
-    timeframe = '1h'
+    timeframe = "1h"
 
     trailing_stop = False
 
     process_only_new_candles = False
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe_copy = dataframe.copy()
         frame_size = 500
         len_df = len(dataframe)
-        dataframe['buy_signal'] = False
-        dataframe['exit_signal'] = False
+        dataframe["buy_signal"] = False
+        dataframe["exit_signal"] = False
         lookback_size = 100
         # Let's calculate argrelextrema on separated data slices and get only last result to avoid lookahead bias!
         for i in range(len_df):
             if i + frame_size < len_df:
-                slice = dataframe_copy[i : i+frame_size]
-                min_peaks = argrelextrema(slice['close'].values, np.less, order=lookback_size)
-                max_peaks = argrelextrema(slice['close'].values, np.greater, order=lookback_size)
+                slice = dataframe_copy[i : i + frame_size]
+                min_peaks = argrelextrema(slice["close"].values, np.less, order=lookback_size)
+                max_peaks = argrelextrema(slice["close"].values, np.greater, order=lookback_size)
                 # Somehow we never getting last index of a frame as min or max. What a surprise :)
                 # So lets take penultimate result and use it as a signal to buy/sell.
                 if len(min_peaks[0]) and min_peaks[0][-1] == frame_size - 2:
                     # signal that penultimate candle is min
                     # lets buy here
-                    dataframe.at[i + frame_size,'buy_signal'] = True
+                    dataframe.at[i + frame_size, "buy_signal"] = True
                 if len(max_peaks[0]) and max_peaks[0][-1] == frame_size - 2:
                     # oh it seams that penultimate candle is max
                     # lets sell ASAP
-                    dataframe.at[i + frame_size, 'exit_signal'] = True
+                    dataframe.at[i + frame_size, "exit_signal"] = True
 
                 if i + frame_size == len_df - 1:
                     print(min_peaks)
@@ -79,21 +75,10 @@ class Minmax(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         print(dataframe.tail(30))
 
-
-        dataframe.loc[
-            (
-                dataframe['buy_signal']
-            ),
-            'enter_long'] = 1
+        dataframe.loc[(dataframe["buy_signal"]), "enter_long"] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-
-        dataframe.loc[
-            (
-                dataframe['exit_signal']
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(dataframe["exit_signal"]), "exit_long"] = 1
         return dataframe

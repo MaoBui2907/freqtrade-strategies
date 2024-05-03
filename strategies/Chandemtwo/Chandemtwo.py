@@ -28,19 +28,13 @@ class Chandemtwo(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
     # ROI table:
-    minimal_roi = {
-        "0": 0.75242,
-        "827": 0.39114,
-        "2168": 0.34123,
-        "3527": 0
-    }
-
+    minimal_roi = {"0": 0.75242, "827": 0.39114, "2168": 0.34123, "3527": 0}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.33572
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Trailing stop:
     trailing_stop = True
@@ -55,7 +49,6 @@ class Chandemtwo(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-
 
     def informative_pairs(self):
         """
@@ -78,19 +71,19 @@ class Chandemtwo(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['CMO'] = ta.CMO(dataframe, timeperiod = 50)
+        dataframe["CMO"] = ta.CMO(dataframe, timeperiod=50)
         # Bollinger bands
-        
+
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=25, stds=3.5)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+
         bollingerTA = ta.BBANDS(dataframe, timeperiod=25, nbdevup=3.2, nbdevdn=3.2, matype=0)
-        
-        dataframe['bb_lowerbandTA'] = bollingerTA['lowerband']
-        dataframe['bb_middlebandTA'] = bollingerTA['middleband']
-        dataframe['bb_upperbandTA'] = bollingerTA['upperband']
+
+        dataframe["bb_lowerbandTA"] = bollingerTA["lowerband"]
+        dataframe["bb_middlebandTA"] = bollingerTA["middleband"]
+        dataframe["bb_upperbandTA"] = bollingerTA["upperband"]
 
         return dataframe
 
@@ -100,15 +93,15 @@ class Chandemtwo(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-                        
+
         dataframe.loc[
             (
-                 (qtpylib.crossed_above(dataframe["CMO"].shift(2), 0)) & 
-                 (dataframe["CMO"].shift(1) >=0) &
-                 (dataframe["CMO"]>=0)
-                
+                (qtpylib.crossed_above(dataframe["CMO"].shift(2), 0))
+                & (dataframe["CMO"].shift(1) >= 0)
+                & (dataframe["CMO"] >= 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -120,10 +113,9 @@ class Chandemtwo(IStrategy):
         """
         dataframe.loc[
             (
-                (qtpylib.crossed_above(dataframe['close'],dataframe['bb_upperband']))
+                (qtpylib.crossed_above(dataframe["close"], dataframe["bb_upperband"]))
                 | (qtpylib.crossed_below(dataframe["CMO"], -35))
-                
-                
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

@@ -6,8 +6,13 @@ import numpy as np  # noqa
 import pandas as pd  # noqa
 from pandas import DataFrame
 
-from freqtrade.strategy import (BooleanParameter, CategoricalParameter, DecimalParameter,
-                                IStrategy, IntParameter)
+from freqtrade.strategy import (
+    BooleanParameter,
+    CategoricalParameter,
+    DecimalParameter,
+    IStrategy,
+    IntParameter,
+)
 
 # --------------------------------
 # Add your lib to import here
@@ -69,6 +74,7 @@ class CrossEMAStrategy(IStrategy):
     You should keep:
     - timeframe, minimal_roi, stoploss, trailing_*
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -76,12 +82,12 @@ class CrossEMAStrategy(IStrategy):
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
     minimal_roi = {
-        "0": 100 # inactive
+        "0": 100  # inactive
     }
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
-    stoploss = -0.99 # inactive
+    stoploss = -0.99  # inactive
 
     # Trailing stoploss
     trailing_stop = False
@@ -94,7 +100,7 @@ class CrossEMAStrategy(IStrategy):
     sell_stoch_rsi = DecimalParameter(0, 0.5, decimals=3, default=0.2, space="sell")
 
     # Optimal timeframe for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -105,33 +111,20 @@ class CrossEMAStrategy(IStrategy):
     ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
-    startup_candle_count: int = 49 # EMA 48 + 1
+    startup_candle_count: int = 49  # EMA 48 + 1
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
-    plot_config = {
-        'main_plot': {
-            'ema28': {},
-            'ema48': {}
-        },
-        'subplots': {
-            "RSI": {
-                'stoch_rsi': {}
-            }
-        }
-    }
+    plot_config = {"main_plot": {"ema28": {}, "ema48": {}}, "subplots": {"RSI": {"stoch_rsi": {}}}}
 
     def informative_pairs(self):
         """
@@ -149,7 +142,7 @@ class CrossEMAStrategy(IStrategy):
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Adds several different TA indicators to the given DataFrame
-        
+
         :param dataframe: Dataframe with data from the exchange
         :param metadata: Additional information, like the currently traded pair
         :return: a Dataframe with all mandatory indicators for the strategies
@@ -158,14 +151,14 @@ class CrossEMAStrategy(IStrategy):
         # ------------------------------------
 
         # # Stochastic RSI
-        dataframe['stoch_rsi'] = ta.momentum.stochrsi(dataframe['close'])
+        dataframe["stoch_rsi"] = ta.momentum.stochrsi(dataframe["close"])
 
         # Overlap Studies
         # ------------------------------------
 
         # # EMA - Exponential Moving Average
-        dataframe['ema28']=ta.trend.ema_indicator(dataframe['close'], 28)
-        dataframe['ema48']=ta.trend.ema_indicator(dataframe['close'], 48)
+        dataframe["ema28"] = ta.trend.ema_indicator(dataframe["close"], 28)
+        dataframe["ema48"] = ta.trend.ema_indicator(dataframe["close"], 48)
 
         return dataframe
 
@@ -178,11 +171,12 @@ class CrossEMAStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['ema28'] > dataframe['ema48']) &
-                (dataframe['stoch_rsi'] < self.buy_stoch_rsi.value) &
-                (dataframe['volume'] > 0)
+                (dataframe["ema28"] > dataframe["ema48"])
+                & (dataframe["stoch_rsi"] < self.buy_stoch_rsi.value)
+                & (dataframe["volume"] > 0)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -195,9 +189,10 @@ class CrossEMAStrategy(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['ema28'] < dataframe['ema48']) &
-                (dataframe['stoch_rsi'] > self.sell_stoch_rsi.value) &
-                (dataframe['volume'] > 0)
+                (dataframe["ema28"] < dataframe["ema48"])
+                & (dataframe["stoch_rsi"] > self.sell_stoch_rsi.value)
+                & (dataframe["volume"] > 0)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

@@ -22,12 +22,7 @@ class DD(IStrategy):
     # Minimal ROI designed for the strategy.
     # adjust based on market conditions. We would recommend to keep it low for quick turn arounds
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.11078,
-        "33": 0.06816,
-        "68": 0.02844,
-        "165": 0
-    }
+    minimal_roi = {"0": 0.11078, "33": 0.06816, "68": 0.02844, "165": 0}
 
     # Trailing stop:
     trailing_stop = True
@@ -38,16 +33,16 @@ class DD(IStrategy):
     stoploss = -0.32745
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
         # Bollinger bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
         return dataframe
 
@@ -61,12 +56,14 @@ class DD(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['close'] < dataframe['bb_lowerband']) &
-             #   (dataframe['mfi'] < 16) &
-              #  (dataframe['adx'] > 25) &
-                (dataframe['rsi'] < 40)
+                (dataframe["close"] < dataframe["bb_lowerband"])
+                &
+                #   (dataframe['mfi'] < 16) &
+                #  (dataframe['adx'] > 25) &
+                (dataframe["rsi"] < 40)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -80,15 +77,13 @@ class DD(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['close'] > dataframe['bb_upperband']) 
-             #   (dataframe['rsi'] > 21)
-                
-                
-                
-          #      (qtpylib.crossed_above(
-           #         dataframe['macdsignal'], dataframe['macd']
-          #      )) &
-          #      (dataframe['fastd'] > 54)
+                dataframe["close"] > dataframe["bb_upperband"]
+                #   (dataframe['rsi'] > 21)
+                #      (qtpylib.crossed_above(
+                #         dataframe['macdsignal'], dataframe['macd']
+                #      )) &
+                #      (dataframe['fastd'] > 54)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

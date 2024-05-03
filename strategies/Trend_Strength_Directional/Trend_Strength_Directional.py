@@ -17,18 +17,14 @@ __BTC_donation__ = "3FgFaG15yntZYSUzfEpxr5mDt1RArvcQrK"
 # Optimized With Sharpe Ratio and 1 years data
 # 12520 trades. 6438/5337/745 Wins/Draws/Losses. Avg profit   1.55%. Median profit   0.17%. Total profit  194026.95473822 USDT ( 194.03%). Avg duration 1 day, 9:13:00 min. Objective: -63.61104
 
+
 class Trend_Strength_Directional(IStrategy):
     INTERFACE_VERSION = 2
 
-    timeframe = '15m'
+    timeframe = "15m"
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.383,
-        "120": 0.082,
-        "283": 0.045,
-        "495": 0
-    }
+    minimal_roi = {"0": 0.383, "120": 0.082, "283": 0.045, "495": 0}
 
     # Stoploss:
     stoploss = -0.314
@@ -40,22 +36,30 @@ class Trend_Strength_Directional(IStrategy):
     trailing_only_offset_is_reached = False
 
     # Hyperopt Buy Parameters
-    buy_plusdi_enabled = CategoricalParameter([True, False], space='entry', optimize=True, default=False)
-    buy_adx = IntParameter(low=1, high=100, default=12, space='entry', optimize=True, load=True)
-    buy_adx_timeframe = IntParameter(low=1, high=50, default=9, space='entry', optimize=True, load=True)
-    buy_plusdi = IntParameter(low=1, high=100, default=44, space='entry', optimize=True, load=True)
-    buy_minusdi = IntParameter(low=1, high=100, default=74, space='entry', optimize=True, load=True)
+    buy_plusdi_enabled = CategoricalParameter(
+        [True, False], space="entry", optimize=True, default=False
+    )
+    buy_adx = IntParameter(low=1, high=100, default=12, space="entry", optimize=True, load=True)
+    buy_adx_timeframe = IntParameter(
+        low=1, high=50, default=9, space="entry", optimize=True, load=True
+    )
+    buy_plusdi = IntParameter(low=1, high=100, default=44, space="entry", optimize=True, load=True)
+    buy_minusdi = IntParameter(low=1, high=100, default=74, space="entry", optimize=True, load=True)
 
     # Hyperopt Sell Parameters
-    sell_plusdi_enabled = CategoricalParameter([True, False], space='exit', optimize=True, default=True)
-    sell_adx = IntParameter(low=1, high=100, default=3, space='exit', optimize=True, load=True)
-    sell_adx_timeframe = IntParameter(low=1, high=50, default=41, space='exit', optimize=True, load=True)
-    sell_plusdi = IntParameter(low=1, high=100, default=49, space='exit', optimize=True, load=True)
-    sell_minusdi = IntParameter(low=1, high=100, default=11, space='exit', optimize=True, load=True)
+    sell_plusdi_enabled = CategoricalParameter(
+        [True, False], space="exit", optimize=True, default=True
+    )
+    sell_adx = IntParameter(low=1, high=100, default=3, space="exit", optimize=True, load=True)
+    sell_adx_timeframe = IntParameter(
+        low=1, high=50, default=41, space="exit", optimize=True, load=True
+    )
+    sell_plusdi = IntParameter(low=1, high=100, default=49, space="exit", optimize=True, load=True)
+    sell_minusdi = IntParameter(low=1, high=100, default=11, space="exit", optimize=True, load=True)
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -63,18 +67,21 @@ class Trend_Strength_Directional(IStrategy):
 
         # GUARDS
         if self.buy_plusdi_enabled.value:
-            conditions.append(ta.PLUS_DI(dataframe, timeperiod=int(self.buy_plusdi.value)) > ta.MINUS_DI(dataframe, timeperiod=int(self.buy_minusdi.value)))
+            conditions.append(
+                ta.PLUS_DI(dataframe, timeperiod=int(self.buy_plusdi.value))
+                > ta.MINUS_DI(dataframe, timeperiod=int(self.buy_minusdi.value))
+            )
 
         # TRIGGERS
         try:
-            conditions.append(ta.ADX(dataframe, timeperiod=int(self.buy_adx_timeframe.value)) > self.buy_adx.value)
+            conditions.append(
+                ta.ADX(dataframe, timeperiod=int(self.buy_adx_timeframe.value)) > self.buy_adx.value
+            )
         except Exception:
             pass
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'enter_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         return dataframe
 
@@ -83,17 +90,21 @@ class Trend_Strength_Directional(IStrategy):
 
         # GUARDS
         if self.sell_plusdi_enabled.value:
-            conditions.append(ta.PLUS_DI(dataframe, timeperiod=int(self.sell_plusdi.value)) < ta.MINUS_DI(dataframe, timeperiod=int(self.sell_minusdi.value)))
+            conditions.append(
+                ta.PLUS_DI(dataframe, timeperiod=int(self.sell_plusdi.value))
+                < ta.MINUS_DI(dataframe, timeperiod=int(self.sell_minusdi.value))
+            )
 
         # TRIGGERS
         try:
-            conditions.append(ta.ADX(dataframe, timeperiod=int(self.sell_adx_timeframe.value)) < self.sell_adx.value)
+            conditions.append(
+                ta.ADX(dataframe, timeperiod=int(self.sell_adx_timeframe.value))
+                < self.sell_adx.value
+            )
         except Exception:
             pass
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
 
         return dataframe

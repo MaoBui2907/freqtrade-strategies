@@ -2,6 +2,7 @@
 from freqtrade.strategy.interface import IStrategy
 from functools import reduce
 from pandas import DataFrame
+
 # --------------------------------
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
@@ -88,7 +89,7 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
     df = dataframe.copy()
     ema1 = ta.EMA(df, timeperiod=ema_length)
     ema2 = ta.EMA(df, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / df['low'] * 100
+    emadif = (ema1 - ema2) / df["low"] * 100
     return emadif
 
 
@@ -111,24 +112,31 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+        5, 80, default=buy_params["base_nb_candles_buy"], space="entry", optimize=True
+    )
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+        5, 80, default=sell_params["base_nb_candles_sell"], space="exit", optimize=True
+    )
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+        0.9, 0.99, default=buy_params["low_offset"], space="entry", optimize=True
+    )
     high_offset = DecimalParameter(
-        0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+        0.95, 1.1, default=sell_params["high_offset"], space="exit", optimize=True
+    )
     high_offset_2 = DecimalParameter(
-        0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
+        0.99, 1.5, default=sell_params["high_offset_2"], space="exit", optimize=True
+    )
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
-    ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_low = DecimalParameter(
+        -20.0, -8.0, default=buy_params["ewo_low"], space="entry", optimize=True
+    )
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
+        2.0, 12.0, default=buy_params["ewo_high"], space="entry", optimize=True
+    )
+    rsi_buy = IntParameter(30, 70, default=buy_params["rsi_buy"], space="entry", optimize=True)
 
     # Trailing stop:
     trailing_stop = True
@@ -145,60 +153,64 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
     ignore_roi_if_entry_signal = True
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'ioc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "ioc"}
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
-    inf_1h = '1h'
+    timeframe = "5m"
+    inf_1h = "1h"
 
     process_only_new_candles = True
     startup_candle_count = 200
 
     plot_config = {
-        'main_plot': {
-            'ma_buy': {'color': 'orange'},
-            'ma_sell': {'color': 'orange'},
+        "main_plot": {
+            "ma_buy": {"color": "orange"},
+            "ma_sell": {"color": "orange"},
         },
     }
 
-    slippage_protection = {
-        'retries': 3,
-        'max_slippage': -0.02
-    }
+    slippage_protection = {"retries": 3, "max_slippage": -0.02}
 
-    def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
-                           rate: float, time_in_force: str, sell_reason: str,
-                           current_time: datetime, **kwargs) -> bool:
-
+    def confirm_trade_exit(
+        self,
+        pair: str,
+        trade: Trade,
+        order_type: str,
+        amount: float,
+        rate: float,
+        time_in_force: str,
+        sell_reason: str,
+        current_time: datetime,
+        **kwargs,
+    ) -> bool:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1]
         previous_candle_1 = dataframe.iloc[-2]
 
-        if (last_candle is not None):
+        if last_candle is not None:
             #            if (sell_reason in ['roi','exit_signal','trailing_stop_loss']):
-            if (sell_reason in ['exit_signal']):
-                if last_candle['block_trade_exit']:
+            if sell_reason in ["exit_signal"]:
+                if last_candle["block_trade_exit"]:
                     return False
-                if last_candle['di_up'] and (last_candle['adx'] > previous_candle_1['adx']):
+                if last_candle["di_up"] and (last_candle["adx"] > previous_candle_1["adx"]):
                     return False
-                if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
+                if (last_candle["hma_50"] * 1.149 > last_candle["ema_100"]) and (
+                    last_candle["close"] < last_candle["ema_100"] * 0.951
+                ):  # *1.2
                     return False
 
         # slippage
         try:
-            state = self.slippage_protection['__pair_retries']
+            state = self.slippage_protection["__pair_retries"]
         except KeyError:
-            state = self.slippage_protection['__pair_retries'] = {}
+            state = self.slippage_protection["__pair_retries"] = {}
 
         candle = dataframe.iloc[-1].squeeze()
 
-        slippage = (rate / candle['close']) - 1
-        if slippage < self.slippage_protection['max_slippage']:
+        slippage = (rate / candle["close"]) - 1
+        if slippage < self.slippage_protection["max_slippage"]:
             pair_retries = state.get(pair, 0)
-            if pair_retries < self.slippage_protection['retries']:
+            if pair_retries < self.slippage_protection["retries"]:
                 state[pair] = pair_retries + 1
                 return False
 
@@ -206,9 +218,15 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
 
         return True
 
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-                        current_rate: float, current_profit: float, **kwargs) -> float:
-
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
         stoploss = self.stoploss
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
@@ -216,8 +234,10 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
             return stoploss
 
         trade_date = timeframe_to_prev_date(
-            self.timeframe, trade.open_date_utc - timedelta(seconds=timeframe_to_seconds(self.timeframe)))
-        trade_candle = dataframe.loc[dataframe['date'] == trade_date]
+            self.timeframe,
+            trade.open_date_utc - timedelta(seconds=timeframe_to_seconds(self.timeframe)),
+        )
+        trade_candle = dataframe.loc[dataframe["date"] == trade_date]
         if trade_candle.empty:
             return stoploss
 
@@ -225,7 +245,7 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
 
         dur_minutes = (current_time - trade.open_date_utc).seconds // 60
 
-        slippage_ratio = trade.open_rate / trade_candle['close'] - 1
+        slippage_ratio = trade.open_rate / trade_candle["close"] - 1
         slippage_ratio = slippage_ratio if slippage_ratio > 0 else 0
         current_profit_comp = current_profit + slippage_ratio
 
@@ -241,35 +261,35 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
         return stoploss
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # Calculate all ma_buy values
         for val in self.base_nb_candles_buy.range:
-            dataframe[f'ma_buy_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_buy_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Calculate all ma_sell values
         for val in self.base_nb_candles_sell.range:
-            dataframe[f'ma_sell_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_sell_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
-        dataframe['hma_50'] = qtpylib.hull_moving_average(dataframe['close'], window=50)
+        dataframe["hma_50"] = qtpylib.hull_moving_average(dataframe["close"], window=50)
 
-        dataframe['sma_9'] = ta.SMA(dataframe, timeperiod=9)
+        dataframe["sma_9"] = ta.SMA(dataframe, timeperiod=9)
         # Elliot
-        dataframe['EWO'] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
+        dataframe["EWO"] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['rsi_fast'] = ta.RSI(dataframe, timeperiod=4)
-        dataframe['rsi_slow'] = ta.RSI(dataframe, timeperiod=20)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi_fast"] = ta.RSI(dataframe, timeperiod=4)
+        dataframe["rsi_slow"] = ta.RSI(dataframe, timeperiod=20)
 
-        dataframe['ema_100'] = ta.EMA(dataframe, timeperiod=100)
+        dataframe["ema_100"] = ta.EMA(dataframe, timeperiod=100)
 
         # confirm_trade_exit
-        dataframe['adx'] = ta.ADX(dataframe, timeperiod=2)
-        dataframe['di_up'] = ta.PLUS_DI(
-            dataframe, timeperiod=2) > ta.MINUS_DI(dataframe, timeperiod=2)
+        dataframe["adx"] = ta.ADX(dataframe, timeperiod=2)
+        dataframe["di_up"] = ta.PLUS_DI(dataframe, timeperiod=2) > ta.MINUS_DI(
+            dataframe, timeperiod=2
+        )
         rsi2 = ta.RSI(dataframe, timeperiod=2)
         rsi4 = ta.RSI(dataframe, timeperiod=4)
-        dataframe['block_trade_exit'] = rsi2 > rsi4
+        dataframe["block_trade_exit"] = rsi2 > rsi4
 
         return dataframe
 
@@ -278,38 +298,51 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
 
         conditions.append(
             (
-
-                (dataframe['rsi_fast'] < 35) &
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] > self.ewo_high.value) &
-                (dataframe['rsi'] < self.rsi_buy.value) &
-                (dataframe['volume'] > 0) &
-                (dataframe['close'] < (
-                    dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
-
-
+                (dataframe["rsi_fast"] < 35)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] > self.ewo_high.value)
+                & (dataframe["rsi"] < self.rsi_buy.value)
+                & (dataframe["volume"] > 0)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
             )
         )
 
         conditions.append(
             (
-
-
-                (dataframe['rsi_fast'] < 35) &
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] < self.ewo_low.value) &
-                (dataframe['volume'] > 0) &
-                (dataframe['close'] < (
-                    dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
-
+                (dataframe["rsi_fast"] < 35)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] < self.ewo_low.value)
+                & (dataframe["volume"] > 0)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'entry'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "entry"] = 1
 
         return dataframe
 
@@ -317,27 +350,34 @@ class NotAnotherSMAOffsetStrategyModHO_LamineDz_20210901(IStrategy):
         conditions = []
 
         conditions.append(
-            ((dataframe['close'] > dataframe['sma_9']) &
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset_2.value)) &
-                (dataframe['rsi'] > 50) &
-                (dataframe['volume'] > 0) &
-                (dataframe['rsi_fast'] > dataframe['rsi_slow'])
-
-             )
-            |
             (
-                (dataframe['close'] < dataframe['hma_50']) &
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
-                (dataframe['volume'] > 0) &
-                (dataframe['rsi_fast'] > dataframe['rsi_slow'])
+                (dataframe["close"] > dataframe["sma_9"])
+                & (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset_2.value
+                    )
+                )
+                & (dataframe["rsi"] > 50)
+                & (dataframe["volume"] > 0)
+                & (dataframe["rsi_fast"] > dataframe["rsi_slow"])
             )
-
+            | (
+                (dataframe["close"] < dataframe["hma_50"])
+                & (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
+                & (dataframe["volume"] > 0)
+                & (dataframe["rsi_fast"] > dataframe["rsi_slow"])
+            )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'exit'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "exit"] = 1
 
         return dataframe

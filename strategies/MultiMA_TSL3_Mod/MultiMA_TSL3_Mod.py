@@ -2,7 +2,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
 from freqtrade.strategy.interface import IStrategy
-from freqtrade.strategy import (DecimalParameter, IntParameter, RealParameter,BooleanParameter)
+from freqtrade.strategy import DecimalParameter, IntParameter, RealParameter, BooleanParameter
 from pandas import DataFrame, Series
 from functools import reduce
 from freqtrade.persistence import Trade
@@ -29,12 +29,13 @@ from technical.indicators import zema, VIDYA
 # I hope you do enough testing before proceeding, either backtesting and/or dry run.
 # Any profits and losses are all your responsibility
 
+
 class MultiMA_TSL3_Mod(IStrategy):
     INTERFACE_VERSION = 2
 
     DATESTAMP = 0
     SELLMA = 1
-    SELL_TRIGGER=2
+    SELL_TRIGGER = 2
 
     # Buy hyperspace params:
     buy_params = {
@@ -55,7 +56,6 @@ class MultiMA_TSL3_Mod(IStrategy):
         "buy_condition_ema_enable": True,  # value loaded from strategy
         "close_pct_max": 0.06785,
         "close_pct_min": 0.01121,
-
     }
 
     # Sell hyperspace params:
@@ -73,12 +73,8 @@ class MultiMA_TSL3_Mod(IStrategy):
         "low_profit_stop_duration": 52,
     }
 
-
-
     # ROI table:
-    minimal_roi = {
-        "0": 100
-    }
+    minimal_roi = {"0": 100}
 
     stoploss = -0.15
     use_custom_stoploss = True
@@ -114,77 +110,92 @@ class MultiMA_TSL3_Mod(IStrategy):
     base_nb_candles_buy_hma2 = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_hma)
     low_offset_hma2 = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_hma)"""
 
-    buy_condition_enable_optimize = False # Not used
-    buy_condition_ema_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
+    buy_condition_enable_optimize = False  # Not used
+    buy_condition_ema_enable = BooleanParameter(
+        default=True, space="entry", optimize=buy_condition_enable_optimize
+    )
     """buy_condition_trima_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
     buy_condition_zema_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
     buy_condition_hma_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)"""
 
     ewo_check_optimize = True
-    ewo_low = DecimalParameter(-20.0, -8.0, default=-20.0, space='entry', optimize=ewo_check_optimize)
-    ewo_high = DecimalParameter(0.0, 12.0, default=6.0, space='entry', optimize=ewo_check_optimize)
-    ewo_low2 = DecimalParameter(-20.0, -8.0, default=-20.0, space='entry', optimize=ewo_check_optimize)
-    ewo_high2 = DecimalParameter(2.0, 12.0, default=6.0, space='entry', optimize=ewo_check_optimize)
-    fast_ewo = IntParameter(10, 50, default=50, space='entry', optimize=True)
-    slow_ewo = IntParameter(100, 200, default=200, space='entry', optimize=True)
-    
-    pct_optimize = True
-    pmax_pct_min = DecimalParameter(1.00, 100.00, default=1, space='entry', optimize=pct_optimize)
-    pmax_pct_max = DecimalParameter(1.00, 100.00, default=1, space='entry', optimize=pct_optimize)
-    volume_pct_min = DecimalParameter(0.01, 20, default=0.01, space='entry', optimize=pct_optimize)
-    volume_pct_max = DecimalParameter(0.01, 20, default=0.01, space='entry', optimize=pct_optimize)
+    ewo_low = DecimalParameter(
+        -20.0, -8.0, default=-20.0, space="entry", optimize=ewo_check_optimize
+    )
+    ewo_high = DecimalParameter(0.0, 12.0, default=6.0, space="entry", optimize=ewo_check_optimize)
+    ewo_low2 = DecimalParameter(
+        -20.0, -8.0, default=-20.0, space="entry", optimize=ewo_check_optimize
+    )
+    ewo_high2 = DecimalParameter(2.0, 12.0, default=6.0, space="entry", optimize=ewo_check_optimize)
+    fast_ewo = IntParameter(10, 50, default=50, space="entry", optimize=True)
+    slow_ewo = IntParameter(100, 200, default=200, space="entry", optimize=True)
 
-    high_precision_pct_optimize = False # Optimise this setting individually
-    close_pct_min = RealParameter(0.0001, 0.1, default=0.01, space='entry', optimize=high_precision_pct_optimize)
-    close_pct_max = RealParameter(0.0001, 0.1, default=0.01, space='entry', optimize=high_precision_pct_optimize)
-    
+    pct_optimize = True
+    pmax_pct_min = DecimalParameter(1.00, 100.00, default=1, space="entry", optimize=pct_optimize)
+    pmax_pct_max = DecimalParameter(1.00, 100.00, default=1, space="entry", optimize=pct_optimize)
+    volume_pct_min = DecimalParameter(0.01, 20, default=0.01, space="entry", optimize=pct_optimize)
+    volume_pct_max = DecimalParameter(0.01, 20, default=0.01, space="entry", optimize=pct_optimize)
+
+    high_precision_pct_optimize = False  # Optimise this setting individually
+    close_pct_min = RealParameter(
+        0.0001, 0.1, default=0.01, space="entry", optimize=high_precision_pct_optimize
+    )
+    close_pct_max = RealParameter(
+        0.0001, 0.1, default=0.01, space="entry", optimize=high_precision_pct_optimize
+    )
+
     buy_rsi_optimize = True
-    buy_rsi_min = IntParameter(0, 100, default=1, space='entry', optimize=buy_rsi_optimize)
-    buy_rsi_max = IntParameter(0, 100, default=100, space='entry', optimize=buy_rsi_optimize)
-    buy_rsi_fast_min = IntParameter(0, 100, default=1, space='entry', optimize=buy_rsi_optimize)
-    buy_rsi_fast_max = IntParameter(0, 100, default=100, space='entry', optimize=buy_rsi_optimize)
-    
+    buy_rsi_min = IntParameter(0, 100, default=1, space="entry", optimize=buy_rsi_optimize)
+    buy_rsi_max = IntParameter(0, 100, default=100, space="entry", optimize=buy_rsi_optimize)
+    buy_rsi_fast_min = IntParameter(0, 100, default=1, space="entry", optimize=buy_rsi_optimize)
+    buy_rsi_fast_max = IntParameter(0, 100, default=100, space="entry", optimize=buy_rsi_optimize)
+
     # Sell hyperspace params:
 
     optimize_sell_ema = True
-    base_nb_candles_ema_sell = IntParameter(5, 80, default=20, space='exit', optimize=True)
-    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=1.012, space='exit', optimize=True)
-    base_nb_candles_ema_sell2 = IntParameter(5, 80, default=20, space='exit', optimize=True)
+    base_nb_candles_ema_sell = IntParameter(5, 80, default=20, space="exit", optimize=True)
+    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=1.012, space="exit", optimize=True)
+    base_nb_candles_ema_sell2 = IntParameter(5, 80, default=20, space="exit", optimize=True)
 
     # Protection hyperspace params:
 
     cooldown_lookback = IntParameter(2, 48, default=2, space="protection", optimize=True)
 
     low_profit_optimize = True
-    low_profit_lookback = IntParameter(2, 60, default=20, space="protection", optimize=low_profit_optimize)
-    low_profit_stop_duration = IntParameter(12, 200, default=20, space="protection", optimize=low_profit_optimize)
-    low_profit_min_req = DecimalParameter(-0.05, 0.05, default=-0.05, space="protection", decimals=2, optimize=low_profit_optimize)
+    low_profit_lookback = IntParameter(
+        2, 60, default=20, space="protection", optimize=low_profit_optimize
+    )
+    low_profit_stop_duration = IntParameter(
+        12, 200, default=20, space="protection", optimize=low_profit_optimize
+    )
+    low_profit_min_req = DecimalParameter(
+        -0.05, 0.05, default=-0.05, space="protection", decimals=2, optimize=low_profit_optimize
+    )
 
-    
-    
     @property
     def protections(self):
         prot = []
 
-        prot.append({
-            "method": "CooldownPeriod",
-            "stop_duration_candles": self.cooldown_lookback.value
-        })
-        prot.append({
-            "method": "LowProfitPairs",
-            "lookback_period_candles": self.low_profit_lookback.value,
-            "trade_limit": 1,
-            "stop_duration": int(self.low_profit_stop_duration.value),
-            "required_profit": self.low_profit_min_req.value
-        })
+        prot.append(
+            {"method": "CooldownPeriod", "stop_duration_candles": self.cooldown_lookback.value}
+        )
+        prot.append(
+            {
+                "method": "LowProfitPairs",
+                "lookback_period_candles": self.low_profit_lookback.value,
+                "trade_limit": 1,
+                "stop_duration": int(self.low_profit_stop_duration.value),
+                "required_profit": self.low_profit_min_req.value,
+            }
+        )
 
         return prot
 
     # Optimal timeframe for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # storage dict for custom info
-    custom_info = { }
+    custom_info = {}
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = True
@@ -197,84 +208,114 @@ class MultiMA_TSL3_Mod(IStrategy):
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 400
 
-    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
-                    current_profit: float, **kwargs):
-       
+    def custom_exit(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: "datetime",
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
-        if(len(dataframe) < 1):
+        if len(dataframe) < 1:
             return False
         last_candle = dataframe.iloc[-1]
 
-        if(self.custom_info[pair][self.DATESTAMP] != last_candle['date']):
+        if self.custom_info[pair][self.DATESTAMP] != last_candle["date"]:
             # new candle, update EMA and check sell
 
             # smoothing coefficients
             sell_ema = self.custom_info[pair][self.SELLMA]
-            if(sell_ema == 0):
-                sell_ema = last_candle['ema_sell'] 
+            if sell_ema == 0:
+                sell_ema = last_candle["ema_sell"]
             emaLength = 32
-            alpha = 2 /(1 + emaLength) 
+            alpha = 2 / (1 + emaLength)
 
             # update sell_ema
-            sell_ema = (alpha * last_candle['close']) + ((1 - alpha) * sell_ema)
+            sell_ema = (alpha * last_candle["close"]) + ((1 - alpha) * sell_ema)
             self.custom_info[pair][self.SELLMA] = sell_ema
-            self.custom_info[pair][self.DATESTAMP] = last_candle['date']
+            self.custom_info[pair][self.DATESTAMP] = last_candle["date"]
 
-            if((last_candle['close'] > (sell_ema * self.high_offset_sell_ema.value)) & (last_candle['buy_copy'] == 0)):
-                if self.config['runmode'].value in ('live', 'dry_run'):
+            if (last_candle["close"] > (sell_ema * self.high_offset_sell_ema.value)) & (
+                last_candle["buy_copy"] == 0
+            ):
+                if self.config["runmode"].value in ("live", "dry_run"):
                     self.custom_info[pair][self.SELL_TRIGGER] = 1
                     return False
 
-                buy_tag = 'empty'
+                buy_tag = "empty"
 
-                if hasattr(trade, 'buy_tag') and trade.buy_tag is not None:
+                if hasattr(trade, "buy_tag") and trade.buy_tag is not None:
                     buy_tag = trade.buy_tag
                 else:
                     trade_open_date = timeframe_to_prev_date(self.timeframe, trade.open_date_utc)
-                    buy_signal = dataframe.loc[dataframe['date'] < trade_open_date]
+                    buy_signal = dataframe.loc[dataframe["date"] < trade_open_date]
                     if not buy_signal.empty:
                         buy_signal_candle = buy_signal.iloc[-1]
-                        buy_tag = buy_signal_candle['buy_tag'] if buy_signal_candle['buy_tag'] != '' else 'empty'
+                        buy_tag = (
+                            buy_signal_candle["buy_tag"]
+                            if buy_signal_candle["buy_tag"] != ""
+                            else "empty"
+                        )
 
-                return f'New Sell Signal ({buy_tag})'
-        
+                return f"New Sell Signal ({buy_tag})"
+
         return False
 
-    #credit to Perkmeister for this custom stoploss to help the strategy ride a green candle when the sell signal triggered
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-                        current_rate: float, current_profit: float, **kwargs) -> float:
+    # credit to Perkmeister for this custom stoploss to help the strategy ride a green candle when the sell signal triggered
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
         sl_new = 1
 
-        if(self.custom_info[pair][self.SELL_TRIGGER] == 1):
-            if self.config['runmode'].value in ('live', 'dry_run'):
+        if self.custom_info[pair][self.SELL_TRIGGER] == 1:
+            if self.config["runmode"].value in ("live", "dry_run"):
                 sl_new = 0.001
 
-        if (current_profit > 0.2):
+        if current_profit > 0.2:
             sl_new = 0.05
-        elif (current_profit > 0.1):
+        elif current_profit > 0.1:
             sl_new = 0.03
-        elif (current_profit > 0.06):
+        elif current_profit > 0.06:
             sl_new = 0.02
-        elif (current_profit > 0.03):
+        elif current_profit > 0.03:
             sl_new = 0.01
 
         return sl_new
 
-    def confirm_trade_entry(self, pair: str, order_type: str, amount: float, rate: float, time_in_force: str, **kwargs) -> bool:
+    def confirm_trade_entry(
+        self, pair: str, order_type: str, amount: float, rate: float, time_in_force: str, **kwargs
+    ) -> bool:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
-        if(len(dataframe) < 1):
+        if len(dataframe) < 1:
             return False
         last_candle = dataframe.iloc[-1].squeeze()
-        if ((rate > last_candle['close'])) : 
+        if rate > last_candle["close"]:
             return False
 
-        self.custom_info[pair][self.DATESTAMP] = last_candle['date']
-        self.custom_info[pair][self.SELLMA] = last_candle['ema_sell']
+        self.custom_info[pair][self.DATESTAMP] = last_candle["date"]
+        self.custom_info[pair][self.SELLMA] = last_candle["ema_sell"]
 
         return True
 
-    def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
-                           rate: float, time_in_force: str, sell_reason: str, **kwargs) -> bool:
+    def confirm_trade_exit(
+        self,
+        pair: str,
+        trade: Trade,
+        order_type: str,
+        amount: float,
+        rate: float,
+        time_in_force: str,
+        sell_reason: str,
+        **kwargs,
+    ) -> bool:
         self.custom_info[pair][self.SELL_TRIGGER] = 0
         return True
 
@@ -282,114 +323,129 @@ class MultiMA_TSL3_Mod(IStrategy):
         return int(self.timeframe[:-1])
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # Parabolic SAR
-        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe["sar"] = ta.SAR(dataframe)
 
         # EWO
-        #dataframe['ema_delta'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema2.value)) - ta.EMA(dataframe, int(self.base_nb_candles_buy_ema.value)) *self.low_offset_ema.value # EWO delta? Not used anyway
-        
-        dataframe['ewo'] = EWO(dataframe, self.fast_ewo.value, self.slow_ewo.value)
+        # dataframe['ema_delta'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema2.value)) - ta.EMA(dataframe, int(self.base_nb_candles_buy_ema.value)) *self.low_offset_ema.value # EWO delta? Not used anyway
+
+        dataframe["ewo"] = EWO(dataframe, self.fast_ewo.value, self.slow_ewo.value)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['rsi_fast'] = ta.RSI(dataframe, timeperiod=4)
-        dataframe['rsi_84'] = ta.RSI(dataframe, timeperiod=84)
-        dataframe['rsi_112'] = ta.RSI(dataframe, timeperiod=112)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi_fast"] = ta.RSI(dataframe, timeperiod=4)
+        dataframe["rsi_84"] = ta.RSI(dataframe, timeperiod=84)
+        dataframe["rsi_112"] = ta.RSI(dataframe, timeperiod=112)
 
         # Heiken Ashi
         heikinashi = qtpylib.heikinashi(dataframe)
         heikinashi["volume"] = dataframe["volume"]
 
-        dataframe['ha_up'] = (heikinashi['close'] > heikinashi['open']).astype('int')
-        dataframe['ha_down'] = (heikinashi['open'] > heikinashi['close']).astype('int')
-        
+        dataframe["ha_up"] = (heikinashi["close"] > heikinashi["open"]).astype("int")
+        dataframe["ha_down"] = (heikinashi["open"] > heikinashi["close"]).astype("int")
 
         # Profit Maximizer - PMAX
-        dataframe['pm'], dataframe['pmx'] = pmax(heikinashi, MAtype=1, length=9, multiplier=27, period=10, src=3)
-        dataframe['source'] = (dataframe['high'] + dataframe['low'] + dataframe['open'] + dataframe['close'])/4
-        dataframe['pmax_thresh'] = ta.EMA(dataframe['source'], timeperiod=9)
+        dataframe["pm"], dataframe["pmx"] = pmax(
+            heikinashi, MAtype=1, length=9, multiplier=27, period=10, src=3
+        )
+        dataframe["source"] = (
+            dataframe["high"] + dataframe["low"] + dataframe["open"] + dataframe["close"]
+        ) / 4
+        dataframe["pmax_thresh"] = ta.EMA(dataframe["source"], timeperiod=9)
 
         dataframe = HA(dataframe, 4)
 
-        if self.config['runmode'].value in ('live', 'dry_run'):
+        if self.config["runmode"].value in ("live", "dry_run"):
             # Exchange downtime protection
-            dataframe['live_data_ok'] = (dataframe['volume'].rolling(window=72, min_periods=72).min() > 0)
+            dataframe["live_data_ok"] = (
+                dataframe["volume"].rolling(window=72, min_periods=72).min() > 0
+            )
         else:
-            dataframe['live_data_ok'] = True
+            dataframe["live_data_ok"] = True
 
         # Check if the entry already exists
         if metadata["pair"] not in self.custom_info:
             # Create empty entry for this pair {datestamp, sellma, sell_trigger}
-            self.custom_info[metadata["pair"]] = ['', 0, 0]
+            self.custom_info[metadata["pair"]] = ["", 0, 0]
 
-        dataframe['24hr_high'] = (dataframe['high'].rolling(window=288, min_periods= 288).max())
-        dataframe['smooth_high'] =ta.EMA(dataframe['24hr_high'], timeperiod=2)
-        dataframe['high_rising'] = (dataframe['smooth_high'] > dataframe['smooth_high'].shift()).astype('int')
-        dataframe['high_falling'] = (dataframe['smooth_high'] < dataframe['smooth_high'].shift()).astype('int')
-        
-        dataframe['24hr_low'] = (dataframe['low'].rolling(window=288, min_periods= 288).min())
-        dataframe['smooth_low'] =ta.EMA(dataframe['24hr_low'], timeperiod=2)
-        dataframe['low_rising'] = (dataframe['smooth_low'] > dataframe['smooth_low'].shift()).astype('int')
-        dataframe['low_falling'] = (dataframe['smooth_low'] < dataframe['smooth_low'].shift()).astype('int')
-        
-        dataframe['24hr_delta'] = (dataframe['24hr_high'] - dataframe['24hr_low'])
-        dataframe['smooth_delta'] =ta.EMA(dataframe['24hr_delta'], timeperiod=2)
-        dataframe['delta_rising'] = (dataframe['smooth_delta'] > dataframe['smooth_delta'].shift()).astype('int')
+        dataframe["24hr_high"] = dataframe["high"].rolling(window=288, min_periods=288).max()
+        dataframe["smooth_high"] = ta.EMA(dataframe["24hr_high"], timeperiod=2)
+        dataframe["high_rising"] = (
+            dataframe["smooth_high"] > dataframe["smooth_high"].shift()
+        ).astype("int")
+        dataframe["high_falling"] = (
+            dataframe["smooth_high"] < dataframe["smooth_high"].shift()
+        ).astype("int")
 
-        dataframe['pmax_high_delta'] = (dataframe['24hr_high'] - dataframe['pmax_thresh'])
-        dataframe['smooth_pmax_high'] =ta.EMA(dataframe['pmax_high_delta'], timeperiod=2)
-        dataframe['pmax_low_delta'] = (dataframe['pmax_thresh'] - dataframe['24hr_low'])
-        dataframe['smooth_pmax_low'] =ta.EMA(dataframe['pmax_low_delta'], timeperiod=2)
+        dataframe["24hr_low"] = dataframe["low"].rolling(window=288, min_periods=288).min()
+        dataframe["smooth_low"] = ta.EMA(dataframe["24hr_low"], timeperiod=2)
+        dataframe["low_rising"] = (
+            dataframe["smooth_low"] > dataframe["smooth_low"].shift()
+        ).astype("int")
+        dataframe["low_falling"] = (
+            dataframe["smooth_low"] < dataframe["smooth_low"].shift()
+        ).astype("int")
 
-        dataframe['pmax_pct'] = (dataframe['pmax_thresh'] - dataframe['24hr_low']) / (dataframe['24hr_high'] - dataframe['24hr_low']) * 100
-        dataframe['pmax_pct_rising'] = (dataframe['pmax_pct'] > dataframe['pmax_pct'].shift()).astype('int')
+        dataframe["24hr_delta"] = dataframe["24hr_high"] - dataframe["24hr_low"]
+        dataframe["smooth_delta"] = ta.EMA(dataframe["24hr_delta"], timeperiod=2)
+        dataframe["delta_rising"] = (
+            dataframe["smooth_delta"] > dataframe["smooth_delta"].shift()
+        ).astype("int")
 
-        dataframe['smooth_volume'] =ta.EMA(dataframe['volume'], timeperiod=2)
-        dataframe['smooth_volume_slow'] =ta.EMA(dataframe['volume'], timeperiod=12)
-        dataframe['volume_pct'] =(dataframe['volume']).pct_change()
-        dataframe['smooth_volume_pct'] =ta.EMA(dataframe['volume_pct'], timeperiod=2)
-        dataframe['volume_pct_rising'] = (dataframe['volume_pct'] > dataframe['volume_pct'].shift()).astype('int')
-        dataframe['smooth_volume_pct_rising'] =ta.EMA(dataframe['volume_pct_rising'], timeperiod=2)
+        dataframe["pmax_high_delta"] = dataframe["24hr_high"] - dataframe["pmax_thresh"]
+        dataframe["smooth_pmax_high"] = ta.EMA(dataframe["pmax_high_delta"], timeperiod=2)
+        dataframe["pmax_low_delta"] = dataframe["pmax_thresh"] - dataframe["24hr_low"]
+        dataframe["smooth_pmax_low"] = ta.EMA(dataframe["pmax_low_delta"], timeperiod=2)
 
-        dataframe['close_pct'] =(dataframe['close']).pct_change()
+        dataframe["pmax_pct"] = (
+            (dataframe["pmax_thresh"] - dataframe["24hr_low"])
+            / (dataframe["24hr_high"] - dataframe["24hr_low"])
+            * 100
+        )
+        dataframe["pmax_pct_rising"] = (
+            dataframe["pmax_pct"] > dataframe["pmax_pct"].shift()
+        ).astype("int")
 
-    
-        
+        dataframe["smooth_volume"] = ta.EMA(dataframe["volume"], timeperiod=2)
+        dataframe["smooth_volume_slow"] = ta.EMA(dataframe["volume"], timeperiod=12)
+        dataframe["volume_pct"] = (dataframe["volume"]).pct_change()
+        dataframe["smooth_volume_pct"] = ta.EMA(dataframe["volume_pct"], timeperiod=2)
+        dataframe["volume_pct_rising"] = (
+            dataframe["volume_pct"] > dataframe["volume_pct"].shift()
+        ).astype("int")
+        dataframe["smooth_volume_pct_rising"] = ta.EMA(dataframe["volume_pct_rising"], timeperiod=2)
+
+        dataframe["close_pct"] = (dataframe["close"]).pct_change()
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         """dataframe['ema_offset_buy'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema.value)) *self.low_offset_ema.value
         dataframe['ema_offset_buy2'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema2.value)) *self.low_offset_ema2.value"""
-        dataframe['ema_sell'] = ta.EMA(dataframe, int(self.base_nb_candles_ema_sell.value))   
-        
-        dataframe.loc[:, 'buy_tag'] = ''
-        dataframe.loc[:, 'buy_copy'] = 0
-        dataframe.loc[:, 'entry'] = 0
+        dataframe["ema_sell"] = ta.EMA(dataframe, int(self.base_nb_candles_ema_sell.value))
 
-        if (self.buy_condition_ema_enable.value):
+        dataframe.loc[:, "buy_tag"] = ""
+        dataframe.loc[:, "buy_copy"] = 0
+        dataframe.loc[:, "entry"] = 0
 
+        if self.buy_condition_ema_enable.value:
             buy_offset_ema = (
-                ( 
-                    #(dataframe['pm'] <= dataframe['pmax_thresh'])
-                    #&
-                    #(dataframe['ha_up'].rolling(self.ha_rolling_up.value).sum() == self.ha_rolling_up.value)
-                    #&
-                    #(qtpylib.crossed_above(dataframe['HA_Close'].shift(self.ha_rolling_up.value -1 ), dataframe['HA_Open'].shift(self.ha_rolling_up.value + 1)))
-                    #&
-                    #(dataframe['ha_down'].shift(self.ha_rolling_up.value).rolling(self.ha_rolling_down.value).sum() == self.ha_rolling_down.value)
-                    #&
-                    (qtpylib.crossed_below(dataframe['sar'], dataframe['pmax_thresh']))
-                    &
-                    (dataframe['pmax_thresh'] > dataframe['pm'])
-                    &
-                    (dataframe['pmax_thresh'] > dataframe['sar'])
-                    #&
-                    #(dataframe['high_rising'] == 1)
-                )
+                # (dataframe['pm'] <= dataframe['pmax_thresh'])
+                # &
+                # (dataframe['ha_up'].rolling(self.ha_rolling_up.value).sum() == self.ha_rolling_up.value)
+                # &
+                # (qtpylib.crossed_above(dataframe['HA_Close'].shift(self.ha_rolling_up.value -1 ), dataframe['HA_Open'].shift(self.ha_rolling_up.value + 1)))
+                # &
+                # (dataframe['ha_down'].shift(self.ha_rolling_up.value).rolling(self.ha_rolling_down.value).sum() == self.ha_rolling_down.value)
+                # &
+                (qtpylib.crossed_below(dataframe["sar"], dataframe["pmax_thresh"]))
+                & (dataframe["pmax_thresh"] > dataframe["pm"])
+                & (dataframe["pmax_thresh"] > dataframe["sar"])
+                # &
+                # (dataframe['high_rising'] == 1)
             )
-            dataframe.loc[buy_offset_ema, 'buy_tag'] += 'ema '
+            dataframe.loc[buy_offset_ema, "buy_tag"] += "ema "
             conditions.append(buy_offset_ema)
 
         """if (self.buy_condition_zema_enable.value):
@@ -441,52 +497,40 @@ class MultiMA_TSL3_Mod(IStrategy):
             conditions.append(buy_offset_hma)"""
 
         add_check = (
-            (dataframe['live_data_ok'])
+            (dataframe["live_data_ok"])
+            & (dataframe["pmax_pct"] > self.pmax_pct_min.value)
+            & (dataframe["volume_pct"] > self.volume_pct_min.value)
+            & (dataframe["close_pct"] > self.close_pct_min.value)
+            & (dataframe["rsi"] > self.buy_rsi_min.value)
+            & (dataframe["rsi_fast"] > self.buy_rsi_fast_min.value)
+            & (dataframe["pmax_pct"] < self.pmax_pct_max.value)
+            & (dataframe["volume_pct"] < self.volume_pct_max.value)
+            & (dataframe["close_pct"] < self.close_pct_max.value)
+            & (dataframe["rsi"] < self.buy_rsi_max.value)
+            & (dataframe["rsi_fast"] < self.buy_rsi_fast_max.value)
+            & (dataframe["ewo"] > self.ewo_high.value)
             &
-            (dataframe['pmax_pct'] > self.pmax_pct_min.value)
-            &
-            (dataframe['volume_pct'] > self.volume_pct_min.value)   
-            &
-            (dataframe['close_pct'] > self.close_pct_min.value)
-            &
-            (dataframe['rsi'] > self.buy_rsi_min.value)
-            &
-            (dataframe['rsi_fast'] > self.buy_rsi_fast_min.value)
-            &
-            (dataframe['pmax_pct'] < self.pmax_pct_max.value)
-            &
-            (dataframe['volume_pct'] < self.volume_pct_max.value)
-            &
-            (dataframe['close_pct'] < self.close_pct_max.value)
-            &
-            (dataframe['rsi'] < self.buy_rsi_max.value)
-            &
-            (dataframe['rsi_fast'] < self.buy_rsi_fast_max.value)
-            &
-            (dataframe['ewo'] > self.ewo_high.value)
-            &
-            
-            #(dataframe['open'] < dataframe['ema_offset_buy'])
-            #&
-            #(dataframe['buy_low_rolling'].shift().rolling(self.buy_smooth_ha_rolling.value).sum() == self.buy_low_rolling.value)
-            #&
-            #(dataframe['delta_rising'].rolling(5).sum() == self.buy_smooth_ha_rolling.value)
-            #&
-            #(dataframe['close'] > (dataframe['ema_sell'] * self.high_offset_sell_ema.value))
-            #&
-            #(dataframe['close'].rolling(288).max() < (dataframe['close'] * 1.10 ))
-            #&
-            #(dataframe['Smooth_HA_O'].shift(1) < dataframe['Smooth_HA_H'].shift(1))
-            #&
-            #(dataframe['rsi_fast'] > self.buy_rsi_fast.value)
-            #&
-            #(dataframe['rsi_84'] > 60)
-            #&
-            #(dataframe['rsi_112'] > 60)
-            #&
-            #(dataframe['ewo'] > self.ewo_high.value)
-            #&
-            #(
+            # (dataframe['open'] < dataframe['ema_offset_buy'])
+            # &
+            # (dataframe['buy_low_rolling'].shift().rolling(self.buy_smooth_ha_rolling.value).sum() == self.buy_low_rolling.value)
+            # &
+            # (dataframe['delta_rising'].rolling(5).sum() == self.buy_smooth_ha_rolling.value)
+            # &
+            # (dataframe['close'] > (dataframe['ema_sell'] * self.high_offset_sell_ema.value))
+            # &
+            # (dataframe['close'].rolling(288).max() < (dataframe['close'] * 1.10 ))
+            # &
+            # (dataframe['Smooth_HA_O'].shift(1) < dataframe['Smooth_HA_H'].shift(1))
+            # &
+            # (dataframe['rsi_fast'] > self.buy_rsi_fast.value)
+            # &
+            # (dataframe['rsi_84'] > 60)
+            # &
+            # (dataframe['rsi_112'] > 60)
+            # &
+            # (dataframe['ewo'] > self.ewo_high.value)
+            # &
+            # (
             #    (
             #        (dataframe['close'] > dataframe['pmax_thresh'])
             #        &
@@ -518,45 +562,45 @@ class MultiMA_TSL3_Mod(IStrategy):
             #            )
             #        )
             #    )
-            #)
-            #&
-            (dataframe['volume'] > 0)
+            # )
+            # &
+            (dataframe["volume"] > 0)
         )
-        
+
         if conditions:
             dataframe.loc[
-                (add_check & reduce(lambda x, y: x | y, conditions)),
-                ['buy_copy','entry']
-            ]=(1,1)
+                (add_check & reduce(lambda x, y: x | y, conditions)), ["buy_copy", "entry"]
+            ] = (1, 1)
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[:, 'exit_long'] = 0
+        dataframe.loc[:, "exit_long"] = 0
 
         return dataframe
+
 
 # Elliot Wave Oscillator
 def EWO(dataframe, sma1_length=5, sma2_length=35):
     df = dataframe.copy()
     sma1 = ta.EMA(df, timeperiod=sma1_length)
     sma2 = ta.EMA(df, timeperiod=sma2_length)
-    smadif = (sma1 - sma2) / df['close'] * 100
+    smadif = (sma1 - sma2) / df["close"] * 100
     return smadif
+
 
 # PMAX
 def pmax(df, period, multiplier, length, MAtype, src):
-
     period = int(period)
     multiplier = int(multiplier)
     length = int(length)
     MAtype = int(MAtype)
     src = int(src)
 
-    mavalue = f'MA_{MAtype}_{length}'
-    atr = f'ATR_{period}'
-    pm = f'pm_{period}_{multiplier}_{length}_{MAtype}'
-    pmx = f'pmX_{period}_{multiplier}_{length}_{MAtype}'
+    mavalue = f"MA_{MAtype}_{length}"
+    atr = f"ATR_{period}"
+    pm = f"pm_{period}_{multiplier}_{length}_{MAtype}"
+    pmx = f"pmX_{period}_{multiplier}_{length}_{MAtype}"
 
     # MAtype==1 --> EMA
     # MAtype==2 --> DEMA
@@ -594,77 +638,83 @@ def pmax(df, period, multiplier, length, MAtype, src):
         mavalue = zema(df, period=length)
 
     df[atr] = ta.ATR(df, timeperiod=period)
-    df['basic_ub'] = mavalue + ((multiplier/10) * df[atr])
-    df['basic_lb'] = mavalue - ((multiplier/10) * df[atr])
+    df["basic_ub"] = mavalue + ((multiplier / 10) * df[atr])
+    df["basic_lb"] = mavalue - ((multiplier / 10) * df[atr])
 
-
-    basic_ub = df['basic_ub'].values
+    basic_ub = df["basic_ub"].values
     final_ub = np.full(len(df), 0.00)
-    basic_lb = df['basic_lb'].values
+    basic_lb = df["basic_lb"].values
     final_lb = np.full(len(df), 0.00)
 
     for i in range(period, len(df)):
-        final_ub[i] = basic_ub[i] if (
-            basic_ub[i] < final_ub[i - 1]
-            or mavalue[i - 1] > final_ub[i - 1]) else final_ub[i - 1]
-        final_lb[i] = basic_lb[i] if (
-            basic_lb[i] > final_lb[i - 1]
-            or mavalue[i - 1] < final_lb[i - 1]) else final_lb[i - 1]
+        final_ub[i] = (
+            basic_ub[i]
+            if (basic_ub[i] < final_ub[i - 1] or mavalue[i - 1] > final_ub[i - 1])
+            else final_ub[i - 1]
+        )
+        final_lb[i] = (
+            basic_lb[i]
+            if (basic_lb[i] > final_lb[i - 1] or mavalue[i - 1] < final_lb[i - 1])
+            else final_lb[i - 1]
+        )
 
-    df['final_ub'] = final_ub
-    df['final_lb'] = final_lb
+    df["final_ub"] = final_ub
+    df["final_lb"] = final_lb
 
     pm_arr = np.full(len(df), 0.00)
     for i in range(period, len(df)):
         pm_arr[i] = (
-            final_ub[i] if (pm_arr[i - 1] == final_ub[i - 1]
-                                    and mavalue[i] <= final_ub[i])
-        else final_lb[i] if (
-            pm_arr[i - 1] == final_ub[i - 1]
-            and mavalue[i] > final_ub[i]) else final_lb[i]
-        if (pm_arr[i - 1] == final_lb[i - 1]
-            and mavalue[i] >= final_lb[i]) else final_ub[i]
-        if (pm_arr[i - 1] == final_lb[i - 1]
-            and mavalue[i] < final_lb[i]) else 0.00)
+            final_ub[i]
+            if (pm_arr[i - 1] == final_ub[i - 1] and mavalue[i] <= final_ub[i])
+            else final_lb[i]
+            if (pm_arr[i - 1] == final_ub[i - 1] and mavalue[i] > final_ub[i])
+            else final_lb[i]
+            if (pm_arr[i - 1] == final_lb[i - 1] and mavalue[i] >= final_lb[i])
+            else final_ub[i]
+            if (pm_arr[i - 1] == final_lb[i - 1] and mavalue[i] < final_lb[i])
+            else 0.00
+        )
 
     pm = Series(pm_arr)
 
     # Mark the trend direction up/down
-    pmx = np.where((pm_arr > 0.00), np.where((mavalue < pm_arr), 'down',  'up'), np.NaN)
+    pmx = np.where((pm_arr > 0.00), np.where((mavalue < pm_arr), "down", "up"), np.NaN)
 
     return pm, pmx
+
 
 # smoothed Heiken Ashi
 def HA(dataframe, smoothing=None):
     df = dataframe.copy()
 
-    df['HA_Close']=(df['open'] + df['high'] + df['low'] + df['close'])/4
+    df["HA_Close"] = (df["open"] + df["high"] + df["low"] + df["close"]) / 4
 
     df.reset_index(inplace=True)
 
-    ha_open = [ (df['open'][0] + df['close'][0]) / 2 ]
-    [ ha_open.append((ha_open[i] + df['HA_Close'].values[i]) / 2) for i in range(0, len(df)-1) ]
-    df['HA_Open'] = ha_open
+    ha_open = [(df["open"][0] + df["close"][0]) / 2]
+    [ha_open.append((ha_open[i] + df["HA_Close"].values[i]) / 2) for i in range(0, len(df) - 1)]
+    df["HA_Open"] = ha_open
 
-    df.set_index('index', inplace=True)
+    df.set_index("index", inplace=True)
 
-    df['HA_High']=df[['HA_Open','HA_Close','high']].max(axis=1)
-    df['HA_Low']=df[['HA_Open','HA_Close','low']].min(axis=1)
+    df["HA_High"] = df[["HA_Open", "HA_Close", "high"]].max(axis=1)
+    df["HA_Low"] = df[["HA_Open", "HA_Close", "low"]].min(axis=1)
 
     if smoothing is not None:
         sml = abs(int(smoothing))
         if sml > 0:
-            df['Smooth_HA_O']=ta.EMA(df['HA_Open'], sml)
-            df['Smooth_HA_C']=ta.EMA(df['HA_Close'], sml)
-            df['Smooth_HA_H']=ta.EMA(df['HA_High'], sml)
-            df['Smooth_HA_L']=ta.EMA(df['HA_Low'], sml)
-            
+            df["Smooth_HA_O"] = ta.EMA(df["HA_Open"], sml)
+            df["Smooth_HA_C"] = ta.EMA(df["HA_Close"], sml)
+            df["Smooth_HA_H"] = ta.EMA(df["HA_High"], sml)
+            df["Smooth_HA_L"] = ta.EMA(df["HA_Low"], sml)
+
     return df
 
+
 def pump_warning(dataframe, perc=15):
-    df = dataframe.copy()    
+    df = dataframe.copy()
     df["change"] = df["high"] - df["low"]
-    df["test1"] = (df["close"] > df["open"])
-    df["test2"] = ((df["change"]/df["low"]) > (perc/100))
-    df["result"] = (df["test1"] & df["test2"]).astype('int')
-    return df['result']
+    df["test1"] = df["close"] > df["open"]
+    df["test2"] = (df["change"] / df["low"]) > (perc / 100)
+    df["result"] = (df["test1"] & df["test2"]).astype("int")
+    return df["result"]

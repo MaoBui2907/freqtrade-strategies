@@ -18,21 +18,18 @@ class AverageStrategy(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "0": 0.5
-    }
+    minimal_roi = {"0": 0.5}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.2
 
     # Optimal timeframe for the strategy
-    timeframe = '4h'
+    timeframe = "4h"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        dataframe['maShort'] = ta.EMA(dataframe, timeperiod=8)
-        dataframe['maMedium'] = ta.EMA(dataframe, timeperiod=21)
+        dataframe["maShort"] = ta.EMA(dataframe, timeperiod=8)
+        dataframe["maMedium"] = ta.EMA(dataframe, timeperiod=21)
 
         return dataframe
 
@@ -43,10 +40,8 @@ class AverageStrategy(IStrategy):
         :return: DataFrame with buy column
         """
         dataframe.loc[
-            (
-                qtpylib.crossed_above(dataframe['maShort'], dataframe['maMedium'])
-            ),
-            'enter_long'] = 1
+            (qtpylib.crossed_above(dataframe["maShort"], dataframe["maMedium"])), "enter_long"
+        ] = 1
 
         return dataframe
 
@@ -57,8 +52,6 @@ class AverageStrategy(IStrategy):
         :return: DataFrame with buy column
         """
         dataframe.loc[
-            (
-                qtpylib.crossed_above(dataframe['maMedium'], dataframe['maShort'])
-            ),
-            'exit_long'] = 1
+            (qtpylib.crossed_above(dataframe["maMedium"], dataframe["maShort"])), "exit_long"
+        ] = 1
         return dataframe

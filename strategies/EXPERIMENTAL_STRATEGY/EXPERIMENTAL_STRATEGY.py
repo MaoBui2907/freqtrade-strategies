@@ -21,34 +21,30 @@ class EXPERIMENTAL_STRATEGY(IStrategy):
     or strategy repository https://github.com/freqtrade/freqtrade-strategies
     for samples and inspiration.
     """
+
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy
-    minimal_roi = {
-        "40": 0.0,
-        "30": 0.01,
-        "20": 0.02,
-        "0": 0.04
-    }
+    minimal_roi = {"40": 0.0, "30": 0.01, "20": 0.02, "0": 0.04}
 
     # Optimal stoploss designed for the strategy
     stoploss = -0.10
 
     # Optimal ticker interval for the strategy
-    ticker_interval = '5m'
+    ticker_interval = "5m"
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'limit',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "limit",
+        "stoploss_on_exchange": False,
     }
 
     # Optional time in force for orders
     order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc',
+        "entry": "gtc",
+        "exit": "gtc",
     }
 
     def informative_pairs(self):
@@ -80,39 +76,39 @@ class EXPERIMENTAL_STRATEGY(IStrategy):
         # ------------------------------------
 
         # ADX
-        dataframe['adx'] = ta.ADX(dataframe)
+        dataframe["adx"] = ta.ADX(dataframe)
 
         # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # Minus Directional Indicator / Movement
-        dataframe['minus_di'] = ta.MINUS_DI(dataframe)
+        dataframe["minus_di"] = ta.MINUS_DI(dataframe)
 
         # Plus Directional Indicator / Movement
-        dataframe['plus_di'] = ta.PLUS_DI(dataframe)
+        dataframe["plus_di"] = ta.PLUS_DI(dataframe)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Stoch fast
         stoch_fast = ta.STOCHF(dataframe)
-        dataframe['fastd'] = stoch_fast['fastd']
-        dataframe['fastk'] = stoch_fast['fastk']
+        dataframe["fastd"] = stoch_fast["fastd"]
+        dataframe["fastk"] = stoch_fast["fastk"]
 
         # Bollinger bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
         # EMA - Exponential Moving Average
-        dataframe['ema10'] = ta.EMA(dataframe, timeperiod=10)
+        dataframe["ema10"] = ta.EMA(dataframe, timeperiod=10)
 
         # SMA - Simple Moving Average
-        dataframe['sma'] = ta.SMA(dataframe, timeperiod=40)
+        dataframe["sma"] = ta.SMA(dataframe, timeperiod=40)
 
         return dataframe
 
@@ -125,16 +121,14 @@ class EXPERIMENTAL_STRATEGY(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['rsi'] < 35) &
-                (dataframe['fastd'] < 35) &
-                (dataframe['adx'] > 30) &
-                (dataframe['plus_di'] > 0.5)
-            ) |
-            (
-                (dataframe['adx'] > 65) &
-                (dataframe['plus_di'] > 0.5)
-            ),
-            'enter_long'] = 1
+                (dataframe["rsi"] < 35)
+                & (dataframe["fastd"] < 35)
+                & (dataframe["adx"] > 30)
+                & (dataframe["plus_di"] > 0.5)
+            )
+            | ((dataframe["adx"] > 65) & (dataframe["plus_di"] > 0.5)),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -148,15 +142,13 @@ class EXPERIMENTAL_STRATEGY(IStrategy):
         dataframe.loc[
             (
                 (
-                    (qtpylib.crossed_above(dataframe['rsi'], 70)) |
-                    (qtpylib.crossed_above(dataframe['fastd'], 70))
-                ) &
-                (dataframe['adx'] > 10) &
-                (dataframe['minus_di'] > 0)
-            ) |
-            (
-                (dataframe['adx'] > 70) &
-                (dataframe['minus_di'] > 0.5)
-            ),
-            'exit_long'] = 1
+                    (qtpylib.crossed_above(dataframe["rsi"], 70))
+                    | (qtpylib.crossed_above(dataframe["fastd"], 70))
+                )
+                & (dataframe["adx"] > 10)
+                & (dataframe["minus_di"] > 0)
+            )
+            | ((dataframe["adx"] > 70) & (dataframe["minus_di"] > 0.5)),
+            "exit_long",
+        ] = 1
         return dataframe

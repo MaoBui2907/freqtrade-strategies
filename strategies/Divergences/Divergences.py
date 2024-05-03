@@ -29,17 +29,16 @@ class Divergences(IStrategy):
     - the prototype for the methods: minimal_roi, stoploss, populate_indicators, populate_entry_trend,
     populate_exit_trend, hyperopt_space, buy_strategy_generator
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
-        # ROI table:
+    # ROI table:
 
     # ROI table:
-    minimal_roi = {
-        "0": 1
-    }
+    minimal_roi = {"0": 1}
 
     # This attribute will be overridden if the config file contains "stoploss".
     stoploss = -0.1
@@ -54,7 +53,7 @@ class Divergences(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    timeframe = '1h'
+    timeframe = "1h"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -69,32 +68,29 @@ class Divergences(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -122,48 +118,44 @@ class Divergences(IStrategy):
         :return: a Dataframe with all mandatory indicators for the strategies
         """
 
-
-        #divergences
+        # divergences
         #     - -   - -
         #         -
         #     4 3 2 1 0
 
-        #src[4] > src[2] and src[3] > src[2] and src[2] < src[1] and src[2] < src[0]
-        dataframe['bullish_div'] = (
-                                        ( dataframe['close'].shift(4) > dataframe['close'].shift(2) ) &
-                                        ( dataframe['close'].shift(3) > dataframe['close'].shift(2) ) &
-                                        ( dataframe['close'].shift(2) < dataframe['close'].shift(1) ) &
-                                        ( dataframe['close'].shift(2) < dataframe['close'] )
-                                   )
+        # src[4] > src[2] and src[3] > src[2] and src[2] < src[1] and src[2] < src[0]
+        dataframe["bullish_div"] = (
+            (dataframe["close"].shift(4) > dataframe["close"].shift(2))
+            & (dataframe["close"].shift(3) > dataframe["close"].shift(2))
+            & (dataframe["close"].shift(2) < dataframe["close"].shift(1))
+            & (dataframe["close"].shift(2) < dataframe["close"])
+        )
 
+        # queremos el volumen medio de las ultimas 24 velas, si es mayor queremos comprar, si es que no es volumen a la baja, esto habria que compararlo tomando el precio unas horas antes
+        dataframe["mean24volume"] = dataframe.volume.rolling(24).mean()
 
-
-
-        #queremos el volumen medio de las ultimas 24 velas, si es mayor queremos comprar, si es que no es volumen a la baja, esto habria que compararlo tomando el precio unas horas antes
-        dataframe['mean24volume'] = dataframe.volume.rolling(24).mean()
-
-        dataframe['mean68close'] = dataframe.close.rolling(68).mean()
+        dataframe["mean68close"] = dataframe.close.rolling(68).mean()
 
         #         -
         #     - -   - -
         #     4 3 2 1 0
-        #src[4] < src[2] and src[3] < src[2] and src[2] > src[1] and src[2] > src[0]
+        # src[4] < src[2] and src[3] < src[2] and src[2] > src[1] and src[2] > src[0]
 
-        dataframe['bearish_div'] = (
-                                        ( dataframe['close'].shift(4) < dataframe['close'].shift(2) ) &
-                                        ( dataframe['close'].shift(3) < dataframe['close'].shift(2) ) &
-                                        ( dataframe['close'].shift(2) > dataframe['close'].shift(1) ) &
-                                        ( dataframe['close'].shift(2) > dataframe['close'] )
-                                    )
+        dataframe["bearish_div"] = (
+            (dataframe["close"].shift(4) < dataframe["close"].shift(2))
+            & (dataframe["close"].shift(3) < dataframe["close"].shift(2))
+            & (dataframe["close"].shift(2) > dataframe["close"].shift(1))
+            & (dataframe["close"].shift(2) > dataframe["close"])
+        )
 
-        dataframe['cci_one'] = ta.CCI(dataframe, timeperiod=170)
-        dataframe['cci_two'] = ta.CCI(dataframe, timeperiod=34)
+        dataframe["cci_one"] = ta.CCI(dataframe, timeperiod=170)
+        dataframe["cci_two"] = ta.CCI(dataframe, timeperiod=34)
 
         # Momentum Indicators
         # ------------------------------------
 
         # ADX
-        dataframe['adx'] = ta.ADX(dataframe)
+        dataframe["adx"] = ta.ADX(dataframe)
 
         # # Plus Directional Indicator / Movement
         # dataframe['plus_dm'] = ta.PLUS_DM(dataframe)
@@ -199,10 +191,10 @@ class Divergences(IStrategy):
         # dataframe['uo'] = ta.ULTOSC(dataframe)
 
         # # Commodity Channel Index: values [Oversold:-100, Overbought:100]
-        dataframe['cci'] = ta.CCI(dataframe)
+        dataframe["cci"] = ta.CCI(dataframe)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # # Inverse Fisher transform on RSI: values [-1.0, 1.0] (https://goo.gl/2JGGoy)
         # rsi = 0.1 * (dataframe['rsi'] - 50)
@@ -218,8 +210,8 @@ class Divergences(IStrategy):
 
         # Stochastic Fast
         stoch_fast = ta.STOCHF(dataframe)
-        dataframe['fastd'] = stoch_fast['fastd']
-        dataframe['fastk'] = stoch_fast['fastk']
+        dataframe["fastd"] = stoch_fast["fastd"]
+        dataframe["fastk"] = stoch_fast["fastk"]
 
         # # Stochastic RSI
         # Please read https://github.com/freqtrade/freqtrade/issues/2961 before using this.
@@ -230,12 +222,12 @@ class Divergences(IStrategy):
 
         # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # MFI
-        dataframe['mfi'] = ta.MFI(dataframe)
+        dataframe["mfi"] = ta.MFI(dataframe)
 
         # # ROC
         # dataframe['roc'] = ta.ROC(dataframe)
@@ -245,16 +237,15 @@ class Divergences(IStrategy):
 
         # Bollinger Bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe["bb_percent"] = (
-            (dataframe["close"] - dataframe["bb_lowerband"]) /
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"])
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_percent"] = (dataframe["close"] - dataframe["bb_lowerband"]) / (
+            dataframe["bb_upperband"] - dataframe["bb_lowerband"]
         )
-        dataframe["bb_width"] = (
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe["bb_middleband"]
-        )
+        dataframe["bb_width"] = (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe[
+            "bb_middleband"
+        ]
 
         # Bollinger Bands - Weighted (EMA based instead of SMA)
         # weighted_bollinger = qtpylib.weighted_bollinger_bands(
@@ -273,13 +264,13 @@ class Divergences(IStrategy):
         # )
 
         # # EMA - Exponential Moving Average
-        dataframe['ema3'] = ta.EMA(dataframe, timeperiod=3)
-        dataframe['ema5'] = ta.EMA(dataframe, timeperiod=5)
-        dataframe['ema10'] = ta.EMA(dataframe, timeperiod=10)
-        dataframe['ema21'] = ta.EMA(dataframe, timeperiod=21)
-        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
-        dataframe['ema100'] = ta.EMA(dataframe, timeperiod=100)
-        dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
+        dataframe["ema3"] = ta.EMA(dataframe, timeperiod=3)
+        dataframe["ema5"] = ta.EMA(dataframe, timeperiod=5)
+        dataframe["ema10"] = ta.EMA(dataframe, timeperiod=10)
+        dataframe["ema21"] = ta.EMA(dataframe, timeperiod=21)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema100"] = ta.EMA(dataframe, timeperiod=100)
+        dataframe["ema200"] = ta.EMA(dataframe, timeperiod=200)
 
         # # SMA - Simple Moving Average
         # dataframe['sma3'] = ta.SMA(dataframe, timeperiod=3)
@@ -290,17 +281,17 @@ class Divergences(IStrategy):
         # dataframe['sma100'] = ta.SMA(dataframe, timeperiod=100)
 
         # Parabolic SAR
-        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe["sar"] = ta.SAR(dataframe)
 
         # TEMA - Triple Exponential Moving Average
-        dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
+        dataframe["tema"] = ta.TEMA(dataframe, timeperiod=9)
 
         # Cycle Indicator
         # ------------------------------------
         # Hilbert Transform Indicator - SineWave
         hilbert = ta.HT_SINE(dataframe)
-        dataframe['htsine'] = hilbert['sine']
-        dataframe['htleadsine'] = hilbert['leadsine']
+        dataframe["htsine"] = hilbert["sine"]
+        dataframe["htleadsine"] = hilbert["leadsine"]
 
         # Pattern Recognition - Bullish candlestick patterns
         # ------------------------------------
@@ -363,22 +354,13 @@ class Divergences(IStrategy):
     # longCond = MACD > signalMACD and k > 50 and xRSI > 50
     # shortCond = MACD < signalMACD
 
-
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (
-                (
-                    (dataframe['rsi'] <= 40) &
-                    (dataframe['bullish_div'])
-                )
-
-            ),
-            'enter_long'] = 1
+        dataframe.loc[((dataframe["rsi"] <= 40) & (dataframe["bullish_div"])), "enter_long"] = 1
 
         return dataframe
 
@@ -388,10 +370,6 @@ class Divergences(IStrategy):
         :param dataframe: DataFrame
         :return: DataFrame with buy column
         """
-        dataframe.loc[
-            (
-                (dataframe['bearish_div'])
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(dataframe["bearish_div"]), "exit_long"] = 1
 
         return dataframe

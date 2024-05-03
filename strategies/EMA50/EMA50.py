@@ -6,13 +6,14 @@ from freqtrade.strategy.interface import IStrategy
 from typing import Dict, List
 from functools import reduce
 from pandas import DataFrame
+
 # --------------------------------
 from freqtrade.strategy.hyper import CategoricalParameter, DecimalParameter, IntParameter
 
 
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy # noqa
+import numpy  # noqa
 # --------------------------------
 # Add your lib to import here
 
@@ -55,12 +56,7 @@ class EMA50(IStrategy):
     sell_hold = CategoricalParameter([True, False], default=True, space="sell")
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.278,
-        "39": 0.087,
-        "124": 0.038,
-        "135": 0
-    }
+    minimal_roi = {"0": 0.278, "39": 0.087, "124": 0.038, "135": 0}
 
     # Trailing stop:
     trailing_stop = True
@@ -72,7 +68,7 @@ class EMA50(IStrategy):
     stoploss = -0.333
 
     # Optimal timeframe for the strategy.
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -87,35 +83,33 @@ class EMA50(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
-    
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
+
     plot_config = {
         # Main plot indicators (Moving averages, ...)
-        'main_plot': {
-            'ema50': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "ema50": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             # Subplots - each dict defines one additional plot
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
+                "rsi": {"color": "red"},
             },
-        }
+        },
     }
+
     def informative_pairs(self):
         """
         Define additional, informative pair/interval combinations to be cached from the exchange.
@@ -140,7 +134,7 @@ class EMA50(IStrategy):
         :param metadata: Additional information, like the currently traded pair
         :return: a Dataframe with all mandatory indicators for the strategies
         """
-        
+
         # Momentum Indicators
         # ------------------------------------
 
@@ -186,8 +180,7 @@ class EMA50(IStrategy):
         # dataframe['cci'] = ta.CCI(dataframe)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
-
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Inverse Fisher transform on RSI, values [-1.0, 1.0] (https://goo.gl/2JGGoy)
         # rsi = 0.1 * (dataframe['rsi'] - 50)
@@ -215,9 +208,9 @@ class EMA50(IStrategy):
 
         # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # MFI
         # dataframe['mfi'] = ta.MFI(dataframe)
@@ -230,16 +223,15 @@ class EMA50(IStrategy):
 
         # Bollinger Bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe["bb_percent"] = (
-            (dataframe["close"] - dataframe["bb_lowerband"]) /
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"])
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_percent"] = (dataframe["close"] - dataframe["bb_lowerband"]) / (
+            dataframe["bb_upperband"] - dataframe["bb_lowerband"]
         )
-        dataframe["bb_width"] = (
-            (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe["bb_middleband"]
-        )
+        dataframe["bb_width"] = (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe[
+            "bb_middleband"
+        ]
 
         # Bollinger Bands - Weighted (EMA based instead of SMA)
         # weighted_bollinger = qtpylib.weighted_bollinger_bands(
@@ -261,9 +253,9 @@ class EMA50(IStrategy):
         # dataframe['ema5'] = ta.EMA(dataframe, timeperiod=5)
         # dataframe['ema10'] = ta.EMA(dataframe, timeperiod=10)
         # dataframe['ema21'] = ta.EMA(dataframe, timeperiod=21)
-        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
         # dataframe['ema100'] = ta.EMA(dataframe, timeperiod=100)
-        #dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
+        # dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
 
         # dataframe['ema7'] = ta.EMA(dataframe, timeperiod=7)
         # dataframe['ema25'] = ta.EMA(dataframe, timeperiod=25)
@@ -346,7 +338,6 @@ class EMA50(IStrategy):
         # Retrieve best bid and best ask from the orderbook
         # ------------------------------------
 
-
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -361,18 +352,17 @@ class EMA50(IStrategy):
 
         # GUARDS AND TRENDS
 
-
         # check that volume is not 0
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         # TRIGGERS
 
         # buy if close crosses above EMA50
-        conditions.append(qtpylib.crossed_above(dataframe['close'], dataframe['ema50']))
+        conditions.append(qtpylib.crossed_above(dataframe["close"], dataframe["ema50"]))
 
         # build the dataframe using the conditions
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), 'enter_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         return dataframe
 
@@ -387,15 +377,13 @@ class EMA50(IStrategy):
         conditions = []
         # if hold, then don't set a sell signal
         if self.sell_hold.value:
-            dataframe.loc[(dataframe['close'].notnull() ), 'exit_long'] = 0
+            dataframe.loc[(dataframe["close"].notnull()), "exit_long"] = 0
 
         else:
-
             # buy if close crosses below EMA50
-            conditions.append(qtpylib.crossed_below(dataframe['close'], dataframe['ema50']))
+            conditions.append(qtpylib.crossed_below(dataframe["close"], dataframe["ema50"]))
 
             if conditions:
-                dataframe.loc[reduce(lambda x, y: x & y, conditions), 'exit_long'] = 1
+                dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
 
         return dataframe
-    

@@ -2,6 +2,7 @@
 from freqtrade.strategy.interface import IStrategy
 from functools import reduce
 from pandas import DataFrame
+
 # --------------------------------
 import talib.abstract as ta
 import numpy as np
@@ -14,12 +15,12 @@ import pandas_ta as pta
 
 # Buy hyperspace params:
 buy_params = {
-     "base_nb_candles_buy": 11,
-     "ewo_high": 2.337,
-     "ewo_low": -15.87,
-     "low_offset": 0.979,
-     "rsi_buy": 55,
- }
+    "base_nb_candles_buy": 11,
+    "ewo_high": 2.337,
+    "ewo_low": -15.87,
+    "low_offset": 0.979,
+    "rsi_buy": 55,
+}
 
 # # Sell hyperspace params:
 # sell_params = {
@@ -28,13 +29,13 @@ buy_params = {
 # }
 
 # Buy hyperspace params:
-#buy_params = {
+# buy_params = {
 #    "base_nb_candles_buy": 11,
 #    "ewo_high": 2.337,
 #    "ewo_low": -15.87,
 #    "low_offset": 0.979,
 #    "rsi_buy": 55,
-#}
+# }
 
 # Sell hyperspace params:
 sell_params = {
@@ -47,175 +48,172 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
     df = dataframe.copy()
     ema1 = ta.EMA(df, timeperiod=ema_length)
     ema2 = ta.EMA(df, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / df['close'] * 100
+    emadif = (ema1 - ema2) / df["close"] * 100
     return emadif
 
 
 def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
     # Momentum Indicators
     # ------------------------------------
 
     # ADX
-    dataframe['adx'] = ta.ADX(dataframe)
+    dataframe["adx"] = ta.ADX(dataframe)
 
     # Plus Directional Indicator / Movement
-    dataframe['plus_dm'] = ta.PLUS_DM(dataframe)
-    dataframe['plus_di'] = ta.PLUS_DI(dataframe)
+    dataframe["plus_dm"] = ta.PLUS_DM(dataframe)
+    dataframe["plus_di"] = ta.PLUS_DI(dataframe)
 
     # Minus Directional Indicator / Movement
-    dataframe['minus_dm'] = ta.MINUS_DM(dataframe)
-    dataframe['minus_di'] = ta.MINUS_DI(dataframe)
+    dataframe["minus_dm"] = ta.MINUS_DM(dataframe)
+    dataframe["minus_di"] = ta.MINUS_DI(dataframe)
 
     # Aroon, Aroon Oscillator
     aroon = ta.AROON(dataframe)
-    dataframe['aroonup'] = aroon['aroonup']
-    dataframe['aroondown'] = aroon['aroondown']
-    dataframe['aroonosc'] = ta.AROONOSC(dataframe)
+    dataframe["aroonup"] = aroon["aroonup"]
+    dataframe["aroondown"] = aroon["aroondown"]
+    dataframe["aroonosc"] = ta.AROONOSC(dataframe)
 
     # Awesome Oscillator
-    dataframe['ao'] = qtpylib.awesome_oscillator(dataframe)
+    dataframe["ao"] = qtpylib.awesome_oscillator(dataframe)
 
     # Keltner Channel
     keltner = qtpylib.keltner_channel(dataframe)
     dataframe["kc_upperband"] = keltner["upper"]
     dataframe["kc_lowerband"] = keltner["lower"]
     dataframe["kc_middleband"] = keltner["mid"]
-    dataframe["kc_percent"] = (
-        (dataframe["close"] - dataframe["kc_lowerband"]) /
-        (dataframe["kc_upperband"] - dataframe["kc_lowerband"])
+    dataframe["kc_percent"] = (dataframe["close"] - dataframe["kc_lowerband"]) / (
+        dataframe["kc_upperband"] - dataframe["kc_lowerband"]
     )
-    dataframe["kc_width"] = (
-        (dataframe["kc_upperband"] - dataframe["kc_lowerband"]) / dataframe["kc_middleband"]
-    )
+    dataframe["kc_width"] = (dataframe["kc_upperband"] - dataframe["kc_lowerband"]) / dataframe[
+        "kc_middleband"
+    ]
 
     # Ultimate Oscillator
-    dataframe['uo'] = ta.ULTOSC(dataframe)
+    dataframe["uo"] = ta.ULTOSC(dataframe)
 
     # Commodity Channel Index: values [Oversold:-100, Overbought:100]
-    dataframe['cci'] = ta.CCI(dataframe)
+    dataframe["cci"] = ta.CCI(dataframe)
 
     # RSI
-    dataframe['rsi'] = ta.RSI(dataframe)
+    dataframe["rsi"] = ta.RSI(dataframe)
 
     # # Inverse Fisher transform on RSI: values [-1.0, 1.0] (https://goo.gl/2JGGoy)
-    rsi = 0.1 * (dataframe['rsi'] - 50)
-    dataframe['fisher_rsi'] = (np.exp(2 * rsi) - 1) / (np.exp(2 * rsi) + 1)
+    rsi = 0.1 * (dataframe["rsi"] - 50)
+    dataframe["fisher_rsi"] = (np.exp(2 * rsi) - 1) / (np.exp(2 * rsi) + 1)
 
     # # Inverse Fisher transform on RSI normalized: values [0.0, 100.0] (https://goo.gl/2JGGoy)
-    dataframe['fisher_rsi_norma'] = 50 * (dataframe['fisher_rsi'] + 1)
+    dataframe["fisher_rsi_norma"] = 50 * (dataframe["fisher_rsi"] + 1)
 
     # # Stochastic Slow
     stoch = ta.STOCH(dataframe)
-    dataframe['slowd'] = stoch['slowd']
-    dataframe['slowk'] = stoch['slowk']
+    dataframe["slowd"] = stoch["slowd"]
+    dataframe["slowk"] = stoch["slowk"]
 
     # Stochastic Fast
     stoch_fast = ta.STOCHF(dataframe)
-    dataframe['fastd'] = stoch_fast['fastd']
-    dataframe['fastk'] = stoch_fast['fastk']
+    dataframe["fastd"] = stoch_fast["fastd"]
+    dataframe["fastk"] = stoch_fast["fastk"]
 
     # # Stochastic RSI
     # Please read https://github.com/freqtrade/freqtrade/issues/2961 before using this.
     # STOCHRSI is NOT aligned with tradingview, which may result in non-expected results.
     stoch_rsi = ta.STOCHRSI(dataframe)
-    dataframe['fastd_rsi'] = stoch_rsi['fastd']
-    dataframe['fastk_rsi'] = stoch_rsi['fastk']
+    dataframe["fastd_rsi"] = stoch_rsi["fastd"]
+    dataframe["fastk_rsi"] = stoch_rsi["fastk"]
 
     # MACD
     macd = ta.MACD(dataframe)
-    dataframe['macd'] = macd['macd']
-    dataframe['macdsignal'] = macd['macdsignal']
-    dataframe['macdhist'] = macd['macdhist']
+    dataframe["macd"] = macd["macd"]
+    dataframe["macdsignal"] = macd["macdsignal"]
+    dataframe["macdhist"] = macd["macdhist"]
 
     # MFI
-    dataframe['mfi'] = ta.MFI(dataframe)
+    dataframe["mfi"] = ta.MFI(dataframe)
 
     # # ROC
-    dataframe['roc'] = ta.ROC(dataframe)
+    dataframe["roc"] = ta.ROC(dataframe)
 
     # Overlap Studies
     # ------------------------------------
 
     # Bollinger Bands
     bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-    dataframe['bb_lowerband'] = bollinger['lower']
-    dataframe['bb_middleband'] = bollinger['mid']
-    dataframe['bb_upperband'] = bollinger['upper']
-    dataframe["bb_percent"] = (
-        (dataframe["close"] - dataframe["bb_lowerband"]) /
-        (dataframe["bb_upperband"] - dataframe["bb_lowerband"])
+    dataframe["bb_lowerband"] = bollinger["lower"]
+    dataframe["bb_middleband"] = bollinger["mid"]
+    dataframe["bb_upperband"] = bollinger["upper"]
+    dataframe["bb_percent"] = (dataframe["close"] - dataframe["bb_lowerband"]) / (
+        dataframe["bb_upperband"] - dataframe["bb_lowerband"]
     )
-    dataframe["bb_width"] = (
-        (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe["bb_middleband"]
-    )
+    dataframe["bb_width"] = (dataframe["bb_upperband"] - dataframe["bb_lowerband"]) / dataframe[
+        "bb_middleband"
+    ]
 
     # Parabolic SAR
-    dataframe['sar'] = ta.SAR(dataframe)
+    dataframe["sar"] = ta.SAR(dataframe)
 
     # TEMA - Triple Exponential Moving Average
-    dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
+    dataframe["tema"] = ta.TEMA(dataframe, timeperiod=9)
 
     # Cycle Indicator
     # ------------------------------------
     # Hilbert Transform Indicator - SineWave
     hilbert = ta.HT_SINE(dataframe)
-    dataframe['htsine'] = hilbert['sine']
-    dataframe['htleadsine'] = hilbert['leadsine']
+    dataframe["htsine"] = hilbert["sine"]
+    dataframe["htleadsine"] = hilbert["leadsine"]
 
     # Pattern Recognition - Bullish candlestick patterns
     # ------------------------------------
     # Hammer: values [0, 100]
-    dataframe['CDLHAMMER'] = ta.CDLHAMMER(dataframe)
+    dataframe["CDLHAMMER"] = ta.CDLHAMMER(dataframe)
     # Inverted Hammer: values [0, 100]
-    dataframe['CDLINVERTEDHAMMER'] = ta.CDLINVERTEDHAMMER(dataframe)
+    dataframe["CDLINVERTEDHAMMER"] = ta.CDLINVERTEDHAMMER(dataframe)
     # Dragonfly Doji: values [0, 100]
-    dataframe['CDLDRAGONFLYDOJI'] = ta.CDLDRAGONFLYDOJI(dataframe)
+    dataframe["CDLDRAGONFLYDOJI"] = ta.CDLDRAGONFLYDOJI(dataframe)
     # Piercing Line: values [0, 100]
-    dataframe['CDLPIERCING'] = ta.CDLPIERCING(dataframe)  # values [0, 100]
+    dataframe["CDLPIERCING"] = ta.CDLPIERCING(dataframe)  # values [0, 100]
     # Morningstar: values [0, 100]
-    dataframe['CDLMORNINGSTAR'] = ta.CDLMORNINGSTAR(dataframe)  # values [0, 100]
+    dataframe["CDLMORNINGSTAR"] = ta.CDLMORNINGSTAR(dataframe)  # values [0, 100]
     # Three White Soldiers: values [0, 100]
-    dataframe['CDL3WHITESOLDIERS'] = ta.CDL3WHITESOLDIERS(dataframe)  # values [0, 100]
+    dataframe["CDL3WHITESOLDIERS"] = ta.CDL3WHITESOLDIERS(dataframe)  # values [0, 100]
 
     # Pattern Recognition - Bearish candlestick patterns
     # ------------------------------------
     # Hanging Man: values [0, 100]
-    dataframe['CDLHANGINGMAN'] = ta.CDLHANGINGMAN(dataframe)
+    dataframe["CDLHANGINGMAN"] = ta.CDLHANGINGMAN(dataframe)
     # Shooting Star: values [0, 100]
-    dataframe['CDLSHOOTINGSTAR'] = ta.CDLSHOOTINGSTAR(dataframe)
+    dataframe["CDLSHOOTINGSTAR"] = ta.CDLSHOOTINGSTAR(dataframe)
     # Gravestone Doji: values [0, 100]
-    dataframe['CDLGRAVESTONEDOJI'] = ta.CDLGRAVESTONEDOJI(dataframe)
+    dataframe["CDLGRAVESTONEDOJI"] = ta.CDLGRAVESTONEDOJI(dataframe)
     # Dark Cloud Cover: values [0, 100]
-    dataframe['CDLDARKCLOUDCOVER'] = ta.CDLDARKCLOUDCOVER(dataframe)
+    dataframe["CDLDARKCLOUDCOVER"] = ta.CDLDARKCLOUDCOVER(dataframe)
     # Evening Doji Star: values [0, 100]
-    dataframe['CDLEVENINGDOJISTAR'] = ta.CDLEVENINGDOJISTAR(dataframe)
+    dataframe["CDLEVENINGDOJISTAR"] = ta.CDLEVENINGDOJISTAR(dataframe)
     # Evening Star: values [0, 100]
-    dataframe['CDLEVENINGSTAR'] = ta.CDLEVENINGSTAR(dataframe)
+    dataframe["CDLEVENINGSTAR"] = ta.CDLEVENINGSTAR(dataframe)
 
     # Pattern Recognition - Bullish/Bearish candlestick patterns
     # ------------------------------------
     # Three Line Strike: values [0, -100, 100]
-    dataframe['CDL3LINESTRIKE'] = ta.CDL3LINESTRIKE(dataframe)
+    dataframe["CDL3LINESTRIKE"] = ta.CDL3LINESTRIKE(dataframe)
     # Spinning Top: values [0, -100, 100]
-    dataframe['CDLSPINNINGTOP'] = ta.CDLSPINNINGTOP(dataframe)  # values [0, -100, 100]
+    dataframe["CDLSPINNINGTOP"] = ta.CDLSPINNINGTOP(dataframe)  # values [0, -100, 100]
     # Engulfing: values [0, -100, 100]
-    dataframe['CDLENGULFING'] = ta.CDLENGULFING(dataframe)  # values [0, -100, 100]
+    dataframe["CDLENGULFING"] = ta.CDLENGULFING(dataframe)  # values [0, -100, 100]
     # Harami: values [0, -100, 100]
-    dataframe['CDLHARAMI'] = ta.CDLHARAMI(dataframe)  # values [0, -100, 100]
+    dataframe["CDLHARAMI"] = ta.CDLHARAMI(dataframe)  # values [0, -100, 100]
     # Three Outside Up/Down: values [0, -100, 100]
-    dataframe['CDL3OUTSIDE'] = ta.CDL3OUTSIDE(dataframe)  # values [0, -100, 100]
+    dataframe["CDL3OUTSIDE"] = ta.CDL3OUTSIDE(dataframe)  # values [0, -100, 100]
     # Three Inside Up/Down: values [0, -100, 100]
-    dataframe['CDL3INSIDE'] = ta.CDL3INSIDE(dataframe)  # values [0, -100, 100]
+    dataframe["CDL3INSIDE"] = ta.CDL3INSIDE(dataframe)  # values [0, -100, 100]
 
     # # Chart type
     # # ------------------------------------
     # # Heikin Ashi Strategy
     heikinashi = qtpylib.heikinashi(dataframe)
-    dataframe['ha_open'] = heikinashi['open']
-    dataframe['ha_close'] = heikinashi['close']
-    dataframe['ha_high'] = heikinashi['high']
-    dataframe['ha_low'] = heikinashi['low']
+    dataframe["ha_open"] = heikinashi["open"]
+    dataframe["ha_close"] = heikinashi["close"]
+    dataframe["ha_high"] = heikinashi["high"]
+    dataframe["ha_low"] = heikinashi["low"]
 
     return dataframe
 
@@ -258,12 +256,7 @@ class ElliotV531(IStrategy):
     # }
     # ROI table:
     # ROI table:
-    minimal_roi = {
-        "0": 0.215,
-        "40": 0.132,
-        "87": 0.086,
-        "201": 0.03
-    }
+    minimal_roi = {"0": 0.215, "40": 0.132, "87": 0.086, "201": 0.03}
 
     # Stoploss:
     stoploss = -0.189
@@ -276,22 +269,28 @@ class ElliotV531(IStrategy):
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+        5, 80, default=buy_params["base_nb_candles_buy"], space="entry", optimize=True
+    )
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+        5, 80, default=sell_params["base_nb_candles_sell"], space="exit", optimize=True
+    )
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+        0.9, 0.99, default=buy_params["low_offset"], space="entry", optimize=True
+    )
     high_offset = DecimalParameter(
-        0.99, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+        0.99, 1.1, default=sell_params["high_offset"], space="exit", optimize=True
+    )
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
-    ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_low = DecimalParameter(
+        -20.0, -8.0, default=buy_params["ewo_low"], space="entry", optimize=True
+    )
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
+        2.0, 12.0, default=buy_params["ewo_high"], space="entry", optimize=True
+    )
+    rsi_buy = IntParameter(30, 70, default=buy_params["rsi_buy"], space="entry", optimize=True)
 
     # Trailing stop:
     trailing_stop = True
@@ -306,56 +305,60 @@ class ElliotV531(IStrategy):
     ignore_roi_if_entry_signal = True
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'ioc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "ioc"}
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
-    informative_timeframe = '30m'
+    timeframe = "5m"
+    informative_timeframe = "30m"
 
     process_only_new_candles = True
     startup_candle_count = 200
 
     plot_config = {
-        'main_plot': {
-            'ma_buy': {'color': 'blue'},
-            'ma_sell': {'color': 'orange'},
+        "main_plot": {
+            "ma_buy": {"color": "blue"},
+            "ma_sell": {"color": "orange"},
         },
     }
 
     use_custom_stoploss = True
 
-    slippage_protection = {
-        'retries': 3,
-        'max_slippage': -0.05
-    }
+    slippage_protection = {"retries": 3, "max_slippage": -0.05}
 
-    def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
-                           rate: float, time_in_force: str, sell_reason: str,
-                           current_time: datetime, **kwargs) -> bool:
-
+    def confirm_trade_exit(
+        self,
+        pair: str,
+        trade: Trade,
+        order_type: str,
+        amount: float,
+        rate: float,
+        time_in_force: str,
+        sell_reason: str,
+        current_time: datetime,
+        **kwargs,
+    ) -> bool:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1]
 
-        if (last_candle is not None):
-            if (sell_reason in ['exit_signal']):
-                if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
+        if last_candle is not None:
+            if sell_reason in ["exit_signal"]:
+                if (last_candle["hma_50"] * 1.149 > last_candle["ema_100"]) and (
+                    last_candle["close"] < last_candle["ema_100"] * 0.951
+                ):  # *1.2
                     return False
 
         # slippage
         try:
-            state = self.slippage_protection['__pair_retries']
+            state = self.slippage_protection["__pair_retries"]
         except KeyError:
-            state = self.slippage_protection['__pair_retries'] = {}
+            state = self.slippage_protection["__pair_retries"] = {}
 
         candle = dataframe.iloc[-1].squeeze()
 
-        slippage = (rate / candle['close']) - 1
-        if slippage < self.slippage_protection['max_slippage']:
+        slippage = (rate / candle["close"]) - 1
+        if slippage < self.slippage_protection["max_slippage"]:
             pair_retries = state.get(pair, 0)
-            if pair_retries < self.slippage_protection['retries']:
+            if pair_retries < self.slippage_protection["retries"]:
                 state[pair] = pair_retries + 1
                 return False
 
@@ -363,10 +366,16 @@ class ElliotV531(IStrategy):
 
         return True
 
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-                        current_rate: float, current_profit: float, **kwargs) -> float:
-
-        if (current_profit > 0):
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
+        if current_profit > 0:
             return 0.99
         else:
             trade_time_50 = current_time - timedelta(minutes=241)
@@ -374,87 +383,85 @@ class ElliotV531(IStrategy):
             # Trade open more then 241 minutes. For this strategy it's means -> loss
             # Let's try to minimize the loss
 
-            if (trade_time_50 > trade.open_date_utc):
-
+            if trade_time_50 > trade.open_date_utc:
                 try:
-                    number_of_candle_shift = int((trade_time_50 - trade.open_date_utc).total_seconds() / 300)
+                    number_of_candle_shift = int(
+                        (trade_time_50 - trade.open_date_utc).total_seconds() / 300
+                    )
                     dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
                     candle = dataframe.iloc[-number_of_candle_shift].squeeze()
 
                     # Are we still sinking?
-                    if current_rate * 1.015 < candle['open']:
+                    if current_rate * 1.015 < candle["open"]:
                         return 0.01
 
                 except IndexError:
-
                     # Whoops, set stoploss at 5%
                     return 0.01
-       
+
         return 1
 
-#        stoploss = self.stoploss
-#        dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
-#        last_candle = dataframe.iloc[-1].squeeze()
-#        if last_candle is None:
-#            return stoploss
-#
-#        trade_date = timeframe_to_prev_date(
-#            self.timeframe, trade.open_date_utc - timedelta(seconds=timeframe_to_seconds(self.timeframe)))
-#        trade_candle = dataframe.loc[dataframe['date'] == trade_date]
-#        if trade_candle.empty:
-#            return stoploss
-#
-#        trade_candle = trade_candle.squeeze()
-#
-#        dur_minutes = (current_time - trade.open_date_utc).seconds // 60
-#
-#        slippage_ratio = trade.open_rate / trade_candle['close'] - 1
-#        slippage_ratio = slippage_ratio if slippage_ratio > 0 else 0
-#        current_profit_comp = current_profit + slippage_ratio
+    #        stoploss = self.stoploss
+    #        dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
+    #        last_candle = dataframe.iloc[-1].squeeze()
+    #        if last_candle is None:
+    #            return stoploss
+    #
+    #        trade_date = timeframe_to_prev_date(
+    #            self.timeframe, trade.open_date_utc - timedelta(seconds=timeframe_to_seconds(self.timeframe)))
+    #        trade_candle = dataframe.loc[dataframe['date'] == trade_date]
+    #        if trade_candle.empty:
+    #            return stoploss
+    #
+    #        trade_candle = trade_candle.squeeze()
+    #
+    #        dur_minutes = (current_time - trade.open_date_utc).seconds // 60
+    #
+    #        slippage_ratio = trade.open_rate / trade_candle['close'] - 1
+    #        slippage_ratio = slippage_ratio if slippage_ratio > 0 else 0
+    #        current_profit_comp = current_profit + slippage_ratio
 
-#        if current_profit_comp >= self.trailing_stop_positive_offset:
-#            return self.trailing_stop_positive
-#
-#        for x in self.minimal_roi:
-#            dur = int(x)
-#            roi = self.minimal_roi[x]
-#            if dur_minutes >= dur and current_profit_comp >= roi:
-#                return 0.001
+    #        if current_profit_comp >= self.trailing_stop_positive_offset:
+    #            return self.trailing_stop_positive
+    #
+    #        for x in self.minimal_roi:
+    #            dur = int(x)
+    #            roi = self.minimal_roi[x]
+    #            if dur_minutes >= dur and current_profit_comp >= roi:
+    #                return 0.001
 
-#        return stoploss
+    #        return stoploss
 
     def informative_pairs(self):
-
         pairs = self.dp.current_whitelist()
         informative_pairs = [(pair, self.informative_timeframe) for pair in pairs]
 
         return informative_pairs
 
     def get_informative_indicators(self, metadata: dict):
-
         dataframe = self.dp.get_pair_dataframe(
-            pair=metadata['pair'], timeframe=self.informative_timeframe)
+            pair=metadata["pair"], timeframe=self.informative_timeframe
+        )
 
         return dataframe
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # Calculate all ma_buy values
         for val in self.base_nb_candles_buy.range:
-            dataframe[f'ma_buy_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_buy_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Calculate all ma_sell values
         for val in self.base_nb_candles_sell.range:
-            dataframe[f'ma_sell_{val}'] = ta.EMA(dataframe, timeperiod=val)
+            dataframe[f"ma_sell_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         # Elliot
-        dataframe['EWO'] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
+        dataframe["EWO"] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
-        dataframe['hma_50'] = pta.hma(dataframe['close'], 50)
-        dataframe['ema_100'] = ta.EMA(dataframe, timeperiod=100)
+        dataframe["hma_50"] = pta.hma(dataframe["close"], 50)
+        dataframe["ema_100"] = ta.EMA(dataframe, timeperiod=100)
 
         return dataframe
 
@@ -463,26 +470,35 @@ class ElliotV531(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] > self.ewo_high.value) &
-                (dataframe['rsi'] < self.rsi_buy.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] > self.ewo_high.value)
+                & (dataframe["rsi"] < self.rsi_buy.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         conditions.append(
             (
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] < self.ewo_low.value) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] < self.ewo_low.value)
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'entry'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "entry"] = 1
 
         return dataframe
 
@@ -491,15 +507,18 @@ class ElliotV531(IStrategy):
 
         conditions.append(
             (
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
-                (dataframe['volume'] > 0)
+                (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
+                & (dataframe["volume"] > 0)
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'exit'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "exit"] = 1
 
         return dataframe

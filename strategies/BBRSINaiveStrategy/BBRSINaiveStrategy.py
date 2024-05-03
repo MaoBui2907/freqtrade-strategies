@@ -20,11 +20,7 @@ class BBRSINaiveStrategy(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi".
-    minimal_roi = {
-        "60": 0.01,
-        "30": 0.02,
-        "0": 0.04
-    }
+    minimal_roi = {"60": 0.01, "30": 0.02, "0": 0.04}
 
     # Optimal stoploss designed for the strategy.
     # This attribute will be overridden if the config file contains "stoploss".
@@ -37,7 +33,7 @@ class BBRSINaiveStrategy(IStrategy):
     # trailing_stop_positive_offset = 0.0  # Disabled / not configured
 
     # Optimal ticker interval for the strategy.
-    timeframe = '15m'
+    timeframe = "15m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -52,29 +48,26 @@ class BBRSINaiveStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'bb_upperband': {'color': 'green'},
-            'bb_midband': {'color': 'orange'},
-            'bb_lowerband': {'color': 'red'},
+        "main_plot": {
+            "bb_upperband": {"color": "green"},
+            "bb_midband": {"color": "orange"},
+            "bb_lowerband": {"color": "red"},
         },
-        'subplots': {
+        "subplots": {
             "RSI": {
-                'rsi': {'color': 'yellow'},
+                "rsi": {"color": "yellow"},
             }
-        }
+        },
     }
 
     def informative_pairs(self):
@@ -92,35 +85,38 @@ class BBRSINaiveStrategy(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger bands
-        bollinger = qtpylib.bollinger_bands(
-            qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe['bb_midband'] = bollinger['mid']
-        dataframe['bb_lowerband'] = bollinger['lower']
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["bb_midband"] = bollinger["mid"]
+        dataframe["bb_lowerband"] = bollinger["lower"]
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (dataframe['rsi'] > 25) &  # Signal: RSI is greater 25
+                (dataframe["rsi"] > 25)  # Signal: RSI is greater 25
+                &
                 # Signal: price is less than lower bb
-                (dataframe['close'] < dataframe['bb_lowerband'])
+                (dataframe["close"] < dataframe["bb_lowerband"])
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (dataframe['rsi'] > 70) &  # Signal: RSI is greater 70
+                (dataframe["rsi"] > 70)  # Signal: RSI is greater 70
+                &
                 # Signal: price is greater than mid bb
-                (dataframe['close'] > dataframe['bb_midband'])
+                (dataframe["close"] > dataframe["bb_midband"])
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
 
         return dataframe

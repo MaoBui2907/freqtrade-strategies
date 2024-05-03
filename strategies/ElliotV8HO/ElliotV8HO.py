@@ -2,6 +2,7 @@
 from freqtrade.strategy.interface import IStrategy
 from functools import reduce
 from pandas import DataFrame
+
 # --------------------------------
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
@@ -13,7 +14,7 @@ def EWO(dataframe, ema_length=5, ema2_length=35):
     df = dataframe.copy()
     ema1 = ta.EMA(df, timeperiod=ema_length)
     ema2 = ta.EMA(df, timeperiod=ema2_length)
-    emadif = (ema1 - ema2) / df['close'] * 100
+    emadif = (ema1 - ema2) / df["close"] * 100
     return emadif
 
 
@@ -51,36 +52,38 @@ class ElliotV8HO(IStrategy):
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.08,
-        "40": 0.032,
-        "87": 0.016
-    }
+    minimal_roi = {"0": 0.08, "40": 0.032, "87": 0.016}
 
     # Stoploss:
     stoploss = -0.189
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        15, 60, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+        15, 60, default=buy_params["base_nb_candles_buy"], space="entry", optimize=True
+    )
     base_nb_candles_sell = IntParameter(
-        15, 60, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+        15, 60, default=sell_params["base_nb_candles_sell"], space="exit", optimize=True
+    )
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+        0.9, 0.99, default=buy_params["low_offset"], space="entry", optimize=True
+    )
     high_offset = DecimalParameter(
-        0.9, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+        0.9, 1.1, default=sell_params["high_offset"], space="exit", optimize=True
+    )
     high_offset_2 = DecimalParameter(
-        0.99, 1.2, default=sell_params['high_offset_2'], space='exit', optimize=True)
+        0.99, 1.2, default=sell_params["high_offset_2"], space="exit", optimize=True
+    )
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
-    ewo_low = DecimalParameter(-20.0, -15.0,
-                               default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_low = DecimalParameter(
+        -20.0, -15.0, default=buy_params["ewo_low"], space="entry", optimize=True
+    )
     ewo_high = DecimalParameter(
-        1.0, 8.0, default=buy_params['ewo_high'], space='entry', optimize=True)
-    rsi_buy = IntParameter(
-        25, 75, default=buy_params['rsi_buy'], space='entry', optimize=True)
+        1.0, 8.0, default=buy_params["ewo_high"], space="entry", optimize=True
+    )
+    rsi_buy = IntParameter(25, 75, default=buy_params["rsi_buy"], space="entry", optimize=True)
 
     # Trailing stop:
     trailing_stop = True
@@ -96,71 +99,69 @@ class ElliotV8HO(IStrategy):
 
     # Optional order time in force.
     order_time_in_force = {
-        'entry': 'gtc',
+        "entry": "gtc",
         # 'exit': 'ioc'
-        'exit': 'gtc'
+        "exit": "gtc",
     }
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
-    informative_timeframe = '1h'
+    timeframe = "5m"
+    informative_timeframe = "1h"
 
     process_only_new_candles = True
     startup_candle_count = 400
 
     plot_config = {
-        'main_plot': {
-            'ma_buy': {'color': 'orange'},
-            'ma_sell': {'color': 'orange'},
+        "main_plot": {
+            "ma_buy": {"color": "orange"},
+            "ma_sell": {"color": "orange"},
         },
     }
 
     use_custom_stoploss = False
 
     def informative_pairs(self):
-
         pairs = self.dp.current_whitelist()
-        informative_pairs = [(pair, self.informative_timeframe)
-                             for pair in pairs]
+        informative_pairs = [(pair, self.informative_timeframe) for pair in pairs]
 
         return informative_pairs
 
     def get_informative_indicators(self, metadata: dict):
-
         dataframe = self.dp.get_pair_dataframe(
-            pair=metadata['pair'], timeframe=self.informative_timeframe)
+            pair=metadata["pair"], timeframe=self.informative_timeframe
+        )
 
         return dataframe
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        if self.config['runmode'].value == 'hyperopt':
+        if self.config["runmode"].value == "hyperopt":
             # Calculate all ma_buy values
             for val in self.base_nb_candles_buy.range:
-                dataframe[f'ma_buy_{val}'] = ta.EMA(dataframe, timeperiod=val)
+                dataframe[f"ma_buy_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
             # Calculate all ma_sell values
             for val in self.base_nb_candles_sell.range:
-                dataframe[f'ma_sell_{val}'] = ta.EMA(dataframe, timeperiod=val)
+                dataframe[f"ma_sell_{val}"] = ta.EMA(dataframe, timeperiod=val)
 
         else:
-            dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] = ta.EMA(
-                dataframe, timeperiod=self.base_nb_candles_buy.value)
+            dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"] = ta.EMA(
+                dataframe, timeperiod=self.base_nb_candles_buy.value
+            )
 
-            dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] = ta.EMA(
-                dataframe, timeperiod=self.base_nb_candles_sell.value)
+            dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"] = ta.EMA(
+                dataframe, timeperiod=self.base_nb_candles_sell.value
+            )
 
-        dataframe['hma_50'] = qtpylib.hull_moving_average(
-            dataframe['close'], window=50)
+        dataframe["hma_50"] = qtpylib.hull_moving_average(dataframe["close"], window=50)
 
-        dataframe['sma_9'] = ta.SMA(dataframe, timeperiod=9)
+        dataframe["sma_9"] = ta.SMA(dataframe, timeperiod=9)
         # Elliot
-        dataframe['EWO'] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
+        dataframe["EWO"] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['rsi_fast'] = ta.RSI(dataframe, timeperiod=4)
-        dataframe['rsi_slow'] = ta.RSI(dataframe, timeperiod=20)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi_fast"] = ta.RSI(dataframe, timeperiod=4)
+        dataframe["rsi_slow"] = ta.RSI(dataframe, timeperiod=20)
 
         return dataframe
 
@@ -169,38 +170,51 @@ class ElliotV8HO(IStrategy):
 
         conditions.append(
             (
-
-                (dataframe['rsi_fast'] < 35) &
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] > self.ewo_high.value) &
-                (dataframe['rsi'] < self.rsi_buy.value) &
-                (dataframe['volume'] > 0) &
-                (dataframe['close'] < (
-                    dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
-
-
+                (dataframe["rsi_fast"] < 35)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] > self.ewo_high.value)
+                & (dataframe["rsi"] < self.rsi_buy.value)
+                & (dataframe["volume"] > 0)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
             )
         )
 
         conditions.append(
             (
-
-
-                (dataframe['rsi_fast'] < 35) &
-                (dataframe['close'] < (dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'] * self.low_offset.value)) &
-                (dataframe['EWO'] < self.ewo_low.value) &
-                (dataframe['volume'] > 0) &
-                (dataframe['close'] < (
-                    dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
-
+                (dataframe["rsi_fast"] < 35)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_buy_{self.base_nb_candles_buy.value}"]
+                        * self.low_offset.value
+                    )
+                )
+                & (dataframe["EWO"] < self.ewo_low.value)
+                & (dataframe["volume"] > 0)
+                & (
+                    dataframe["close"]
+                    < (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'entry'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "entry"] = 1
 
         return dataframe
 
@@ -208,27 +222,34 @@ class ElliotV8HO(IStrategy):
         conditions = []
 
         conditions.append(
-            ((dataframe['close'] > dataframe['hma_50']) &
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset_2.value)) &
-                (dataframe['rsi'] > 50) &
-                (dataframe['volume'] > 0) &
-                (dataframe['rsi_fast'] > dataframe['rsi_slow'])
-
-             )
-            |
             (
-                (dataframe['close'] < dataframe['hma_50']) &
-                (dataframe['close'] > (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
-                (dataframe['volume'] > 0) &
-                (dataframe['rsi_fast'] > dataframe['rsi_slow'])
+                (dataframe["close"] > dataframe["hma_50"])
+                & (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset_2.value
+                    )
+                )
+                & (dataframe["rsi"] > 50)
+                & (dataframe["volume"] > 0)
+                & (dataframe["rsi_fast"] > dataframe["rsi_slow"])
             )
-
+            | (
+                (dataframe["close"] < dataframe["hma_50"])
+                & (
+                    dataframe["close"]
+                    > (
+                        dataframe[f"ma_sell_{self.base_nb_candles_sell.value}"]
+                        * self.high_offset.value
+                    )
+                )
+                & (dataframe["volume"] > 0)
+                & (dataframe["rsi_fast"] > dataframe["rsi_slow"])
+            )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x | y, conditions),
-                'exit'
-            ]=1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), "exit"] = 1
 
         return dataframe

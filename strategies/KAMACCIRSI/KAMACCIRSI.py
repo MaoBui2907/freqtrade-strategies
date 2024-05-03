@@ -58,6 +58,7 @@ class KAMACCIRSI(IStrategy):
     Ideas and Todo:
         - Add informative pairs to help decision (e.g. BTC/USD to inform other */BTC pairs)
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
@@ -83,37 +84,32 @@ class KAMACCIRSI(IStrategy):
 
     # Buy hyperspace params:
     buy_params = {
-        'cci-enabled': True,
-        'cci-limit': 198,
-        'cci-period': 18,
-        'kama-long-period': 46,
-        'kama-short-period': 11,
-        'kama-trigger': 'cross',
-        'rsi-enabled': False,
-        'rsi-limit': 72,
-        'rsi-period': 5
+        "cci-enabled": True,
+        "cci-limit": 198,
+        "cci-period": 18,
+        "kama-long-period": 46,
+        "kama-short-period": 11,
+        "kama-trigger": "cross",
+        "rsi-enabled": False,
+        "rsi-limit": 72,
+        "rsi-period": 5,
     }
 
     # Sell hyperspace params:
     sell_params = {
-        'sell-cci-enabled': False,
-        'sell-cci-limit': -144,
-        'sell-cci-period': 18,
-        'sell-kama-long-period': 41,
-        'sell-kama-short-period': 5,
-        'sell-kama-trigger': 'cross',
-        'sell-rsi-enabled': False,
-        'sell-rsi-limit': 69,
-        'sell-rsi-period': 12
+        "sell-cci-enabled": False,
+        "sell-cci-limit": -144,
+        "sell-cci-period": 18,
+        "sell-kama-long-period": 41,
+        "sell-kama-short-period": 5,
+        "sell-kama-trigger": "cross",
+        "sell-rsi-enabled": False,
+        "sell-rsi-limit": 69,
+        "sell-rsi-period": 12,
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.11599,
-        "18": 0.03112,
-        "34": 0.01895,
-        "131": 0
-    }
+    minimal_roi = {"0": 0.11599, "18": 0.03112, "34": 0.01895, "131": 0}
 
     # Stoploss:
     stoploss = -0.32982
@@ -128,7 +124,7 @@ class KAMACCIRSI(IStrategy):
     END HYPEROPT
     """
 
-    timeframe = '5m'
+    timeframe = "5m"
 
     # Make sure these match or are not overridden in config
     use_exit_signal = True
@@ -146,6 +142,7 @@ class KAMACCIRSI(IStrategy):
     """
     Not currently being used for anything, thinking about implementing this later.
     """
+
     def informative_pairs(self):
         # https://www.freqtrade.io/en/latest/strategy-customization/#additional-data-informative_pairs
         informative_pairs = [(f"{self.config['stake_currency']}/USD", self.timeframe)]
@@ -154,66 +151,73 @@ class KAMACCIRSI(IStrategy):
     """
     Populate all of the indicators we need (note: indicators are separate for buy/sell)
     """
+
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # # Commodity Channel Index: values [Oversold:-100, Overbought:100]
-        dataframe['buy-cci'] = ta.CCI(dataframe, timeperiod=self.buy_params['cci-period'])
-        dataframe['sell-cci'] = ta.CCI(dataframe, timeperiod=self.sell_params['sell-cci-period'])
+        dataframe["buy-cci"] = ta.CCI(dataframe, timeperiod=self.buy_params["cci-period"])
+        dataframe["sell-cci"] = ta.CCI(dataframe, timeperiod=self.sell_params["sell-cci-period"])
 
         # RSI
-        dataframe['buy-rsi'] = ta.RSI(dataframe, timeperiod=self.buy_params['rsi-period'])
-        dataframe['sell-rsi'] = ta.RSI(dataframe, timeperiod=self.sell_params['sell-rsi-period'])
+        dataframe["buy-rsi"] = ta.RSI(dataframe, timeperiod=self.buy_params["rsi-period"])
+        dataframe["sell-rsi"] = ta.RSI(dataframe, timeperiod=self.sell_params["sell-rsi-period"])
 
         # KAMA - Kaufman Adaptive Moving Average
-        dataframe['buy-kama-short'] = ta.KAMA(dataframe, timeperiod=self.buy_params['kama-short-period'])
-        dataframe['buy-kama-long'] = ta.KAMA(dataframe, timeperiod=self.buy_params['kama-long-period'])
-        dataframe['buy-kama-long-slope'] = (dataframe['buy-kama-long'] / dataframe['buy-kama-long'].shift())
+        dataframe["buy-kama-short"] = ta.KAMA(
+            dataframe, timeperiod=self.buy_params["kama-short-period"]
+        )
+        dataframe["buy-kama-long"] = ta.KAMA(
+            dataframe, timeperiod=self.buy_params["kama-long-period"]
+        )
+        dataframe["buy-kama-long-slope"] = (
+            dataframe["buy-kama-long"] / dataframe["buy-kama-long"].shift()
+        )
 
-        dataframe['sell-kama-short'] = ta.KAMA(dataframe, timeperiod=self.sell_params['sell-kama-short-period'])
-        dataframe['sell-kama-long'] = ta.KAMA(dataframe, timeperiod=self.sell_params['sell-kama-long-period'])
-        dataframe['sell-kama-long-slope'] = (dataframe['sell-kama-long'] / dataframe['sell-kama-long'].shift())
+        dataframe["sell-kama-short"] = ta.KAMA(
+            dataframe, timeperiod=self.sell_params["sell-kama-short-period"]
+        )
+        dataframe["sell-kama-long"] = ta.KAMA(
+            dataframe, timeperiod=self.sell_params["sell-kama-long-period"]
+        )
+        dataframe["sell-kama-long-slope"] = (
+            dataframe["sell-kama-long"] / dataframe["sell-kama-long"].shift()
+        )
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         conditions = []
-        if self.buy_params['rsi-enabled']:
-            conditions.append(dataframe['buy-rsi'] > self.buy_params['rsi-limit'])
-        if self.buy_params['cci-enabled']:
-            conditions.append(dataframe['buy-cci'] > self.buy_params['cci-limit'])
-        if self.buy_params['kama-trigger'] == 'cross':
-            conditions.append(dataframe['buy-kama-short'] > dataframe['buy-kama-long'])
-        if self.buy_params['kama-trigger'] == 'slope':
-            conditions.append(dataframe['buy-kama-long'] > 1)
+        if self.buy_params["rsi-enabled"]:
+            conditions.append(dataframe["buy-rsi"] > self.buy_params["rsi-limit"])
+        if self.buy_params["cci-enabled"]:
+            conditions.append(dataframe["buy-cci"] > self.buy_params["cci-limit"])
+        if self.buy_params["kama-trigger"] == "cross":
+            conditions.append(dataframe["buy-kama-short"] > dataframe["buy-kama-long"])
+        if self.buy_params["kama-trigger"] == "slope":
+            conditions.append(dataframe["buy-kama-long"] > 1)
 
         # Check that volume is not 0
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'enter_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         conditions = []
-        if self.sell_params['sell-rsi-enabled']:
-            conditions.append(dataframe['sell-rsi'] < self.sell_params['sell-rsi-limit'])
-        if self.sell_params['sell-cci-enabled']:
-            conditions.append(dataframe['sell-cci'] < self.sell_params['sell-cci-limit'])
-        if self.sell_params['sell-kama-trigger'] == 'cross':
-            conditions.append(dataframe['sell-kama-short'] < dataframe['sell-kama-long'])
-        if self.sell_params['sell-kama-trigger'] == 'slope':
-            conditions.append(dataframe['sell-kama-long'] < 1)
+        if self.sell_params["sell-rsi-enabled"]:
+            conditions.append(dataframe["sell-rsi"] < self.sell_params["sell-rsi-limit"])
+        if self.sell_params["sell-cci-enabled"]:
+            conditions.append(dataframe["sell-cci"] < self.sell_params["sell-cci-limit"])
+        if self.sell_params["sell-kama-trigger"] == "cross":
+            conditions.append(dataframe["sell-kama-short"] < dataframe["sell-kama-long"])
+        if self.sell_params["sell-kama-trigger"] == "slope":
+            conditions.append(dataframe["sell-kama-long"] < 1)
 
         # Check that volume is not 0
-        conditions.append(dataframe['volume'] > 0)
+        conditions.append(dataframe["volume"] > 0)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long'] = 1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
 
         return dataframe

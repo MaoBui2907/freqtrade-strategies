@@ -2,28 +2,25 @@ from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
 import talib.abstract as ta
 
+
 class FrostAuraM21hStrategy(IStrategy):
     """
     This is FrostAura's mark 2 strategy which aims to make purchase decisions
     based on the Stochastic and RSI.
-    
+
     Last Optimization:
         Sharpe Ratio    : 6.24747% (prev 6.41952)
         Profit %        : 1537.94% (1432.33%)
         Optimized for   : Last 109 days, 1h
         ATT             : 719.4m (prev 4321.0m)
     """
+
     # Strategy interface version - allow new iterations of the strategy interface.
     # Check the documentation or the Sample strategy to get the latest version.
     INTERFACE_VERSION = 2
 
     # Minimal ROI designed for the strategy.
-    minimal_roi = {
-        "0": 0.32365,
-        "359": 0.12673,
-        "934": 0.08834,
-        "2090": 0
-    }
+    minimal_roi = {"0": 0.32365, "359": 0.12673, "934": 0.08834, "2090": 0}
 
     # Optimal stoploss designed for the strategy.
     stoploss = -0.44897
@@ -32,7 +29,7 @@ class FrostAuraM21hStrategy(IStrategy):
     trailing_stop = False
 
     # Optimal ticker interval for the strategy.
-    timeframe = '15m'
+    timeframe = "15m"
 
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
@@ -47,32 +44,29 @@ class FrostAuraM21hStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional order time in force.
-    order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc'
-    }
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
-        'main_plot': {
-            'tema': {},
-            'sar': {'color': 'white'},
+        "main_plot": {
+            "tema": {},
+            "sar": {"color": "white"},
         },
-        'subplots': {
+        "subplots": {
             "MACD": {
-                'macd': {'color': 'blue'},
-                'macdsignal': {'color': 'orange'},
+                "macd": {"color": "blue"},
+                "macdsignal": {"color": "orange"},
             },
             "RSI": {
-                'rsi': {'color': 'red'},
-            }
-        }
+                "rsi": {"color": "red"},
+            },
+        },
     }
 
     def informative_pairs(self):
@@ -80,36 +74,34 @@ class FrostAuraM21hStrategy(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Stochastic Slow
         stoch = ta.STOCH(dataframe)
-        dataframe['slowd'] = stoch['slowd']
-        dataframe['slowk'] = stoch['slowk']
+        dataframe["slowd"] = stoch["slowd"]
+        dataframe["slowk"] = stoch["slowk"]
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         minimum_coin_price = 0.0000015
-        
+
         dataframe.loc[
             (
-                (dataframe['rsi'] > 48) &
-                (dataframe["slowd"] > 79) &
-                (dataframe["slowk"] > 77) &
-                (dataframe["close"] > minimum_coin_price)
+                (dataframe["rsi"] > 48)
+                & (dataframe["slowd"] > 79)
+                & (dataframe["slowk"] > 77)
+                & (dataframe["close"] > minimum_coin_price)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['rsi'] < 48) &
-                (dataframe["slowd"] < 79) &
-                (dataframe["slowk"] < 77)
-            ),
-            'exit_long'] = 1
-        
+            ((dataframe["rsi"] < 48) & (dataframe["slowd"] < 79) & (dataframe["slowk"] < 77)),
+            "exit_long",
+        ] = 1
+
         return dataframe

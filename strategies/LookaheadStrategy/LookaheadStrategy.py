@@ -8,7 +8,6 @@ from pandas import DataFrame
 
 
 class LookaheadStrategy(IStrategy):
-
     INTERFACE_VERSION = 3
 
     # Buy hyperspace params:
@@ -72,7 +71,6 @@ class LookaheadStrategy(IStrategy):
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         conditions = []
 
         conditions.append(
@@ -93,7 +91,6 @@ class LookaheadStrategy(IStrategy):
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         conditions = []
 
         conditions.append(

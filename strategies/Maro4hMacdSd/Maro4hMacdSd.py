@@ -4,11 +4,10 @@ from pandas import DataFrame
 # --------------------------------
 
 import talib.abstract as ta
-import numpy as np # noqa
+import numpy as np  # noqa
 
 
 class Maro4hMacdSd(IStrategy):
-
     max_open_trades = 1
     stake_amount = 500
     # Minimal ROI designed for the strategy.
@@ -16,15 +15,10 @@ class Maro4hMacdSd(IStrategy):
 
     stoploss = -0.21611
 
-    minimal_roi = {
-        "0": 0.24627,
-        "24": 0.06484,
-        "38": 0.02921,
-        "145": 0
-    }
+    minimal_roi = {"0": 0.24627, "24": 0.06484, "38": 0.02921, "145": 0}
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -38,14 +32,13 @@ class Maro4hMacdSd(IStrategy):
     use_exit_signal = True
     exit_profit_only = False
     ignore_roi_if_entry_signal = False
-    
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -56,17 +49,16 @@ class Maro4hMacdSd(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
         # MACD
-        macd = ta.MACD(dataframe,fastperiod=12, slowperiod=26, signalperiod=9)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = 100*macd['macdhist']/dataframe['close']
+        macd = ta.MACD(dataframe, fastperiod=12, slowperiod=26, signalperiod=9)
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = 100 * macd["macdhist"] / dataframe["close"]
 
-        dataframe['corr'] = ta.STDDEV(dataframe, timeperiod=28)
-        dataframe['corr_mean'] = ta.MA(dataframe['corr'], timeperiod=28)
+        dataframe["corr"] = ta.STDDEV(dataframe, timeperiod=28)
+        dataframe["corr_mean"] = ta.MA(dataframe["corr"], timeperiod=28)
 
-        dataframe['corr_sell'] = ta.STDDEV(dataframe, timeperiod=28)
-        dataframe['corr_mean_sell'] = ta.MA(dataframe['corr'], timeperiod=28)
-
+        dataframe["corr_sell"] = ta.STDDEV(dataframe, timeperiod=28)
+        dataframe["corr_mean_sell"] = ta.MA(dataframe["corr"], timeperiod=28)
 
         return dataframe
 
@@ -79,12 +71,13 @@ class Maro4hMacdSd(IStrategy):
 
         dataframe.loc[
             (
-            (dataframe['macdhist'] < 0) &
-            (dataframe['macdhist'].shift(2) > dataframe['macdhist'].shift(1))
-            & (dataframe['macdhist'] > dataframe['macdhist'].shift(2))
-            &
-            (dataframe['corr'] > dataframe['corr_mean'])
-            ),'enter_long'] = 1
+                (dataframe["macdhist"] < 0)
+                & (dataframe["macdhist"].shift(2) > dataframe["macdhist"].shift(1))
+                & (dataframe["macdhist"] > dataframe["macdhist"].shift(2))
+                & (dataframe["corr"] > dataframe["corr_mean"])
+            ),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -96,10 +89,12 @@ class Maro4hMacdSd(IStrategy):
         """
         dataframe.loc[
             (
-            (dataframe['macdhist'] > 0) &
-            (dataframe['macdhist'].shift(2) < dataframe['macdhist'].shift(1))
-            &(dataframe['macdhist'] < dataframe['macdhist'].shift(2)) &
-            (dataframe['corr_sell'] < dataframe['corr_mean_sell'])
-            ),'exit_long'] = 1
+                (dataframe["macdhist"] > 0)
+                & (dataframe["macdhist"].shift(2) < dataframe["macdhist"].shift(1))
+                & (dataframe["macdhist"] < dataframe["macdhist"].shift(2))
+                & (dataframe["corr_sell"] < dataframe["corr_mean_sell"])
+            ),
+            "exit_long",
+        ] = 1
 
         return dataframe

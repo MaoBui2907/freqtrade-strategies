@@ -5,17 +5,18 @@ from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import merge_informative_pair
 from pandas import DataFrame
 
+
 def bollinger_bands(stock_price, window_size, num_of_std):
     rolling_mean = stock_price.rolling(window=window_size).mean()
     rolling_std = stock_price.rolling(window=window_size).std()
     lower_band = rolling_mean - (rolling_std * num_of_std)
     return np.nan_to_num(rolling_mean), np.nan_to_num(lower_band)
 
-class Cluc4werk(IStrategy):
 
+class Cluc4werk(IStrategy):
     # Used for "informative pairs"
-    stake = 'BTC'
-    fiat  = 'USD'
+    stake = "BTC"
+    fiat = "USD"
 
     """
     PASTE OUTPUT FROM HYPEROPT HERE
@@ -23,18 +24,16 @@ class Cluc4werk(IStrategy):
 
     # Buy hyperspace params:
     buy_params = {
-        'bbdelta-close': 0.00793,
-        'bbdelta-tail': 0.83802,
-        'close-bblower': 0.0034,
-        'closedelta-close': 0.00613,
-        'rocr-1h': 0.64081,
-        'volume': 21
+        "bbdelta-close": 0.00793,
+        "bbdelta-tail": 0.83802,
+        "close-bblower": 0.0034,
+        "closedelta-close": 0.00613,
+        "rocr-1h": 0.64081,
+        "volume": 21,
     }
 
     # Sell hyperspace params:
-    sell_params = {
-     'sell-bbmiddle-close': 0.97703
-    }
+    sell_params = {"sell-bbmiddle-close": 0.97703}
 
     # ROI table:
     minimal_roi = {
@@ -44,7 +43,7 @@ class Cluc4werk(IStrategy):
         "587": 0.00643,
         "711": 0.00377,
         "770": 0.00114,
-        "1039": 0
+        "1039": 0,
     }
 
     # Stoploss:
@@ -59,8 +58,8 @@ class Cluc4werk(IStrategy):
     """
     END HYPEROPT
     """
-    
-    timeframe = '1m'
+
+    timeframe = "1m"
 
     # Make sure these match or are not overridden in config
     use_exit_signal = True
@@ -70,7 +69,7 @@ class Cluc4werk(IStrategy):
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
-        informative_pairs = [(pair, '1h') for pair in pairs]
+        informative_pairs = [(pair, "1h") for pair in pairs]
 
         """
         Idea is to have "STAKE/USD" and "COIN/USD" as informative pairs as they move inverse of COIN/STAKE.
@@ -81,33 +80,32 @@ class Cluc4werk(IStrategy):
         If a desired informative pair does not exist (e.g. if exchange doesnt trade XLM/USD in this example), simply ignore those indicators without errors.
         """
 
-        coin, stake = metadata['pair'].split('/')
-        
-        informative_pairs += [("ETH/USD", timeframe),
-                              ("BTC/USD", timeframe),
-                             ]
+        coin, stake = metadata["pair"].split("/")
 
-        
-        
+        informative_pairs += [
+            ("ETH/USD", timeframe),
+            ("BTC/USD", timeframe),
+        ]
+
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # Set Up Bollinger Bands
-        mid, lower = bollinger_bands(dataframe['close'], window_size=40, num_of_std=2)
-        dataframe['lower'] = lower
-        dataframe['bbdelta'] = (mid - dataframe['lower']).abs()
-        dataframe['closedelta'] = (dataframe['close'] - dataframe['close'].shift()).abs()
-        dataframe['tail'] = (dataframe['close'] - dataframe['low']).abs()
+        mid, lower = bollinger_bands(dataframe["close"], window_size=40, num_of_std=2)
+        dataframe["lower"] = lower
+        dataframe["bbdelta"] = (mid - dataframe["lower"]).abs()
+        dataframe["closedelta"] = (dataframe["close"] - dataframe["close"].shift()).abs()
+        dataframe["tail"] = (dataframe["close"] - dataframe["low"]).abs()
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
 
-        dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
-        dataframe['volume_mean_slow'] = dataframe['volume'].rolling(window=30).mean()
-        dataframe['rocr'] = ta.ROCR(dataframe, timeperiod=28)
-        
-        inf_tf = '1h'
-        
+        dataframe["ema_slow"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["volume_mean_slow"] = dataframe["volume"].rolling(window=30).mean()
+        dataframe["rocr"] = ta.ROCR(dataframe, timeperiod=28)
+
+        inf_tf = "1h"
+
         """
         informative = self.dp.get_pair_dataframe(pair="ETH/USDT", timeframe="5m")
         # ETH/USDT RSI based on 5m candles
@@ -115,9 +113,11 @@ class Cluc4werk(IStrategy):
         dataframe = merge_informative_pair(dataframe, informative, self.timeframe, '5m', ffill=True)
         """
 
-        informative = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=inf_tf)
-        informative['rocr'] = ta.ROCR(informative, timeperiod=168)
-        dataframe = merge_informative_pair(dataframe, informative, self.timeframe, inf_tf, ffill=True)
+        informative = self.dp.get_pair_dataframe(pair=metadata["pair"], timeframe=inf_tf)
+        informative["rocr"] = ta.ROCR(informative, timeperiod=168)
+        dataframe = merge_informative_pair(
+            dataframe, informative, self.timeframe, inf_tf, ffill=True
+        )
 
         return dataframe
 
@@ -125,23 +125,26 @@ class Cluc4werk(IStrategy):
         params = self.buy_params
 
         dataframe.loc[
-            (
-                dataframe['rocr_1h'].gt(params['rocr-1h'])
-            ) &
-            ((      
-                    dataframe['lower'].shift().gt(0) &
-                    dataframe['bbdelta'].gt(dataframe['close'] * params['bbdelta-close']) &
-                    dataframe['closedelta'].gt(dataframe['close'] * params['closedelta-close']) &
-                    dataframe['tail'].lt(dataframe['bbdelta'] * params['bbdelta-tail']) &
-                    dataframe['close'].lt(dataframe['lower'].shift()) &
-                    dataframe['close'].le(dataframe['close'].shift())
-            ) |
-            (       
-                    (dataframe['close'] < dataframe['ema_slow']) &
-                    (dataframe['close'] < params['close-bblower'] * dataframe['bb_lowerband']) &
-                    (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * params['volume']))
-            )),
-            'entry'
+            (dataframe["rocr_1h"].gt(params["rocr-1h"]))
+            & (
+                (
+                    dataframe["lower"].shift().gt(0)
+                    & dataframe["bbdelta"].gt(dataframe["close"] * params["bbdelta-close"])
+                    & dataframe["closedelta"].gt(dataframe["close"] * params["closedelta-close"])
+                    & dataframe["tail"].lt(dataframe["bbdelta"] * params["bbdelta-tail"])
+                    & dataframe["close"].lt(dataframe["lower"].shift())
+                    & dataframe["close"].le(dataframe["close"].shift())
+                )
+                | (
+                    (dataframe["close"] < dataframe["ema_slow"])
+                    & (dataframe["close"] < params["close-bblower"] * dataframe["bb_lowerband"])
+                    & (
+                        dataframe["volume"]
+                        < (dataframe["volume_mean_slow"].shift(1) * params["volume"])
+                    )
+                )
+            ),
+            "entry",
         ] = 1
         return dataframe
 
@@ -149,13 +152,17 @@ class Cluc4werk(IStrategy):
         params = self.sell_params
 
         dataframe.loc[
-            #(dataframe['high'].le(dataframe['high'].shift(1))) &
-            #(dataframe['close'] > dataframe['bb_middleband']) &
-            (qtpylib.crossed_above((dataframe['close'] * params['sell-bbmiddle-close']),dataframe['bb_middleband'])) &
-            #(qtpylib.crossed_above(dataframe['close'],dataframe['bb_middleband'])) &
-            (dataframe['volume'] > 0)
-            ,
-            'exit'
+            # (dataframe['high'].le(dataframe['high'].shift(1))) &
+            # (dataframe['close'] > dataframe['bb_middleband']) &
+            (
+                qtpylib.crossed_above(
+                    (dataframe["close"] * params["sell-bbmiddle-close"]), dataframe["bb_middleband"]
+                )
+            )
+            &
+            # (qtpylib.crossed_above(dataframe['close'],dataframe['bb_middleband'])) &
+            (dataframe["volume"] > 0),
+            "exit",
         ] = 1
 
         return dataframe

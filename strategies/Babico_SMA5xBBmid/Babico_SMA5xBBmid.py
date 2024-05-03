@@ -5,11 +5,9 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 # --------------------------------
 
-class Babico_SMA5xBBmid(IStrategy):
 
-    minimal_roi = {
-        "0": 99999999
-    }
+class Babico_SMA5xBBmid(IStrategy):
+    minimal_roi = {"0": 99999999}
 
     stoploss = -0.99
 
@@ -25,39 +23,34 @@ class Babico_SMA5xBBmid(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'trailing_stop_loss': 'limit',
-        'stoploss': 'limit',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "trailing_stop_loss": "limit",
+        "stoploss": "limit",
+        "stoploss_on_exchange": False,
     }
 
     # Optimal timeframe for the strategy
-    timeframe = '1d'
+    timeframe = "1d"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         bb = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_low'] = bb['lower']
-        dataframe['bb_mid'] = bb['mid']
-        dataframe['bb_upp'] = bb['upper']
+        dataframe["bb_low"] = bb["lower"]
+        dataframe["bb_mid"] = bb["mid"]
+        dataframe["bb_upp"] = bb["upper"]
 
-        dataframe['ema5'] = ta.EMA(dataframe, timeperiod=5)
+        dataframe["ema5"] = ta.EMA(dataframe, timeperiod=5)
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                qtpylib.crossed_above(dataframe['ema5'], dataframe['bb_mid']) 
-            ),
-            'enter_long'] = 1
+            (qtpylib.crossed_above(dataframe["ema5"], dataframe["bb_mid"])), "enter_long"
+        ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                qtpylib.crossed_above(dataframe['bb_mid'], dataframe['ema5']) 
-            ),
-            'exit_long'] = 1
+            (qtpylib.crossed_above(dataframe["bb_mid"], dataframe["ema5"])), "exit_long"
+        ] = 1
         return dataframe

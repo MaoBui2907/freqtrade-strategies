@@ -108,7 +108,6 @@ class Apollo11(IStrategy):
         ]
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         # Adding EMA's into the dataframe
         dataframe["s1_ema_xs"] = ta.EMA(dataframe, timeperiod=self.s1_ema_xs)
         dataframe["s1_ema_sm"] = ta.EMA(dataframe, timeperiod=self.s1_ema_sm)
@@ -125,28 +124,36 @@ class Apollo11(IStrategy):
         s2_bb_sma_value = ta.SMA(dataframe, timeperiod=self.s2_bb_sma_length)
         s2_bb_std_dev_value = ta.STDDEV(dataframe, self.s2_bb_std_dev_length)
         dataframe["s2_bb_std_dev_value"] = s2_bb_std_dev_value
-        dataframe["s2_bb_lower_band"] = s2_bb_sma_value - (s2_bb_std_dev_value * self.s2_bb_lower_offset)
+        dataframe["s2_bb_lower_band"] = s2_bb_sma_value - (
+            s2_bb_std_dev_value * self.s2_bb_lower_offset
+        )
 
         s2_fib_atr_value = ta.ATR(dataframe, timeframe=self.s2_fib_atr_len)
         s2_fib_sma_value = ta.SMA(dataframe, timeperiod=self.s2_fib_sma_len)
 
-        dataframe["s2_fib_lower_band"] = s2_fib_sma_value - s2_fib_atr_value * self.s2_fib_lower_value
+        dataframe["s2_fib_lower_band"] = (
+            s2_fib_sma_value - s2_fib_atr_value * self.s2_fib_lower_value
+        )
 
         s3_bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=3)
         dataframe["s3_bb_lowerband"] = s3_bollinger["lower"]
 
         dataframe["s3_ema_long"] = ta.EMA(dataframe, timeperiod=self.s3_ema_long)
         dataframe["s3_ema_short"] = ta.EMA(dataframe, timeperiod=self.s3_ema_short)
-        dataframe["s3_fast_ma"] = ta.EMA(dataframe["volume"] * dataframe["close"], self.s3_ma_fast) / ta.EMA(
-            dataframe["volume"], self.s3_ma_fast
-        )
-        dataframe["s3_slow_ma"] = ta.EMA(dataframe["volume"] * dataframe["close"], self.s3_ma_slow) / ta.EMA(
-            dataframe["volume"], self.s3_ma_slow
-        )
+        dataframe["s3_fast_ma"] = ta.EMA(
+            dataframe["volume"] * dataframe["close"], self.s3_ma_fast
+        ) / ta.EMA(dataframe["volume"], self.s3_ma_fast)
+        dataframe["s3_slow_ma"] = ta.EMA(
+            dataframe["volume"] * dataframe["close"], self.s3_ma_slow
+        ) / ta.EMA(dataframe["volume"], self.s3_ma_slow)
 
         # Volume weighted MACD
-        dataframe["fastMA"] = ta.EMA(dataframe["volume"] * dataframe["close"], 12) / ta.EMA(dataframe["volume"], 12)
-        dataframe["slowMA"] = ta.EMA(dataframe["volume"] * dataframe["close"], 26) / ta.EMA(dataframe["volume"], 26)
+        dataframe["fastMA"] = ta.EMA(dataframe["volume"] * dataframe["close"], 12) / ta.EMA(
+            dataframe["volume"], 12
+        )
+        dataframe["slowMA"] = ta.EMA(dataframe["volume"] * dataframe["close"], 26) / ta.EMA(
+            dataframe["volume"], 26
+        )
         dataframe["vwmacd"] = dataframe["fastMA"] - dataframe["slowMA"]
         dataframe["signal"] = ta.EMA(dataframe["vwmacd"], 9)
         dataframe["hist"] = dataframe["vwmacd"] - dataframe["signal"]
@@ -165,15 +172,23 @@ class Apollo11(IStrategy):
                 dataframe["s1_ema_xs"] < dataframe["s1_ema_xl"],
                 dataframe["volume"] > 0,
             ]
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (1, "buy_signal_1")
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (
+                1,
+                "buy_signal_1",
+            )
 
         if self.buy_signal_2:
             conditions = [
-                qtpylib.crossed_above(dataframe["s2_fib_lower_band"], dataframe["s2_bb_lower_band"]),
+                qtpylib.crossed_above(
+                    dataframe["s2_fib_lower_band"], dataframe["s2_bb_lower_band"]
+                ),
                 dataframe["close"] < dataframe["s2_ema"],
                 dataframe["volume"] > 0,
             ]
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (1, "buy_signal_2")
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (
+                1,
+                "buy_signal_2",
+            )
 
         if self.buy_signal_3:
             conditions = [
@@ -182,7 +197,10 @@ class Apollo11(IStrategy):
                 dataframe["high"] < dataframe["s3_ema_long"],
                 dataframe["volume"] > 0,
             ]
-            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (1, "buy_signal_3")
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), ["buy", "buy_tag"]] = (
+                1,
+                "buy_signal_3",
+            )
 
         if not all([self.buy_signal_1, self.buy_signal_2, self.buy_signal_3]):
             dataframe.loc[(), "enter_long"] = 0
@@ -195,9 +213,14 @@ class Apollo11(IStrategy):
         return dataframe
 
     def custom_stoploss(
-        self, pair: str, trade: Trade, current_time: datetime, current_rate: float, current_profit: float, **kwargs
+        self,
+        pair: str,
+        trade: Trade,
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
     ) -> float:
-
         if current_profit > 0.2:
             return 0.04
         if current_profit > 0.1:

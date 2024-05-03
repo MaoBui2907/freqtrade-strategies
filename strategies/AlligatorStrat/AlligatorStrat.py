@@ -25,29 +25,26 @@ class AlligatorStrat(IStrategy):
         # "187": 0.03,
     }
 
-
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.2
 
     # Optimal ticker interval for the strategy
-    ticker_interval = '4h'
+    ticker_interval = "4h"
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-
         # CCIPeriod = 14
         # T3Period = 5
         # b = 0.618
 
-        dataframe['SMAShort'] = ta.SMA(dataframe, timeperiod=5)
-        dataframe['SMAMedium'] = ta.SMA(dataframe, timeperiod=8)
-        dataframe['SMALong'] = ta.SMA(dataframe, timeperiod=13)
+        dataframe["SMAShort"] = ta.SMA(dataframe, timeperiod=5)
+        dataframe["SMAMedium"] = ta.SMA(dataframe, timeperiod=8)
+        dataframe["SMALong"] = ta.SMA(dataframe, timeperiod=13)
 
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
-        dataframe['macdhist'] = macd['macdhist']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
+        dataframe["macdhist"] = macd["macdhist"]
 
         # b2 = b*b2b3 = b2 * b2c1 = -b3
         # c2 = (3 * (b2+b3))
@@ -60,9 +57,6 @@ class AlligatorStrat(IStrategy):
 
         # xcci = ta.CCI(CCIPeriod)
 
-
-
-
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -73,14 +67,13 @@ class AlligatorStrat(IStrategy):
         """
         dataframe.loc[
             (
-                #or cross above SMALong to be more conservative
+                # or cross above SMALong to be more conservative
                 (
-                qtpylib.crossed_above(dataframe['SMAShort'], dataframe['SMAMedium']) &
-                ((dataframe['macd'] > -0.00001)) &
-                (dataframe['macd'] > dataframe['macdsignal'])
+                    qtpylib.crossed_above(dataframe["SMAShort"], dataframe["SMAMedium"])
+                    & (dataframe["macd"] > -0.00001)
+                    & (dataframe["macd"] > dataframe["macdsignal"])
                 )
-                |
-                qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal'])
+                | qtpylib.crossed_above(dataframe["macd"], dataframe["macdsignal"])
                 # |
                 # (
                 # (dataframe['SMAShort'] > dataframe['SMAMedium']) &
@@ -88,7 +81,8 @@ class AlligatorStrat(IStrategy):
                 # qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal'])
                 # )
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -101,12 +95,13 @@ class AlligatorStrat(IStrategy):
         dataframe.loc[
             (
                 # qtpylib.crossed_below(dataframe['SMAShort'], dataframe['SMALong']) &
-                ((dataframe['close'] < dataframe['SMAMedium']) &
-                (dataframe['macd'] < dataframe['macdsignal'])
+                (
+                    (dataframe["close"] < dataframe["SMAMedium"])
+                    & (dataframe["macd"] < dataframe["macdsignal"])
                 )
-                |
-                qtpylib.crossed_below(dataframe['macd'], dataframe['macdsignal'])
+                | qtpylib.crossed_below(dataframe["macd"], dataframe["macdsignal"])
                 # (dataframe['cci'] >= 100.0)
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

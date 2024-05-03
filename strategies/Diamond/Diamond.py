@@ -73,12 +73,7 @@ class Diamond(IStrategy):
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.242,
-        "13": 0.044,
-        "51": 0.02,
-        "170": 0
-    }
+    minimal_roi = {"0": 0.242, "13": 0.044, "51": 0.02, "170": 0}
 
     # Stoploss:
     stoploss = -0.271
@@ -89,29 +84,65 @@ class Diamond(IStrategy):
     trailing_stop_positive_offset = 0.054
     trailing_only_offset_is_reached = False
     # timeframe
-    timeframe = '5m'
+    timeframe = "5m"
     # #################### END OF RESULT PLACE ####################
 
-    buy_vertical_push = DecimalParameter(0.5, 1.5, decimals=3, default=1, space='entry')
-    buy_horizontal_push = IntParameter(0, 10, default=0, space='entry')
-    buy_fast_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
-                                         #  you can not enable this lines befour you
-                                         #  populate an indicator for them and set
-                                         #  the same key name for it
-                                         #  'ma_fast', 'ma_slow', {...}
-                                         ], default='ma_fast', space='entry')
-    buy_slow_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
-                                         #  'ma_fast', 'ma_slow', {...}
-                                         ], default='ma_slow', space='entry')
+    buy_vertical_push = DecimalParameter(0.5, 1.5, decimals=3, default=1, space="entry")
+    buy_horizontal_push = IntParameter(0, 10, default=0, space="entry")
+    buy_fast_key = CategoricalParameter(
+        [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            #  you can not enable this lines befour you
+            #  populate an indicator for them and set
+            #  the same key name for it
+            #  'ma_fast', 'ma_slow', {...}
+        ],
+        default="ma_fast",
+        space="entry",
+    )
+    buy_slow_key = CategoricalParameter(
+        [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            #  'ma_fast', 'ma_slow', {...}
+        ],
+        default="ma_slow",
+        space="entry",
+    )
 
-    sell_vertical_push = DecimalParameter(0.5, 1.5, decimals=3,  default=1, space='exit')
-    sell_horizontal_push = IntParameter(0, 10, default=0, space='exit')
-    sell_fast_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
-                                          #  'ma_fast', 'ma_slow', {...}
-                                          ], default='ma_fast', space='exit')
-    sell_slow_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
-                                          #  'ma_fast', 'ma_slow', {...}
-                                          ], default='ma_slow', space='exit')
+    sell_vertical_push = DecimalParameter(0.5, 1.5, decimals=3, default=1, space="exit")
+    sell_horizontal_push = IntParameter(0, 10, default=0, space="exit")
+    sell_fast_key = CategoricalParameter(
+        [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            #  'ma_fast', 'ma_slow', {...}
+        ],
+        default="ma_fast",
+        space="exit",
+    )
+    sell_slow_key = CategoricalParameter(
+        [
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            #  'ma_fast', 'ma_slow', {...}
+        ],
+        default="ma_slow",
+        space="exit",
+    )
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # you can add new indicators and enable them inside
@@ -124,31 +155,25 @@ class Diamond(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(
-            qtpylib.crossed_above
-            (
+            qtpylib.crossed_above(
                 dataframe[self.buy_fast_key.value].shift(self.buy_horizontal_push.value),
-                dataframe[self.buy_slow_key.value] * self.buy_vertical_push.value
+                dataframe[self.buy_slow_key.value] * self.buy_vertical_push.value,
             )
         )
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'entry']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "entry"] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(
-            qtpylib.crossed_below
-            (
+            qtpylib.crossed_below(
                 dataframe[self.sell_fast_key.value].shift(self.sell_horizontal_push.value),
-                dataframe[self.sell_slow_key.value] * self.sell_vertical_push.value
+                dataframe[self.sell_slow_key.value] * self.sell_vertical_push.value,
             )
         )
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
         return dataframe

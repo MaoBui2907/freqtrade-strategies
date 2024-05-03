@@ -22,21 +22,16 @@ import numpy as np
 import talib as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
+
 class Ichess(IStrategy):
-    
     # ROI table:
-    minimal_roi = {
-        "0": 0.642,
-        "8834": 0.37,
-        "25392": 0.118,
-        "55146": 0
-    }
+    minimal_roi = {"0": 0.642, "8834": 0.37, "25392": 0.118, "55146": 0}
 
     # Stoploss:
     stoploss = -0.314
 
     # Opt Timeframe
-    timeframe = '1d'
+    timeframe = "1d"
 
     buy_fast_timeperiod = IntParameter(2, 50, default=9, space="buy")
     buy_slow_timeperiod = IntParameter(2, 50, default=10, space="buy")
@@ -54,31 +49,37 @@ class Ichess(IStrategy):
 
         # Heikin Ashi Strategy
         heikinashi = qtpylib.heikinashi(df)
-        df['ha_open'] = heikinashi['open']
-        df['ha_close'] = heikinashi['close']
-        df['ha_high'] = heikinashi['high']
-        df['ha_low'] = heikinashi['low']
+        df["ha_open"] = heikinashi["open"]
+        df["ha_close"] = heikinashi["close"]
+        df["ha_high"] = heikinashi["high"]
+        df["ha_low"] = heikinashi["low"]
 
-        df['tenkan'] = (df['ha_high'].rolling(window=conversion_line_period).max() +
-                        df['ha_low'].rolling(window=conversion_line_period).min()) / 2
-        df['kijun'] = (df['ha_high'].rolling(window=base_line_periods).max() +
-                       df['ha_low'].rolling(window=base_line_periods).min()) / 2
-        df['senkou_leading_a'] = (df['tenkan'] + df['kijun']) / 2
-        df['senkou_leading_b'] = (df['ha_high'].rolling(
-            window=laggin_span).max() + df['ha_low'].rolling(window=laggin_span).min()) / 2
-        df['senkou_span_a'] = df['senkou_leading_a'].shift(displacement)
-        df['senkou_span_b'] = df['senkou_leading_b'].shift(displacement)
-        df['chikou_span'] = df['ha_close'].shift(displacement)
+        df["tenkan"] = (
+            df["ha_high"].rolling(window=conversion_line_period).max()
+            + df["ha_low"].rolling(window=conversion_line_period).min()
+        ) / 2
+        df["kijun"] = (
+            df["ha_high"].rolling(window=base_line_periods).max()
+            + df["ha_low"].rolling(window=base_line_periods).min()
+        ) / 2
+        df["senkou_leading_a"] = (df["tenkan"] + df["kijun"]) / 2
+        df["senkou_leading_b"] = (
+            df["ha_high"].rolling(window=laggin_span).max()
+            + df["ha_low"].rolling(window=laggin_span).min()
+        ) / 2
+        df["senkou_span_a"] = df["senkou_leading_a"].shift(displacement)
+        df["senkou_span_b"] = df["senkou_leading_b"].shift(displacement)
+        df["chikou_span"] = df["ha_close"].shift(displacement)
 
-        df['tenkan1'] = df['tenkan'].shift(+1)
-        df['kijun1'] = df['kijun'].shift(+1)
-        df['senkou_leading_a1'] = df['senkou_leading_a'].shift(+1)
-        df['senkou_leading_b1'] = df['senkou_leading_b'].shift(+1)
-        df['senkou_span_a1'] = df['senkou_span_a'].shift(+1)
-        df['senkou_span_b1'] = df['senkou_span_b'].shift(+1)
-        df['chikou_span1'] = df['chikou_span'].shift(+1)
+        df["tenkan1"] = df["tenkan"].shift(+1)
+        df["kijun1"] = df["kijun"].shift(+1)
+        df["senkou_leading_a1"] = df["senkou_leading_a"].shift(+1)
+        df["senkou_leading_b1"] = df["senkou_leading_b"].shift(+1)
+        df["senkou_span_a1"] = df["senkou_span_a"].shift(+1)
+        df["senkou_span_b1"] = df["senkou_span_b"].shift(+1)
+        df["chikou_span1"] = df["chikou_span"].shift(+1)
 
-        df['ha_close1'] = df['ha_close'].shift(+1)
+        df["ha_close1"] = df["ha_close"].shift(+1)
 
         # // == Price and Kijun Sen (standard line) Cross ==
 
@@ -91,20 +92,22 @@ class Ichess(IStrategy):
             senkou_span_b,
         ):
             if (tenkan > kijun) and (tenkan1 <= kijun1):
-                intersect = (tenkan1 * (kijun - kijun1) - kijun1 * (tenkan -
-                             tenkan1)) / ((kijun - kijun1) - (tenkan - tenkan1))
+                intersect = (tenkan1 * (kijun - kijun1) - kijun1 * (tenkan - tenkan1)) / (
+                    (kijun - kijun1) - (tenkan - tenkan1)
+                )
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return 2
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return 0.5
                 else:
                     return 1
             elif (tenkan < kijun) and (tenkan1 >= kijun1):
-                intersect = (tenkan1 * (kijun - kijun1) - kijun1 * (tenkan -
-                             tenkan1)) / ((kijun - kijun1) - (tenkan - tenkan1))
+                intersect = (tenkan1 * (kijun - kijun1) - kijun1 * (tenkan - tenkan1)) / (
+                    (kijun - kijun1) - (tenkan - tenkan1)
+                )
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return -0.5
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return -2
                 else:
                     return -1
@@ -112,13 +115,13 @@ class Ichess(IStrategy):
                 return 0
 
         # df['tkCrossScore'] = np.vectorize(calcTkCross)()
-        df['tkCrossScore'] = np.vectorize(calcTkCross)(
-            df['tenkan'],
-            df['kijun'],
-            df['tenkan1'],
-            df['kijun1'],
-            df['senkou_span_a'],
-            df['senkou_span_b'],
+        df["tkCrossScore"] = np.vectorize(calcTkCross)(
+            df["tenkan"],
+            df["kijun"],
+            df["tenkan1"],
+            df["kijun1"],
+            df["senkou_span_a"],
+            df["senkou_span_b"],
         )
         # // == Price and Kijun Sen (standard line) Cross ==
 
@@ -131,33 +134,35 @@ class Ichess(IStrategy):
             senkou_span_b,
         ):
             if (ha_close > kijun) and (ha_close1 <= kijun1):
-                intersect = (ha_close1 * (kijun - kijun1) - kijun1 * (ha_close -
-                             ha_close1)) / ((kijun - kijun1) - (ha_close - ha_close1))
+                intersect = (ha_close1 * (kijun - kijun1) - kijun1 * (ha_close - ha_close1)) / (
+                    (kijun - kijun1) - (ha_close - ha_close1)
+                )
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return 2
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return 0.5
                 else:
                     return 1
             elif (ha_close < kijun) and (ha_close1 >= kijun1):
-                intersect = (ha_close1 * (kijun - kijun1) - kijun1 * (ha_close -
-                             ha_close1)) / ((kijun - kijun1) - (ha_close - ha_close1))
+                intersect = (ha_close1 * (kijun - kijun1) - kijun1 * (ha_close - ha_close1)) / (
+                    (kijun - kijun1) - (ha_close - ha_close1)
+                )
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return -0.5
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return -2
                 else:
                     return -1
             else:
                 return 0
 
-        df['pkCrossScore'] = np.vectorize(calcPkCross)(
-            df['ha_close'],
-            df['kijun'],
-            df['ha_close1'],
-            df['kijun1'],
-            df['senkou_span_a'],
-            df['senkou_span_b'],
+        df["pkCrossScore"] = np.vectorize(calcPkCross)(
+            df["ha_close"],
+            df["kijun"],
+            df["ha_close1"],
+            df["kijun1"],
+            df["senkou_span_a"],
+            df["senkou_span_b"],
         )
 
         # // == Kumo Breakouts ==
@@ -169,20 +174,36 @@ class Ichess(IStrategy):
             senkou_span_b,
             senkou_span_b1,
         ):
-            if (((ha_close > senkou_span_a) and (ha_close1 <= senkou_span_a1) and (senkou_span_a > senkou_span_b)) or ((ha_close > senkou_span_b) and (ha_close1 <= senkou_span_b1) and (senkou_span_a < senkou_span_b))):
+            if (
+                (ha_close > senkou_span_a)
+                and (ha_close1 <= senkou_span_a1)
+                and (senkou_span_a > senkou_span_b)
+            ) or (
+                (ha_close > senkou_span_b)
+                and (ha_close1 <= senkou_span_b1)
+                and (senkou_span_a < senkou_span_b)
+            ):
                 return 2
-            elif(((ha_close < senkou_span_a) and (ha_close1 >= senkou_span_a1) and (senkou_span_a < senkou_span_b)) or ((ha_close < senkou_span_b) and (ha_close1 >= senkou_span_b1) and (senkou_span_a > senkou_span_b))):
+            elif (
+                (ha_close < senkou_span_a)
+                and (ha_close1 >= senkou_span_a1)
+                and (senkou_span_a < senkou_span_b)
+            ) or (
+                (ha_close < senkou_span_b)
+                and (ha_close1 >= senkou_span_b1)
+                and (senkou_span_a > senkou_span_b)
+            ):
                 return -2
             else:
                 return 0
 
-        df['kumoBreakoutScore'] = np.vectorize(calcKumoBreakout)(
-            df['ha_close'],
-            df['senkou_span_a'],
-            df['ha_close1'],
-            df['senkou_span_a1'],
-            df['senkou_span_b'],
-            df['senkou_span_b1'],
+        df["kumoBreakoutScore"] = np.vectorize(calcKumoBreakout)(
+            df["ha_close"],
+            df["senkou_span_a"],
+            df["ha_close1"],
+            df["senkou_span_a1"],
+            df["senkou_span_b"],
+            df["senkou_span_b1"],
         )
 
         # // == Senkou Span Cross ==
@@ -198,28 +219,28 @@ class Ichess(IStrategy):
             if (senkou_leading_a > senkou_leading_b) and (senkou_leading_a1 <= senkou_leading_b1):
                 if (ha_close > senkou_span_a) and (ha_close > senkou_span_b):
                     return 2
-                elif(ha_close < senkou_span_a) and (ha_close < senkou_span_b):
+                elif (ha_close < senkou_span_a) and (ha_close < senkou_span_b):
                     return 0.5
                 else:
                     return 1
             elif (senkou_leading_a < senkou_leading_b) and (senkou_leading_a1 >= senkou_leading_b1):
                 if (ha_close > senkou_span_a) and (ha_close > senkou_span_b):
                     return -0.5
-                elif(ha_close < senkou_span_a) and (ha_close < senkou_span_b):
+                elif (ha_close < senkou_span_a) and (ha_close < senkou_span_b):
                     return -2
                 else:
                     return -1
             else:
                 return 0
 
-        df['senkouCrossScore'] = np.vectorize(calcSenkouCross)(
-            df['senkou_leading_a'],
-            df['senkou_leading_b'],
-            df['senkou_leading_a1'],
-            df['senkou_leading_b1'],
-            df['ha_close'],
-            df['senkou_span_a'],
-            df['senkou_span_b'],
+        df["senkouCrossScore"] = np.vectorize(calcSenkouCross)(
+            df["senkou_leading_a"],
+            df["senkou_leading_b"],
+            df["senkou_leading_a1"],
+            df["senkou_leading_b1"],
+            df["ha_close"],
+            df["senkou_span_a"],
+            df["senkou_span_b"],
         )
         # // == Chikou Span Cross ==
 
@@ -232,33 +253,35 @@ class Ichess(IStrategy):
             senkou_span_b,
         ):
             if (ha_close > chikou_span) and (ha_close1 <= chikou_span1):
-                intersect = (ha_close1 * (chikou_span - chikou_span1) - chikou_span1 * (
-                    ha_close - ha_close1)) / ((chikou_span - chikou_span1) - (ha_close - ha_close1))
+                intersect = (
+                    ha_close1 * (chikou_span - chikou_span1) - chikou_span1 * (ha_close - ha_close1)
+                ) / ((chikou_span - chikou_span1) - (ha_close - ha_close1))
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return 2
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return 0.5
                 else:
                     return 1
             elif (ha_close < chikou_span) and (ha_close1 >= chikou_span1):
-                intersect = (ha_close1 * (chikou_span - chikou_span1) - chikou_span1 * (
-                    ha_close - ha_close1)) / ((chikou_span - chikou_span1) - (ha_close - ha_close1))
+                intersect = (
+                    ha_close1 * (chikou_span - chikou_span1) - chikou_span1 * (ha_close - ha_close1)
+                ) / ((chikou_span - chikou_span1) - (ha_close - ha_close1))
                 if (intersect > senkou_span_a) and (intersect > senkou_span_b):
                     return -0.5
-                elif(intersect < senkou_span_a) and (intersect < senkou_span_b):
+                elif (intersect < senkou_span_a) and (intersect < senkou_span_b):
                     return -2
                 else:
                     return -1
             else:
                 return 0
 
-        df['chikouCrossScore'] = np.vectorize(calcChikouCross)(
-            df['ha_close'],
-            df['chikou_span'],
-            df['ha_close1'],
-            df['chikou_span1'],
-            df['senkou_span_a'],
-            df['senkou_span_b'],
+        df["chikouCrossScore"] = np.vectorize(calcChikouCross)(
+            df["ha_close"],
+            df["chikou_span"],
+            df["ha_close1"],
+            df["chikou_span1"],
+            df["senkou_span_a"],
+            df["senkou_span_b"],
         )
 
         # // == price relative to cloud ==
@@ -269,15 +292,15 @@ class Ichess(IStrategy):
         ):
             if (ha_close > senkou_span_a) and (ha_close > senkou_span_b):
                 return 2
-            elif(ha_close < senkou_span_a) and (ha_close < senkou_span_b):
+            elif (ha_close < senkou_span_a) and (ha_close < senkou_span_b):
                 return -2
             else:
                 return 0
 
-        df['pricePlacementScore'] = np.vectorize(calcPricePlacement)(
-            df['ha_close'],
-            df['senkou_span_a'],
-            df['senkou_span_b'],
+        df["pricePlacementScore"] = np.vectorize(calcPricePlacement)(
+            df["ha_close"],
+            df["senkou_span_a"],
+            df["senkou_span_b"],
         )
 
         # // == lag line releative to cloud ==
@@ -288,50 +311,57 @@ class Ichess(IStrategy):
         ):
             if (ha_close > senkou_leading_a) and (ha_close > senkou_leading_b):
                 return 2
-            elif(ha_close < senkou_leading_a) and (ha_close < senkou_leading_b):
+            elif (ha_close < senkou_leading_a) and (ha_close < senkou_leading_b):
                 return -2
             else:
                 return 0
 
-        df['chikouPlacementScore'] = np.vectorize(calcChikouPlacement)(
-            df['ha_close'],
-            df['senkou_leading_a'],
-            df['senkou_leading_b'],
+        df["chikouPlacementScore"] = np.vectorize(calcChikouPlacement)(
+            df["ha_close"],
+            df["senkou_leading_a"],
+            df["senkou_leading_b"],
         )
 
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # //
-        dataframe['Ichimoku_Score'] = (
-            df['tkCrossScore'] +
-            df['pkCrossScore'] +
-            df['kumoBreakoutScore'] +
-            df['senkouCrossScore'] +
-            df['chikouCrossScore']
-        ).rolling(1).sum().cumsum()
+        dataframe["Ichimoku_Score"] = (
+            (
+                df["tkCrossScore"]
+                + df["pkCrossScore"]
+                + df["kumoBreakoutScore"]
+                + df["senkouCrossScore"]
+                + df["chikouCrossScore"]
+            )
+            .rolling(1)
+            .sum()
+            .cumsum()
+        )
 
-        print(metadata['pair'],dataframe['Ichimoku_Score'].median())
+        print(metadata["pair"], dataframe["Ichimoku_Score"].median())
 
         return dataframe
-
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # exit()
         dataframe.loc[
             # (dataframe['Ichimoku_Score']>0)&
             qtpylib.crossed_above(
-                ta.SMA(dataframe['Ichimoku_Score'], self.buy_fast_timeperiod.value),
-                ta.SMA(dataframe['Ichimoku_Score'], self.buy_slow_timeperiod.value)
-            ), 'enter_long'] = 1
+                ta.SMA(dataframe["Ichimoku_Score"], self.buy_fast_timeperiod.value),
+                ta.SMA(dataframe["Ichimoku_Score"], self.buy_slow_timeperiod.value),
+            ),
+            "enter_long",
+        ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-                # (dataframe['Ichimoku_Score']<0)|
-                (
+            # (dataframe['Ichimoku_Score']<0)|
+            (
                 qtpylib.crossed_below(
-                    ta.SMA(dataframe['Ichimoku_Score'], self.sell_fast_timeperiod.value),
-                    ta.SMA(dataframe['Ichimoku_Score'], self.sell_slow_timeperiod.value)
+                    ta.SMA(dataframe["Ichimoku_Score"], self.sell_fast_timeperiod.value),
+                    ta.SMA(dataframe["Ichimoku_Score"], self.sell_slow_timeperiod.value),
                 )
-            ), 'exit_long'] = 1
+            ),
+            "exit_long",
+        ] = 1
 
         return dataframe
-

@@ -28,6 +28,7 @@ from freqtrade.strategy import merge_informative_pair
 ##                                                                                                       ##
 ###########################################################################################################
 
+
 class CombinedBinHClucAndMADV3(IStrategy):
     INTERFACE_VERSION = 2
 
@@ -35,15 +36,17 @@ class CombinedBinHClucAndMADV3(IStrategy):
         "0": 0.021,
     }
 
-    stoploss = -0.99 # effectively disabled.
+    stoploss = -0.99  # effectively disabled.
 
-    timeframe = '5m'
-    inf_1h = '1h'
+    timeframe = "5m"
+    inf_1h = "1h"
 
     # Sell signal
     use_exit_signal = True
     exit_profit_only = False
-    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    exit_profit_offset = (
+        0.001  # it doesn't meant anything, just to guarantee there is a minimal profit.
+    )
     ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
@@ -63,14 +66,21 @@ class CombinedBinHClucAndMADV3(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
-    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-                        current_rate: float, current_profit: float, **kwargs) -> float:
+    def custom_stoploss(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: datetime,
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ) -> float:
         # Manage losing trades and open room for better ones.
 
         if (current_profit < 0) & (current_time - timedelta(minutes=240) > trade.open_date_utc):
@@ -79,107 +89,104 @@ class CombinedBinHClucAndMADV3(IStrategy):
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
-        informative_pairs = [(pair, '1h') for pair in pairs]
+        informative_pairs = [(pair, "1h") for pair in pairs]
         return informative_pairs
 
     def informative_1h_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         assert self.dp, "DataProvider is required for multiple timeframes."
         # Get the informative pair
-        informative_1h = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.inf_1h)
+        informative_1h = self.dp.get_pair_dataframe(pair=metadata["pair"], timeframe=self.inf_1h)
         # EMA
-        informative_1h['ema_50'] = ta.EMA(informative_1h, timeperiod=50)
-        informative_1h['ema_200'] = ta.EMA(informative_1h, timeperiod=200)
+        informative_1h["ema_50"] = ta.EMA(informative_1h, timeperiod=50)
+        informative_1h["ema_200"] = ta.EMA(informative_1h, timeperiod=200)
         # RSI
-        informative_1h['rsi'] = ta.RSI(informative_1h, timeperiod=14)
+        informative_1h["rsi"] = ta.RSI(informative_1h, timeperiod=14)
 
         return informative_1h
 
     def normal_tf_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-         # strategy BinHV45
-        bb_40 = qtpylib.bollinger_bands(dataframe['close'], window=40, stds=2)
-        dataframe['lower'] = bb_40['lower']
-        dataframe['mid'] = bb_40['mid']
-        dataframe['bbdelta'] = (bb_40['mid'] - dataframe['lower']).abs()
-        dataframe['closedelta'] = (dataframe['close'] - dataframe['close'].shift()).abs()
-        dataframe['tail'] = (dataframe['close'] - dataframe['low']).abs()
+        # strategy BinHV45
+        bb_40 = qtpylib.bollinger_bands(dataframe["close"], window=40, stds=2)
+        dataframe["lower"] = bb_40["lower"]
+        dataframe["mid"] = bb_40["mid"]
+        dataframe["bbdelta"] = (bb_40["mid"] - dataframe["lower"]).abs()
+        dataframe["closedelta"] = (dataframe["close"] - dataframe["close"].shift()).abs()
+        dataframe["tail"] = (dataframe["close"] - dataframe["low"]).abs()
 
         # strategy ClucMay72018
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
-        dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
-        dataframe['volume_mean_slow'] = dataframe['volume'].rolling(window=30).mean()
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
+        dataframe["ema_slow"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["volume_mean_slow"] = dataframe["volume"].rolling(window=30).mean()
 
         # EMA
-        dataframe['ema_50'] = ta.EMA(dataframe, timeperiod=50)
-        dataframe['ema_200'] = ta.EMA(dataframe, timeperiod=200)
+        dataframe["ema_50"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema_200"] = ta.EMA(dataframe, timeperiod=200)
 
-        dataframe['ema_26'] = ta.EMA(dataframe, timeperiod=26)
-        dataframe['ema_12'] = ta.EMA(dataframe, timeperiod=12)
+        dataframe["ema_26"] = ta.EMA(dataframe, timeperiod=26)
+        dataframe["ema_12"] = ta.EMA(dataframe, timeperiod=12)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
 
         return dataframe
-
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # The indicators for the 1h informative timeframe
         informative_1h = self.informative_1h_indicators(dataframe, metadata)
-        dataframe = merge_informative_pair(dataframe, informative_1h, self.timeframe, self.inf_1h, ffill=True)
+        dataframe = merge_informative_pair(
+            dataframe, informative_1h, self.timeframe, self.inf_1h, ffill=True
+        )
 
         # The indicators for the normal (5m) timeframe
         dataframe = self.normal_tf_indicators(dataframe, metadata)
 
         return dataframe
 
-
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (  # strategy BinHV45
-                (dataframe['close'] > dataframe['ema_200_1h']) &
-                (dataframe['ema_50'] > dataframe['ema_200']) &
-                (dataframe['ema_50_1h'] > dataframe['ema_200_1h']) &
-
-                dataframe['lower'].shift().gt(0) &
-                dataframe['bbdelta'].gt(dataframe['close'] * 0.031) &
-                dataframe['closedelta'].gt(dataframe['close'] * 0.018) &
-                dataframe['tail'].lt(dataframe['bbdelta'] * 0.233) &
-                dataframe['close'].lt(dataframe['lower'].shift()) &
-                dataframe['close'].le(dataframe['close'].shift()) &
-                (dataframe['volume'] > 0) # Make sure Volume is not 0
+                (dataframe["close"] > dataframe["ema_200_1h"])
+                & (dataframe["ema_50"] > dataframe["ema_200"])
+                & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
+                & dataframe["lower"].shift().gt(0)
+                & dataframe["bbdelta"].gt(dataframe["close"] * 0.031)
+                & dataframe["closedelta"].gt(dataframe["close"] * 0.018)
+                & dataframe["tail"].lt(dataframe["bbdelta"] * 0.233)
+                & dataframe["close"].lt(dataframe["lower"].shift())
+                & dataframe["close"].le(dataframe["close"].shift())
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             )
-            |
-            (  # strategy ClucMay72018
-                (dataframe['close'] < dataframe['ema_slow']) &
-                (dataframe['close'] < 0.985 * dataframe['bb_lowerband']) &
-                (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * 20)) &
-                (dataframe['volume'] < (dataframe['volume'].shift() * 4)) &
-                (dataframe['volume'] > 0) # Make sure Volume is not 0
+            | (  # strategy ClucMay72018
+                (dataframe["close"] < dataframe["ema_slow"])
+                & (dataframe["close"] < 0.985 * dataframe["bb_lowerband"])
+                & (dataframe["volume"] < (dataframe["volume_mean_slow"].shift(1) * 20))
+                & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
             )
-            |
-            (  # strategy MACD Low buy
-                (dataframe['ema_26'] > dataframe['ema_12']) &
-                ((dataframe['ema_26'] - dataframe['ema_12']) > (dataframe['open'] * 0.02)) &
-                ((dataframe['ema_26'].shift() - dataframe['ema_12'].shift()) > (dataframe['open']/100)) &
-                (dataframe['volume'] < (dataframe['volume'].shift() * 4)) &
-                (dataframe['close'] < (dataframe['bb_lowerband'])) &
-                (dataframe['volume'] > 0) # Make sure Volume is not 0
-            )
-            ,
-            'entry'
+            | (  # strategy MACD Low buy
+                (dataframe["ema_26"] > dataframe["ema_12"])
+                & ((dataframe["ema_26"] - dataframe["ema_12"]) > (dataframe["open"] * 0.02))
+                & (
+                    (dataframe["ema_26"].shift() - dataframe["ema_12"].shift())
+                    > (dataframe["open"] / 100)
+                )
+                & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
+                & (dataframe["close"] < (dataframe["bb_lowerband"]))
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
+            ),
+            "entry",
         ] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (dataframe['close'] > dataframe['bb_middleband'] * 1.01) &
-                (dataframe['volume'] > 0) # Make sure Volume is not 0
-            )
-            ,
-            'exit'
+                (dataframe["close"] > dataframe["bb_middleband"] * 1.01)
+                & (dataframe["volume"] > 0)  # Make sure Volume is not 0
+            ),
+            "exit",
         ] = 1
         return dataframe

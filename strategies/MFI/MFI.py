@@ -21,20 +21,14 @@ class MFI(IStrategy):
     # Minimal ROI designed for the strategy.
     # adjust based on market conditions. We would recommend to keep it low for quick turn arounds
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "1440": 0.01,
-        "80": 0.02,
-        "40": 0.03,
-        "20": 0.04,
-        "0":  0.05
-    }
+    minimal_roi = {"1440": 0.01, "80": 0.02, "40": 0.03, "20": 0.04, "0": 0.05}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.10
 
     # Optimal timeframe for the strateg
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -42,28 +36,14 @@ class MFI(IStrategy):
     trailing_stop_positive_offset = 0.02
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe['MFI'] = ta.MFI(dataframe, timeperiod=14)
-
-
-
+        dataframe["MFI"] = ta.MFI(dataframe, timeperiod=14)
 
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[
-            (
-
-                (dataframe['MFI'].shift() <= 14)
-
-            ),
-            'enter_long'] = 1
+        dataframe.loc[(dataframe["MFI"].shift() <= 14), "enter_long"] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[
-            (
-                    (dataframe['MFI'] >= 75)
-
-            ),
-            'exit_long'] = 1
+        dataframe.loc[(dataframe["MFI"] >= 75), "exit_long"] = 1
         return dataframe

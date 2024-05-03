@@ -18,26 +18,26 @@ class EMABBRSI(IStrategy):
         "0": 0.14142349227153977,
         "25": 0.04585271106137356,
         "41": 0.020732379189664467,
-        "67": 0
+        "67": 0,
     }
 
     # Optimal stoploss designed for the strategy
     stoploss = -0.20
     # Optimal ticker interval for the strategy
-    ticker_interval = '1h'
+    ticker_interval = "1h"
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'limit',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "limit",
+        "stoploss_on_exchange": False,
     }
 
     # Optional time in force for orders
     order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc',
+        "entry": "gtc",
+        "exit": "gtc",
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -55,26 +55,25 @@ class EMABBRSI(IStrategy):
         # 5 and 10 crossover
         # buys at 200 EMA re-testing or 100EMA
         # when 7 closes above 25 or sell when 7 crosses below 25
-        dataframe['ema7'] = ta.EMA(dataframe, timeperiod=7)
-        dataframe['ema25'] = ta.EMA(dataframe, timeperiod=25)
+        dataframe["ema7"] = ta.EMA(dataframe, timeperiod=7)
+        dataframe["ema25"] = ta.EMA(dataframe, timeperiod=25)
 
-        dataframe['ema50']=ta.EMA(dataframe, timeperiod=50)
-        dataframe['ema200']=ta.EMA(dataframe, timeperiod=200)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema200"] = ta.EMA(dataframe, timeperiod=200)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Bollinger bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
         bollinger3 = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=3)
-        dataframe['bb_lowerband3'] = bollinger3['lower']
-        dataframe['bb_middleband3'] = bollinger3['mid']
-        dataframe['bb_upperband3'] = bollinger3['upper']
-
+        dataframe["bb_lowerband3"] = bollinger3["lower"]
+        dataframe["bb_middleband3"] = bollinger3["mid"]
+        dataframe["bb_upperband3"] = bollinger3["upper"]
 
         return dataframe
 
@@ -87,25 +86,20 @@ class EMABBRSI(IStrategy):
         """
         dataframe.loc[
             (
-                (dataframe['rsi'] > 33) &
+                (dataframe["rsi"] > 33)
+                &
                 # (dataframe['close'] < dataframe['bb_lowerband3'])
                 # (dataframe['close'] < dataframe['bb_lowerband3'])
-                qtpylib.crossed_above(dataframe['close'], dataframe['bb_lowerband3'])
-               
+                qtpylib.crossed_above(dataframe["close"], dataframe["bb_lowerband3"])
             )
-            |
-            (
-                (dataframe['close'].shift(1) > dataframe['ema200']) &
-                (dataframe['low'] < dataframe['ema200']) &
-                (dataframe['close'] > dataframe['ema200']) 
+            | (
+                (dataframe["close"].shift(1) > dataframe["ema200"])
+                & (dataframe["low"] < dataframe["ema200"])
+                & (dataframe["close"] > dataframe["ema200"])
             )
-            |
-            (
-                qtpylib.crossed_above(dataframe['ema50'], dataframe['ema200'])
-               
-            )
-           ,
-            'enter_long'] = 1
+            | (qtpylib.crossed_above(dataframe["ema50"], dataframe["ema200"])),
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -117,15 +111,8 @@ class EMABBRSI(IStrategy):
         :return: DataFrame with buy column
         """
         dataframe.loc[
-                (
-                    (dataframe['close'] > dataframe['bb_lowerband']) &
-                     (dataframe['rsi'] > 91)      
-                )
-                |
-                (
-                    qtpylib.crossed_below(dataframe['ema50'], dataframe['ema200'])
-                
-                )
-                ,
-            'exit_long'] = 1
+            ((dataframe["close"] > dataframe["bb_lowerband"]) & (dataframe["rsi"] > 91))
+            | (qtpylib.crossed_below(dataframe["ema50"], dataframe["ema200"])),
+            "exit_long",
+        ] = 1
         return dataframe

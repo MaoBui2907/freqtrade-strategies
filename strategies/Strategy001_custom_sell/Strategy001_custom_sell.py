@@ -1,4 +1,3 @@
-
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
@@ -7,8 +6,8 @@ from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
-class Strategy001_custom_exit(IStrategy):
 
+class Strategy001_custom_exit(IStrategy):
     """
     Strategy 001_custom_exit
     author@: Gerald Lonlas, froggleston
@@ -20,19 +19,14 @@ class Strategy001_custom_exit(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "60":  0.01,
-        "30":  0.03,
-        "20":  0.04,
-        "0":  0.05
-    }
+    minimal_roi = {"60": 0.01, "30": 0.03, "20": 0.04, "0": 0.05}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.10
 
     # Optimal timeframe for the strategy
-    timeframe = '5m'
+    timeframe = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -49,10 +43,10 @@ class Strategy001_custom_exit(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
@@ -77,16 +71,16 @@ class Strategy001_custom_exit(IStrategy):
         or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
         """
 
-        dataframe['ema20'] = ta.EMA(dataframe, timeperiod=20)
-        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
-        dataframe['ema100'] = ta.EMA(dataframe, timeperiod=100)
+        dataframe["ema20"] = ta.EMA(dataframe, timeperiod=20)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
+        dataframe["ema100"] = ta.EMA(dataframe, timeperiod=100)
 
         heikinashi = qtpylib.heikinashi(dataframe)
-        dataframe['ha_open'] = heikinashi['open']
-        dataframe['ha_close'] = heikinashi['close']
+        dataframe["ha_open"] = heikinashi["open"]
+        dataframe["ha_close"] = heikinashi["close"]
 
-        dataframe['rsi'] = ta.RSI(dataframe, 14)
-        
+        dataframe["rsi"] = ta.RSI(dataframe, 14)
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -97,11 +91,12 @@ class Strategy001_custom_exit(IStrategy):
         """
         dataframe.loc[
             (
-                qtpylib.crossed_above(dataframe['ema20'], dataframe['ema50']) &
-                (dataframe['ha_close'] > dataframe['ema20']) &
-                (dataframe['ha_open'] < dataframe['ha_close'])  # green bar
+                qtpylib.crossed_above(dataframe["ema20"], dataframe["ema50"])
+                & (dataframe["ha_close"] > dataframe["ema20"])
+                & (dataframe["ha_open"] < dataframe["ha_close"])  # green bar
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -113,27 +108,36 @@ class Strategy001_custom_exit(IStrategy):
         """
         dataframe.loc[
             (
-                qtpylib.crossed_above(dataframe['ema50'], dataframe['ema100']) &
-                (dataframe['ha_close'] < dataframe['ema20']) &
-                (dataframe['ha_open'] > dataframe['ha_close'])  # red bar
+                qtpylib.crossed_above(dataframe["ema50"], dataframe["ema100"])
+                & (dataframe["ha_close"] < dataframe["ema20"])
+                & (dataframe["ha_open"] > dataframe["ha_close"])  # red bar
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe
 
-    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs):
+    def custom_exit(
+        self,
+        pair: str,
+        trade: "Trade",
+        current_time: "datetime",
+        current_rate: float,
+        current_profit: float,
+        **kwargs,
+    ):
         """
         Sell only when matching some criteria other than those used to generate the sell signal
         :return: str sell_reason, if any, otherwise None
         """
         # get dataframe
         dataframe, _ = self.dp.get_analyzed_dataframe(pair=pair, timeframe=self.timeframe)
-        
+
         # get the current candle
         current_candle = dataframe.iloc[-1].squeeze()
-        
+
         # if RSI greater than 70 and profit is positive, then sell
-        if (current_candle['rsi'] > 70) and (current_profit > 0):
+        if (current_candle["rsi"] > 70) and (current_profit > 0):
             return "rsi_profit_sell"
-        
+
         # else, hold
         return None

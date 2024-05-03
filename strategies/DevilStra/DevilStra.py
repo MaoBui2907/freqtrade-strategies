@@ -77,7 +77,7 @@ SPELLS = {
             "sell_real_num0": 0.0678,
             "sell_real_num1": 0.8698,
             "sell_real_num2": 0.3917,
-        }
+        },
     },
     "Gu": {
         "buy_params": {
@@ -107,7 +107,7 @@ SPELLS = {
             "sell_real_num0": 0.2707,
             "sell_real_num1": 0.7987,
             "sell_real_num2": 0.6891,
-        }
+        },
     },
     "Lu": {
         "buy_params": {
@@ -137,7 +137,7 @@ SPELLS = {
             "sell_real_num0": 0.3205,
             "sell_real_num1": 0.2055,
             "sell_real_num2": 0.8467,
-        }
+        },
     },
     "La": {
         "buy_params": {
@@ -167,7 +167,7 @@ SPELLS = {
             "sell_real_num0": 0.3992,
             "sell_real_num1": 0.7747,
             "sell_real_num2": 0.7415,
-        }
+        },
     },
     "Si": {
         "buy_params": {
@@ -197,7 +197,7 @@ SPELLS = {
             "sell_real_num0": 0.372,
             "sell_real_num1": 0.5948,
             "sell_real_num2": 0.9872,
-        }
+        },
     },
     "Pa": {
         "buy_params": {
@@ -227,7 +227,7 @@ SPELLS = {
             "sell_real_num0": 0.278,
             "sell_real_num1": 0.0643,
             "sell_real_num2": 0.7065,
-        }
+        },
     },
     "De": {
         "buy_params": {
@@ -257,7 +257,7 @@ SPELLS = {
             "sell_real_num0": 0.4989,
             "sell_real_num1": 0.4131,
             "sell_real_num2": 0.8904,
-        }
+        },
     },
     "Ra": {
         "buy_params": {
@@ -287,7 +287,7 @@ SPELLS = {
             "sell_real_num0": 0.3506,
             "sell_real_num1": 0.8767,
             "sell_real_num2": 0.0614,
-        }
+        },
     },
     "Cu": {
         "buy_params": {
@@ -317,25 +317,25 @@ SPELLS = {
             "sell_real_num0": 0.4,
             "sell_real_num1": 0.2,
             "sell_real_num2": 0.7,
-        }
-    }
+        },
+    },
 }
 # ######################## END SETTINGS ############################
 
 
 def spell_finder(index, space):
-    return SPELLS[index][space+"_params"]
+    return SPELLS[index][space + "_params"]
 
 
 def normalize(df):
-    df = (df-df.min())/(df.max()-df.min())
+    df = (df - df.min()) / (df.max() - df.min())
     return df
 
 
 def gene_calculator(dataframe, indicator):
     # Cuz Timeperiods not effect calculating CDL patterns recognations
-    if 'CDL' in indicator:
-        splited_indicator = indicator.split('-')
+    if "CDL" in indicator:
+        splited_indicator = indicator.split("-")
         splited_indicator[1] = "0"
         new_indicator = "-".join(splited_indicator)
         # print(indicator, new_indicator)
@@ -355,9 +355,7 @@ def gene_calculator(dataframe, indicator):
         # For Pattern Recognations
         if gene_len == 1:
             # print('gene_len == 1\t', indicator)
-            result = getattr(ta, gene_name)(
-                dataframe
-            )
+            result = getattr(ta, gene_name)(dataframe)
             return normalize(result)
         elif gene_len == 2:
             # print('gene_len == 2\t', indicator)
@@ -381,7 +379,7 @@ def gene_calculator(dataframe, indicator):
         elif gene_len == 4:
             # print('gene_len == 4\t', indicator)
             gene_timeperiod = int(gene[1])
-            sharp_indicator = f'{gene_name}-{gene_timeperiod}'
+            sharp_indicator = f"{gene_name}-{gene_timeperiod}"
             dataframe[sharp_indicator] = getattr(ta, gene_name)(
                 dataframe,
                 timeperiod=gene_timeperiod,
@@ -392,7 +390,7 @@ def gene_calculator(dataframe, indicator):
             # print('gene_len == 5\t', indicator)
             gene_timeperiod = int(gene[2])
             gene_index = int(gene[1])
-            sharp_indicator = f'{gene_name}-{gene_index}-{gene_timeperiod}'
+            sharp_indicator = f"{gene_name}-{gene_index}-{gene_timeperiod}"
             dataframe[sharp_indicator] = getattr(ta, gene_name)(
                 dataframe,
                 timeperiod=gene_timeperiod,
@@ -401,133 +399,62 @@ def gene_calculator(dataframe, indicator):
 
 
 def condition_generator(dataframe, operator, indicator, crossed_indicator, real_num):
-
-    condition = (dataframe['volume'] > 10)
+    condition = dataframe["volume"] > 10
 
     # TODO : it ill callculated in populate indicators.
 
     dataframe[indicator] = gene_calculator(dataframe, indicator)
-    dataframe[crossed_indicator] = gene_calculator(
-        dataframe, crossed_indicator)
+    dataframe[crossed_indicator] = gene_calculator(dataframe, crossed_indicator)
 
     indicator_trend_sma = f"{indicator}-SMA-{TREND_CHECK_CANDLES}"
     if operator in ["UT", "DT", "OT", "CUT", "CDT", "COT"]:
-        dataframe[indicator_trend_sma] = gene_calculator(
-            dataframe, indicator_trend_sma)
+        dataframe[indicator_trend_sma] = gene_calculator(dataframe, indicator_trend_sma)
 
     if operator == ">":
-        condition = (
-            dataframe[indicator] > dataframe[crossed_indicator]
-        )
+        condition = dataframe[indicator] > dataframe[crossed_indicator]
     elif operator == "=":
-        condition = (
-            np.isclose(dataframe[indicator], dataframe[crossed_indicator])
-        )
+        condition = np.isclose(dataframe[indicator], dataframe[crossed_indicator])
     elif operator == "<":
-        condition = (
-            dataframe[indicator] < dataframe[crossed_indicator]
-        )
+        condition = dataframe[indicator] < dataframe[crossed_indicator]
     elif operator == "C":
-        condition = (
-            (qtpylib.crossed_below(dataframe[indicator], dataframe[crossed_indicator])) |
-            (qtpylib.crossed_above(
-                dataframe[indicator], dataframe[crossed_indicator]))
+        condition = (qtpylib.crossed_below(dataframe[indicator], dataframe[crossed_indicator])) | (
+            qtpylib.crossed_above(dataframe[indicator], dataframe[crossed_indicator])
         )
     elif operator == "CA":
-        condition = (
-            qtpylib.crossed_above(
-                dataframe[indicator], dataframe[crossed_indicator])
-        )
+        condition = qtpylib.crossed_above(dataframe[indicator], dataframe[crossed_indicator])
     elif operator == "CB":
-        condition = (
-            qtpylib.crossed_below(
-                dataframe[indicator], dataframe[crossed_indicator])
-        )
+        condition = qtpylib.crossed_below(dataframe[indicator], dataframe[crossed_indicator])
     elif operator == ">R":
-        condition = (
-            dataframe[indicator] > real_num
-        )
+        condition = dataframe[indicator] > real_num
     elif operator == "=R":
-        condition = (
-            np.isclose(dataframe[indicator], real_num)
-        )
+        condition = np.isclose(dataframe[indicator], real_num)
     elif operator == "<R":
-        condition = (
-            dataframe[indicator] < real_num
-        )
+        condition = dataframe[indicator] < real_num
     elif operator == "/>R":
-        condition = (
-            dataframe[indicator].div(dataframe[crossed_indicator]) > real_num
-        )
+        condition = dataframe[indicator].div(dataframe[crossed_indicator]) > real_num
     elif operator == "/=R":
-        condition = (
-            np.isclose(dataframe[indicator].div(
-                dataframe[crossed_indicator]), real_num)
-        )
+        condition = np.isclose(dataframe[indicator].div(dataframe[crossed_indicator]), real_num)
     elif operator == "/<R":
-        condition = (
-            dataframe[indicator].div(dataframe[crossed_indicator]) < real_num
-        )
+        condition = dataframe[indicator].div(dataframe[crossed_indicator]) < real_num
     elif operator == "UT":
-        condition = (
-            dataframe[indicator] > dataframe[indicator_trend_sma]
-        )
+        condition = dataframe[indicator] > dataframe[indicator_trend_sma]
     elif operator == "DT":
-        condition = (
-            dataframe[indicator] < dataframe[indicator_trend_sma]
-        )
+        condition = dataframe[indicator] < dataframe[indicator_trend_sma]
     elif operator == "OT":
-        condition = (
-
-            np.isclose(dataframe[indicator], dataframe[indicator_trend_sma])
-        )
+        condition = np.isclose(dataframe[indicator], dataframe[indicator_trend_sma])
     elif operator == "CUT":
         condition = (
-            (
-                qtpylib.crossed_above(
-                    dataframe[indicator],
-                    dataframe[indicator_trend_sma]
-                )
-            ) &
-            (
-                dataframe[indicator] > dataframe[indicator_trend_sma]
-            )
-        )
+            qtpylib.crossed_above(dataframe[indicator], dataframe[indicator_trend_sma])
+        ) & (dataframe[indicator] > dataframe[indicator_trend_sma])
     elif operator == "CDT":
         condition = (
-            (
-                qtpylib.crossed_below(
-                    dataframe[indicator],
-                    dataframe[indicator_trend_sma]
-                )
-            ) &
-            (
-                dataframe[indicator] < dataframe[indicator_trend_sma]
-            )
-        )
+            qtpylib.crossed_below(dataframe[indicator], dataframe[indicator_trend_sma])
+        ) & (dataframe[indicator] < dataframe[indicator_trend_sma])
     elif operator == "COT":
         condition = (
-            (
-                (
-                    qtpylib.crossed_below(
-                        dataframe[indicator],
-                        dataframe[indicator_trend_sma]
-                    )
-                ) |
-                (
-                    qtpylib.crossed_above(
-                        dataframe[indicator],
-                        dataframe[indicator_trend_sma]
-                    )
-                )
-            ) &
-            (
-                np.isclose(
-                    dataframe[indicator],
-                    dataframe[indicator_trend_sma]
-                )
-            )
-        )
+            (qtpylib.crossed_below(dataframe[indicator], dataframe[indicator_trend_sma]))
+            | (qtpylib.crossed_above(dataframe[indicator], dataframe[indicator_trend_sma]))
+        ) & (np.isclose(dataframe[indicator], dataframe[indicator_trend_sma]))
 
     return condition, dataframe
 
@@ -547,19 +474,14 @@ class DevilStra(IStrategy):
     }
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.574,
-        "1757": 0.158,
-        "3804": 0.089,
-        "6585": 0
-    }
+    minimal_roi = {"0": 0.574, "1757": 0.158, "3804": 0.089, "6585": 0}
 
     # Stoploss:
     stoploss = -0.28
     # #################### END OF RESULT PLACE ####################
 
     # 𝖂𝖔𝖗𝖘𝖙, 𝖀𝖓𝖎𝖉𝖊𝖆𝖑, 𝕾𝖚𝖇𝖔𝖕𝖙𝖎𝖒𝖆𝖑, 𝕸𝖆𝖑𝖆𝖕𝖗𝖔𝖕𝖔𝖘 𝕬𝖓𝖉 𝕯𝖎𝖘𝖒𝖆𝖑 𝖙𝖎𝖒𝖊𝖋𝖗𝖆𝖒𝖊 𝖋𝖔𝖗 𝖙𝖍𝖎𝖘 𝖘𝖙𝖗𝖆𝖙𝖊𝖌𝖞:
-    timeframe = '4h'
+    timeframe = "4h"
 
     spell_pot = [
         ",".join(
@@ -567,154 +489,120 @@ class DevilStra(IStrategy):
                 random.choices(
                     list(SPELLS.keys()),
                     # TODO: k will be change to len(pairlist)
-                    k=PAIR_LIST_LENGHT
+                    k=PAIR_LIST_LENGHT,
                 )
             )
-        )for i in range(PAIN_RANGE)
+        )
+        for i in range(PAIN_RANGE)
     ]
 
-    buy_spell = CategoricalParameter(
-        spell_pot, default=spell_pot[0], space='entry')
-    sell_spell = CategoricalParameter(
-        spell_pot, default=spell_pot[0], space='exit')
+    buy_spell = CategoricalParameter(spell_pot, default=spell_pot[0], space="entry")
+    sell_spell = CategoricalParameter(spell_pot, default=spell_pot[0], space="exit")
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         pairs = self.dp.current_whitelist()
         pairs_len = len(pairs)
-        pair_index = pairs.index(metadata['pair'])
+        pair_index = pairs.index(metadata["pair"])
 
         buy_spells = self.buy_spell.value.split(",")
         buy_spells_len = len(buy_spells)
 
         if pairs_len > buy_spells_len:
-            print(
-                f"First set PAIR_LIST_LENGHT={pairs_len + 1} And re-hyperopt the")
+            print(f"First set PAIR_LIST_LENGHT={pairs_len + 1} And re-hyperopt the")
             print("Buy strategy And paste result in exact place(lines 535~564)")
             print("IMPORTANT: You Need An 'STATIC' Pairlist On Your Config.json !!!")
             exit()
 
         buy_params_index = buy_spells[pair_index]
 
-        params = spell_finder(buy_params_index, 'entry')
+        params = spell_finder(buy_params_index, "entry")
         conditions = list()
         # TODO: Its not dry code!
-        buy_indicator = params['buy_indicator0']
-        buy_crossed_indicator = params['buy_crossed_indicator0']
-        buy_operator = params['buy_operator0']
-        buy_real_num = params['buy_real_num0']
+        buy_indicator = params["buy_indicator0"]
+        buy_crossed_indicator = params["buy_crossed_indicator0"]
+        buy_operator = params["buy_operator0"]
+        buy_real_num = params["buy_real_num0"]
         condition, dataframe = condition_generator(
-            dataframe,
-            buy_operator,
-            buy_indicator,
-            buy_crossed_indicator,
-            buy_real_num
+            dataframe, buy_operator, buy_indicator, buy_crossed_indicator, buy_real_num
         )
         conditions.append(condition)
         # backup
-        buy_indicator = params['buy_indicator1']
-        buy_crossed_indicator = params['buy_crossed_indicator1']
-        buy_operator = params['buy_operator1']
-        buy_real_num = params['buy_real_num1']
+        buy_indicator = params["buy_indicator1"]
+        buy_crossed_indicator = params["buy_crossed_indicator1"]
+        buy_operator = params["buy_operator1"]
+        buy_real_num = params["buy_real_num1"]
 
         condition, dataframe = condition_generator(
-            dataframe,
-            buy_operator,
-            buy_indicator,
-            buy_crossed_indicator,
-            buy_real_num
+            dataframe, buy_operator, buy_indicator, buy_crossed_indicator, buy_real_num
         )
         conditions.append(condition)
 
-        buy_indicator = params['buy_indicator2']
-        buy_crossed_indicator = params['buy_crossed_indicator2']
-        buy_operator = params['buy_operator2']
-        buy_real_num = params['buy_real_num2']
+        buy_indicator = params["buy_indicator2"]
+        buy_crossed_indicator = params["buy_crossed_indicator2"]
+        buy_operator = params["buy_operator2"]
+        buy_real_num = params["buy_real_num2"]
         condition, dataframe = condition_generator(
-            dataframe,
-            buy_operator,
-            buy_indicator,
-            buy_crossed_indicator,
-            buy_real_num
+            dataframe, buy_operator, buy_indicator, buy_crossed_indicator, buy_real_num
         )
         conditions.append(condition)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'entry']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "entry"] = 1
 
         # print(len(dataframe.keys()))
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         pairs = self.dp.current_whitelist()
         pairs_len = len(pairs)
-        pair_index = pairs.index(metadata['pair'])
+        pair_index = pairs.index(metadata["pair"])
 
         sell_spells = self.sell_spell.value.split(",")
         sell_spells_len = len(sell_spells)
 
         if pairs_len > sell_spells_len:
-            print(
-                f"First set PAIR_LIST_LENGHT={pairs_len + 1} And re-hyperopt the")
+            print(f"First set PAIR_LIST_LENGHT={pairs_len + 1} And re-hyperopt the")
             print("Sell strategy And paste result in exact place(lines 535~564)")
             print("IMPORTANT: You Need An 'STATIC' Pairlist On Your Config.json !!!")
             exit()
 
         sell_params_index = sell_spells[pair_index]
 
-        params = spell_finder(sell_params_index, 'exit')
+        params = spell_finder(sell_params_index, "exit")
 
         conditions = list()
         # TODO: Its not dry code!
-        sell_indicator = params['sell_indicator0']
-        sell_crossed_indicator = params['sell_crossed_indicator0']
-        sell_operator = params['sell_operator0']
-        sell_real_num = params['sell_real_num0']
+        sell_indicator = params["sell_indicator0"]
+        sell_crossed_indicator = params["sell_crossed_indicator0"]
+        sell_operator = params["sell_operator0"]
+        sell_real_num = params["sell_real_num0"]
         condition, dataframe = condition_generator(
-            dataframe,
-            sell_operator,
-            sell_indicator,
-            sell_crossed_indicator,
-            sell_real_num
+            dataframe, sell_operator, sell_indicator, sell_crossed_indicator, sell_real_num
         )
         conditions.append(condition)
 
-        sell_indicator = params['sell_indicator1']
-        sell_crossed_indicator = params['sell_crossed_indicator1']
-        sell_operator = params['sell_operator1']
-        sell_real_num = params['sell_real_num1']
+        sell_indicator = params["sell_indicator1"]
+        sell_crossed_indicator = params["sell_crossed_indicator1"]
+        sell_operator = params["sell_operator1"]
+        sell_real_num = params["sell_real_num1"]
         condition, dataframe = condition_generator(
-            dataframe,
-            sell_operator,
-            sell_indicator,
-            sell_crossed_indicator,
-            sell_real_num
+            dataframe, sell_operator, sell_indicator, sell_crossed_indicator, sell_real_num
         )
         conditions.append(condition)
 
-        sell_indicator = params['sell_indicator2']
-        sell_crossed_indicator = params['sell_crossed_indicator2']
-        sell_operator = params['sell_operator2']
-        sell_real_num = params['sell_real_num2']
+        sell_indicator = params["sell_indicator2"]
+        sell_crossed_indicator = params["sell_crossed_indicator2"]
+        sell_operator = params["sell_operator2"]
+        sell_real_num = params["sell_real_num2"]
         condition, dataframe = condition_generator(
-            dataframe,
-            sell_operator,
-            sell_indicator,
-            sell_crossed_indicator,
-            sell_real_num
+            dataframe, sell_operator, sell_indicator, sell_crossed_indicator, sell_real_num
         )
         conditions.append(condition)
 
         if conditions:
-            dataframe.loc[
-                reduce(lambda x, y: x & y, conditions),
-                'exit_long']=1
+            dataframe.loc[reduce(lambda x, y: x & y, conditions), "exit_long"] = 1
         return dataframe

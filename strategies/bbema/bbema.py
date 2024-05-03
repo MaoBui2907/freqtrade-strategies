@@ -6,6 +6,7 @@ from pandas import DataFrame
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 from freqtrade.strategy.interface import IStrategy
 
+
 class bbema(IStrategy):
     """
     Default Strategy provided by freqtrade bot.
@@ -13,28 +14,26 @@ class bbema(IStrategy):
     """
 
     # Minimal ROI designed for the strategy
-    minimal_roi = {
-        "0": 0.2
-    }
+    minimal_roi = {"0": 0.2}
 
     # Optimal stoploss designed for the strategy
     stoploss = -0.10
 
     # Optimal ticker interval for the strategy
-    ticker_interval = '1h'
+    ticker_interval = "1h"
 
     # Optional order type mapping
     order_types = {
-        'buy': 'market',
-        'exit': 'market',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "buy": "market",
+        "exit": "market",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     # Optional time in force for orders
     order_time_in_force = {
-        'entry': 'gtc',
-        'exit': 'gtc',
+        "entry": "gtc",
+        "exit": "gtc",
     }
 
     def informative_pairs(self):
@@ -62,16 +61,15 @@ class bbema(IStrategy):
         :return: a Dataframe with all mandatory indicators for the strategies
         """
 
-       
         # Bollinger bands
         bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=3)
-        dataframe['bb_lowerband'] = bollinger['lower']
-        dataframe['bb_middleband'] = bollinger['mid']
-        dataframe['bb_upperband'] = bollinger['upper']
+        dataframe["bb_lowerband"] = bollinger["lower"]
+        dataframe["bb_middleband"] = bollinger["mid"]
+        dataframe["bb_upperband"] = bollinger["upper"]
 
-        dataframe['ema10'] = ta.EMA(dataframe, timeperiod=10)
-        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
-            
+        dataframe["ema10"] = ta.EMA(dataframe, timeperiod=10)
+        dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -81,13 +79,11 @@ class bbema(IStrategy):
         :param metadata: Additional information, like the currently traded pair
         :return: DataFrame with buy column
         """
-       
-        dataframe['close10'] = dataframe['close'].shift(periods=-10)
+
+        dataframe["close10"] = dataframe["close"].shift(periods=-10)
         dataframe.loc[
-            (
-                (qtpylib.crossed_above(dataframe['ema10'], dataframe['ema50'])) 
-            ), 
-            'enter_long'] = 1
+            (qtpylib.crossed_above(dataframe["ema10"], dataframe["ema50"])), "enter_long"
+        ] = 1
 
         return dataframe
 
@@ -100,8 +96,9 @@ class bbema(IStrategy):
         """
         dataframe.loc[
             (
-                (qtpylib.crossed_above(dataframe['ema50'], dataframe['ema10'])) 
-                # (dataframe['close'] < dataframe['close'].shift(periods=-10)) 
+                qtpylib.crossed_above(dataframe["ema50"], dataframe["ema10"])
+                # (dataframe['close'] < dataframe['close'].shift(periods=-10))
             ),
-            'exit_long'] = 1
+            "exit_long",
+        ] = 1
         return dataframe

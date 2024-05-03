@@ -1,22 +1,16 @@
-import numpy as np # noqa
-import pandas as pd # noqa
+import numpy as np  # noqa
+import pandas as pd  # noqa
 from pandas import DataFrame
 from freqtrade.strategy.interface import IStrategy
 from technical.consensus import Consensus
 
-class conny(IStrategy):
 
-    minimal_roi = {
-        "0": 0.025,
-        "10": 0.015,
-        "20": 0.01,
-        "30": 0.005,
-        "120": 0
-    }
+class conny(IStrategy):
+    minimal_roi = {"0": 0.025, "10": 0.015, "20": 0.01, "30": 0.005, "120": 0}
 
     stoploss = -0.0203
 
-    timeframe = '15m'
+    timeframe = "15m"
 
     process_only_new_candles = True
 
@@ -25,7 +19,6 @@ class conny(IStrategy):
     ignore_roi_if_entry_signal = True
 
     startup_candle_count: int = 30
-
 
     def informative_pairs(self):
         return []
@@ -55,28 +48,21 @@ class conny(IStrategy):
         c.evaluate_williams()
         c.evaluate_momentum()
         c.evaluate_adx()
-        dataframe['consensus_buy'] = c.score()['entry']
-        dataframe['consensus_sell'] = c.score()['exit_long']
-
+        dataframe["consensus_buy"] = c.score()["entry"]
+        dataframe["consensus_sell"] = c.score()["exit_long"]
 
         print(dataframe)
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['consensus_buy'] > 45) &
-                (dataframe['volume'] > 0)
-            ),
-            'enter_long'] = 1
+            ((dataframe["consensus_buy"] > 45) & (dataframe["volume"] > 0)), "enter_long"
+        ] = 1
 
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
-            (
-                (dataframe['consensus_sell'] > 88) &
-                (dataframe['volume'] > 0)
-            ),
-            'exit_long'] = 1
+            ((dataframe["consensus_sell"] > 88) & (dataframe["volume"] > 0)), "exit_long"
+        ] = 1
         return dataframe

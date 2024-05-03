@@ -32,7 +32,6 @@ class SwingHigh(IStrategy):
         return []
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         macd = ta.MACD(dataframe)
         dataframe["macd"] = macd["macd"]
         dataframe["macdsignal"] = macd["macdsignal"]
@@ -46,7 +45,6 @@ class SwingHigh(IStrategy):
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[
             (
                 (dataframe["macd"] > dataframe["macdsignal"])
@@ -59,7 +57,6 @@ class SwingHigh(IStrategy):
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
         dataframe.loc[
             (
                 (dataframe["macd"] < dataframe["macdsignal"])

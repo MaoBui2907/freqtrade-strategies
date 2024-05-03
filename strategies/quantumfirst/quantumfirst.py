@@ -5,6 +5,7 @@ Created on Sat Aug 29 15:18:55 2020
 
 @author: alex
 """
+
 # --- Do not remove these libs ---
 from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
@@ -12,7 +13,7 @@ from pandas import DataFrame
 
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-import numpy # noqa
+import numpy  # noqa
 
 
 class quantumfirst(IStrategy):
@@ -27,20 +28,14 @@ class quantumfirst(IStrategy):
 
     # Minimal ROI designed for the strategy.
     # This attribute will be overridden if the config file contains "minimal_roi"
-    minimal_roi = {
-        "1440": 0.01,
-        "80": 0.02,
-        "40": 0.03,
-        "20": 0.04,
-        "0":  0.05
-    }
+    minimal_roi = {"1440": 0.01, "80": 0.02, "40": 0.03, "20": 0.04, "0": 0.05}
 
     # Optimal stoploss designed for the strategy
     # This attribute will be overridden if the config file contains "stoploss"
     stoploss = -0.10
 
     # Optimal ticker interval for the strategy
-    ticker_interval = '5m'
+    ticker_interval = "5m"
 
     # trailing stoploss
     trailing_stop = False
@@ -57,10 +52,10 @@ class quantumfirst(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'entry': 'limit',
-        'exit': 'limit',
-        'stoploss': 'market',
-        'stoploss_on_exchange': False
+        "entry": "limit",
+        "exit": "limit",
+        "stoploss": "market",
+        "stoploss_on_exchange": False,
     }
 
     def informative_pairs(self):
@@ -87,34 +82,34 @@ class quantumfirst(IStrategy):
 
         # MACD
         macd = ta.MACD(dataframe)
-        dataframe['macd'] = macd['macd']
-        dataframe['macdsignal'] = macd['macdsignal']
+        dataframe["macd"] = macd["macd"]
+        dataframe["macdsignal"] = macd["macdsignal"]
 
         # Minus Directional Indicator / Movement
-        dataframe['minus_di'] = ta.MINUS_DI(dataframe)
+        dataframe["minus_di"] = ta.MINUS_DI(dataframe)
 
         # RSI
-        dataframe['rsi'] = ta.RSI(dataframe)
+        dataframe["rsi"] = ta.RSI(dataframe)
 
         # Inverse Fisher transform on RSI, values [-1.0, 1.0] (https://goo.gl/2JGGoy)
-        rsi = 0.1 * (dataframe['rsi'] - 50)
-        dataframe['fisher_rsi'] = (numpy.exp(2 * rsi) - 1) / (numpy.exp(2 * rsi) + 1)
+        rsi = 0.1 * (dataframe["rsi"] - 50)
+        dataframe["fisher_rsi"] = (numpy.exp(2 * rsi) - 1) / (numpy.exp(2 * rsi) + 1)
         # Inverse Fisher transform on RSI normalized, value [0.0, 100.0] (https://goo.gl/2JGGoy)
-        dataframe['fisher_rsi_norma'] = 50 * (dataframe['fisher_rsi'] + 1)
+        dataframe["fisher_rsi_norma"] = 50 * (dataframe["fisher_rsi"] + 1)
 
         # Stoch fast
         stoch_fast = ta.STOCHF(dataframe)
-        dataframe['fastd'] = stoch_fast['fastd']
-        dataframe['fastk'] = stoch_fast['fastk']
+        dataframe["fastd"] = stoch_fast["fastd"]
+        dataframe["fastk"] = stoch_fast["fastk"]
 
         # Overlap Studies
         # ------------------------------------
 
         # SAR Parabol
-        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe["sar"] = ta.SAR(dataframe)
 
         # SMA - Simple Moving Average
-        dataframe['sma'] = ta.SMA(dataframe, timeperiod=40)
+        dataframe["sma"] = ta.SMA(dataframe, timeperiod=40)
 
         return dataframe
 
@@ -127,16 +122,18 @@ class quantumfirst(IStrategy):
         dataframe.loc[
             # Prod
             (
-                (dataframe['close'] > 0.00000200) &
-                (dataframe['volume'] > dataframe['volume'].rolling(200).mean() * 4) &
-                (dataframe['close'] < dataframe['sma']) &
-                (dataframe['fastd'] > dataframe['fastk']) &
-                (dataframe['rsi'] > 0) &
-                (dataframe['fastd'] > 0) &
+                (dataframe["close"] > 0.00000200)
+                & (dataframe["volume"] > dataframe["volume"].rolling(200).mean() * 4)
+                & (dataframe["close"] < dataframe["sma"])
+                & (dataframe["fastd"] > dataframe["fastk"])
+                & (dataframe["rsi"] > 0)
+                & (dataframe["fastd"] > 0)
+                &
                 # (dataframe['fisher_rsi'] < -0.94)
-                (dataframe['fisher_rsi_norma'] < 38.900000000000006)
+                (dataframe["fisher_rsi_norma"] < 38.900000000000006)
             ),
-            'enter_long'] = 1
+            "enter_long",
+        ] = 1
 
         return dataframe
 
@@ -149,14 +146,11 @@ class quantumfirst(IStrategy):
         dataframe.loc[
             # Prod
             (
-                (qtpylib.crossed_above(dataframe['rsi'], 50)) &
-                (dataframe['macd'] < 0) &
-                (dataframe['minus_di'] > 0)
-            ) |
-            (
-                (dataframe['sar'] > dataframe['close']) &
-                (dataframe['fisher_rsi'] > 0.3)
-            ),
-
-            'exit_long'] = 1
+                (qtpylib.crossed_above(dataframe["rsi"], 50))
+                & (dataframe["macd"] < 0)
+                & (dataframe["minus_di"] > 0)
+            )
+            | ((dataframe["sar"] > dataframe["close"]) & (dataframe["fisher_rsi"] > 0.3)),
+            "exit_long",
+        ] = 1
         return dataframe

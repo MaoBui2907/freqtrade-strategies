@@ -4,26 +4,14 @@ from pandas import DataFrame
 
 
 class YOLO(IStrategy):
-
     # Buy hyperspace params:
-    buy_params = {
-		'adx': 34, 
-		'aroon-down': 33, 
-		'aroon-up': 98
-    }
+    buy_params = {"adx": 34, "aroon-down": 33, "aroon-up": 98}
 
     # Sell hyperspace params:
-    sell_params = {
-
-    }
+    sell_params = {}
 
     # ROI table:
-    minimal_roi = {
-        "0": 0.03,
-        "7": 0.02,
-        "33": 0.01,
-        "71": 0.005
-    }
+    minimal_roi = {"0": 0.03, "7": 0.02, "33": 0.01, "71": 0.005}
 
     # Stoploss:
     stoploss = -0.01
@@ -37,21 +25,19 @@ class YOLO(IStrategy):
     """
     END HYPEROPT
     """
-    
-    timeframe = '1m'
+
+    timeframe = "1m"
 
     use_exit_signal = False
     exit_profit_only = False
     ignore_roi_if_entry_signal = True
 
-
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe["adx"] = ta.ADX(dataframe, timeperiod=90)  # 90
+        aroon = ta.AROON(dataframe, timeperiod=60)  # 60
 
-        dataframe['adx'] = ta.ADX(dataframe, timeperiod=90) #90
-        aroon = ta.AROON(dataframe, timeperiod=60) #60
-
-        dataframe['aroon-down'] = aroon['aroondown'] 
-        dataframe['aroon-up'] = aroon['aroonup']
+        dataframe["aroon-down"] = aroon["aroondown"]
+        dataframe["aroon-up"] = aroon["aroonup"]
 
         return dataframe
 
@@ -59,13 +45,13 @@ class YOLO(IStrategy):
         params = self.buy_params
 
         dataframe.loc[
-            ( 
-                (dataframe['adx'] > params['adx']) &
-                (dataframe['aroon-up'] > params['aroon-up']) &
-                (dataframe['aroon-down'] < params['aroon-down']) &
-                (dataframe['volume'] > 0)
+            (
+                (dataframe["adx"] > params["adx"])
+                & (dataframe["aroon-up"] > params["aroon-up"])
+                & (dataframe["aroon-down"] < params["aroon-down"])
+                & (dataframe["volume"] > 0)
             ),
-            'entry'
+            "entry",
         ] = 1
 
         return dataframe
@@ -74,5 +60,5 @@ class YOLO(IStrategy):
         """
         no sell signal
         """
-        dataframe['exit_long'] = 0
+        dataframe["exit_long"] = 0
         return dataframe
