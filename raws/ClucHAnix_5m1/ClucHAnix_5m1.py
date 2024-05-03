@@ -90,9 +90,9 @@ class ClucHAnix_5m1(IStrategy):
     order_types = {
         "entry": "market",
         "exit": "market",
-        "emergencysell": "market",
-        "forcebuy": "market",
-        "forcesell": "market",
+        "emergency_exit": "market",
+        "force_enter": "market",
+        "force_exit": "market",
         "stoploss": "market",
         "stoploss_on_exchange": False,
         "stoploss_on_exchange_interval": 60,
@@ -328,7 +328,7 @@ class ClucHAnix_5mTB1(ClucHAnix_5m1):
     def trailing_buy_offset(self, dataframe, pair: str, current_price: float):
         # return rebound limit before a buy in % of initial price, function of current price
         # return None to stop trailing buy (will start again at next buy signal)
-        # return 'forcebuy' to force immediate buy
+        # return 'force_enter' to force immediate buy
         # (example with 0.5%. initial price : 100 (uplimit is 100.5), 2nd price : 99 (no buy, uplimit updated to 99.5), 3price 98 (no buy uplimit updated to 98.5), 4th price 99 -> BUY
         current_trailing_profit_ratio = self.current_trailing_profit_ratio(pair, current_price)
         last_candle = dataframe.iloc[-1]
@@ -348,7 +348,7 @@ class ClucHAnix_5mTB1(ClucHAnix_5m1):
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
             if (current_trailing_profit_ratio > 0) and (last_candle["entry"] == 1):
                 # more than 1h, price under first signal, buy signal still active -> buy
-                return "forcebuy"
+                return "force_enter"
             else:
                 # wait for next signal
                 return None
@@ -358,7 +358,7 @@ class ClucHAnix_5mTB1(ClucHAnix_5m1):
             and (current_trailing_profit_ratio < (-1 * self.min_uptrend_trailing_profit))
         ):
             # less than 90s and price is rising, buy
-            return "forcebuy"
+            return "force_enter"
 
         if current_trailing_profit_ratio < 0:
             # current price is higher than initial price
@@ -419,7 +419,7 @@ class ClucHAnix_5mTB1(ClucHAnix_5m1):
                             logger.info(f'start trailing buy for {pair} at {last_candle["close"]}')
 
                         elif trailing_buy["trailing_buy_order_started"]:
-                            if trailing_buy_offset == "forcebuy":
+                            if trailing_buy_offset == "force_enter":
                                 # buy in custom conditions
                                 val = True
                                 ratio = "%.2f" % (

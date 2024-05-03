@@ -5433,7 +5433,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
     def trailing_buy_offset(self, dataframe, pair: str, current_price: float):
         # return rebound limit before a buy in % of initial price, function of current price
         # return None to stop trailing buy (will start again at next buy signal)
-        # return 'forcebuy' to force immediate buy
+        # return 'force_enter' to force immediate buy
         # (example with 0.5%. initial price : 100 (uplimit is 100.5), 2nd price : 99 (no buy, uplimit updated to 99.5), 3price 98 (no buy uplimit updated to 98.5), 4th price 99 -> BUY
         current_trailing_profit_ratio = self.current_trailing_buy_profit_ratio(pair, current_price)
         last_candle = dataframe.iloc[-1]
@@ -5452,7 +5452,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
             if (current_trailing_profit_ratio > 0) and (last_candle["buy"] == 1):
                 # more than 1h, price under first signal, buy signal still active -> buy
-                return "forcebuy"
+                return "force_enter"
             else:
                 # wait for next signal
                 return None
@@ -5462,7 +5462,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
             and (current_trailing_profit_ratio < (-1 * self.min_uptrend_trailing_profit))
         ):
             # less than 90s and price is rising, buy
-            return "forcebuy"
+            return "force_enter"
 
         if current_trailing_profit_ratio < 0:
             # current price is higher than initial price
@@ -5483,7 +5483,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
     def trailing_sell_offset(self, dataframe, pair: str, current_price: float):
         # return rebound limit before a buy in % of initial price, function of current price
         # return None to stop trailing buy (will start again at next buy signal)
-        # return 'forcebuy' to force immediate buy
+        # return 'force_enter' to force immediate buy
         # (example with 0.5%. initial price : 100 (uplimit is 100.5), 2nd price : 99 (no buy, uplimit updated to 99.5), 3price 98 (no buy uplimit updated to 98.5), 4th price 99 -> BUY
         current_trailing_sell_profit_ratio = self.current_trailing_sell_profit_ratio(
             pair, current_price
@@ -5504,7 +5504,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
             if (current_trailing_sell_profit_ratio > 0) and (last_candle["exit_long"] != 0):
                 # more than 1h, price over first signal, sell signal still active -> sell
-                return "forcesell"
+                return "force_exit"
             else:
                 # wait for next signal
                 return None
@@ -5514,7 +5514,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
             and (current_trailing_sell_profit_ratio < (-1 * self.min_uptrend_trailing_profit))
         ):
             # less than 90s and price is falling, sell
-            return "forcesell"
+            return "force_exit"
 
         if current_trailing_sell_profit_ratio > 0:
             # current price is lower than initial price
@@ -5576,7 +5576,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                             logger.info(f'start trailing buy for {pair} at {last_candle["close"]}')
 
                         elif trailing_buy["trailing_buy_order_started"]:
-                            if trailing_buy_offset == "forcebuy":
+                            if trailing_buy_offset == "force_enter":
                                 # buy in custom conditions
                                 val = True
                                 ratio = "%.2f" % (
@@ -5696,7 +5696,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                             logger.info(f'start trailing sell for {pair} at {last_candle["close"]}')
 
                         elif trailing_sell["trailing_sell_order_started"]:
-                            if trailing_sell_offset == "forcesell":
+                            if trailing_sell_offset == "force_exit":
                                 # sell in custom conditions
                                 val = True
                                 ratio = "%.2f" % (
@@ -5704,7 +5704,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                                     * 100
                                 )
                                 self.trailing_sell_info(pair, current_price)
-                                logger.info(f"FORCESELL for {pair} ({ratio} %, {current_price})")
+                                logger.info(f"force_exit for {pair} ({ratio} %, {current_price})")
 
                             elif trailing_sell_offset is None:
                                 # stop trailing sell custom conditions

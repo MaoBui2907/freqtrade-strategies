@@ -155,9 +155,9 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
     order_types = {
         "entry": "limit",
         "exit": "limit",
-        "emergencysell": "limit",
-        "forcebuy": "limit",
-        "forcesell": "limit",
+        "emergency_exit": "limit",
+        "force_enter": "limit",
+        "force_exit": "limit",
         "stoploss": "limit",
         "stoploss_on_exchange": False,
         "stoploss_on_exchange_interval": 60,

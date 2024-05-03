@@ -23,7 +23,7 @@ import technical.indicators as ftt
 #
 # WARNING
 #
-# Do not use stoploss_on_exchange or the bot may trigger emergencysell when it
+# Do not use stoploss_on_exchange or the bot may trigger emergency_exit when it
 # fails to place the stoploss.
 #
 # WARNING

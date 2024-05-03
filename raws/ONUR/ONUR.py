@@ -19,11 +19,11 @@ class ONUR(IStrategy):
     timeframe = "15m"
 
     order_types = {
-        "buy": "limit",
-        "sell": "limit",
-        "emergencysell": "market",
-        "forcebuy": "market",
-        "forcesell": "market",
+        "entry": "limit",
+        "exit": "limit",
+        "emergency_exit": "market",
+        "force_enter": "market",
+        "force_exit": "market",
         "stoploss": "market",
         "stoploss_on_exchange": True,
         "stoploss_on_exchange_interval": 60,

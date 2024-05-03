@@ -64,8 +64,8 @@ class Martin(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        "buy": "limit",
-        "sell": "limit",
+        "entry": "limit",
+        "exit": "limit",
         "stoploss": "market",
         "stoploss_on_exchange": False,
     }

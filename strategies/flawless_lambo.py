@@ -961,7 +961,7 @@ class flawless_lambo(IStrategy):
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
             if (current_trailing_sell_profit_ratio > 0) and (last_candle["exit_long"] != 0):
                 # more than 1h, price over first signal, sell signal still active -> sell
-                return "forcesell"
+                return "force_exit"
             else:
                 # wait for next signal
                 return None
@@ -971,7 +971,7 @@ class flawless_lambo(IStrategy):
             and (current_trailing_sell_profit_ratio < (-1 * self.min_uptrend_trailing_profit))
         ):
             # less than 90s and price is falling, sell
-            return "forcesell"
+            return "force_exit"
 
         if current_trailing_sell_profit_ratio > 0:
             # current price is lower than initial price
@@ -1168,7 +1168,7 @@ class flawless_lambo(IStrategy):
                             )
 
                         elif trailing_sell["trailing_sell_order_started"]:
-                            if trailing_sell_offset == "forcesell":
+                            if trailing_sell_offset == "force_exit":
                                 # sell in custom conditions
                                 val = True
                                 ratio = "%.2f" % (
@@ -1177,7 +1177,7 @@ class flawless_lambo(IStrategy):
                                 )
                                 self.trailing_sell_info(pair, current_price)
                                 self.logger.info(
-                                    f"FORCESELL for {pair} ({ratio} %, {current_price})"
+                                    f"force_exit for {pair} ({ratio} %, {current_price})"
                                 )
 
                             elif trailing_sell_offset is None:

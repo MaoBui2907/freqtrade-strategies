@@ -37,7 +37,7 @@ class BreakEven(IStrategy):
     #        "0": 0
     #    }
 
-    # And this is basically "/forcesell all", that sells no matter what profit
+    # And this is basically "/force_exit all", that sells no matter what profit
     #    minimal_roi = {
     #        "0": -1
     #    }
