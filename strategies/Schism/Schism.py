@@ -131,7 +131,7 @@ class Schism(IStrategy):
                     hold_pct = (trade_data['free_slots'] / 100) * -1
                     conditions.append(trade_data['avg_other_profit'] >= hold_pct)
                 else:
-                    conditions.append(trade_data['biggest_loser'] == True)
+                    conditions.append(trade_data['biggest_loser'] is True)
 
         else:
             conditions.append(dataframe['volume'].lt(0))

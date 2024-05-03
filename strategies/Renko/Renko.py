@@ -89,10 +89,10 @@ class Renko(IStrategy):
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         for index, row in dataframe.iterrows():  
-            if row['previous-trend'] == False and row['trend'] == True:
+            if row['previous-trend'] is False and row['trend'] is True:
                 last_row = dataframe.loc[dataframe['date'] == row['date']][-1:] 
                 dataframe.loc[dataframe.index== last_row.index.values[0], 'enter_long'] = 1
-            if row['previous-trend'] == True and row['trend'] == True:
+            if row['previous-trend'] is True and row['trend'] is True:
                 last_row = dataframe.loc[dataframe['date'] == row['date']][-1:] 
                 dataframe.loc[dataframe.index== last_row.index.values[0], 'enter_long'] = 1
             else:

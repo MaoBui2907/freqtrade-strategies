@@ -419,7 +419,7 @@ class BinClucMadDevelop(IStrategy):
                 & dataframe["tail"].lt(dataframe["bbdelta"] * self.buy_bb40_tail_bbdelta.value)
                 & dataframe["close"].lt(dataframe["lower"].shift())
                 & dataframe["close"].le(dataframe["close"].shift())
-                & (self.v8_buy_condition_0_enable.value == True)
+                & (self.v8_buy_condition_0_enable.value is True)
             ),
             "v8_buy_condition_0_enable",
         ] = 1
@@ -441,7 +441,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["close"] < dataframe["ema_50"])
                 & (dataframe["close"] < self.buy_bb20_close_bblowerband.value * dataframe["bb_lowerband"])
                 & (dataframe["volume"] < (dataframe["volume_mean_slow"].shift(1) * self.buy_bb20_volume.value))
-                & (self.v8_buy_condition_1_enable.value == True)
+                & (self.v8_buy_condition_1_enable.value is True)
             ),
             "v8_buy_condition_1_enable",
         ] = 1
@@ -464,7 +464,7 @@ class BinClucMadDevelop(IStrategy):
                     < self.buy_dip_threshold_3.value
                 )
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - self.buy_rsi_diff.value)
-                & (self.v8_buy_condition_2_enable.value == True)
+                & (self.v8_buy_condition_2_enable.value is True)
             ),
             "v8_buy_condition_2_enable",
         ] = 1
@@ -491,7 +491,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["rsi_1h"] > self.buy_rsi_1h.value)
                 & (dataframe["rsi"] < self.buy_rsi.value)
                 & (dataframe["mfi"] < self.buy_mfi.value)
-                & (self.v8_buy_condition_3_enable.value == True)
+                & (self.v8_buy_condition_3_enable.value is True)
             ),
             "v8_buy_condition_3_enable",
         ] = 1
@@ -516,7 +516,7 @@ class BinClucMadDevelop(IStrategy):
                 & ((dataframe["ema_26"] - dataframe["ema_12"]) > (dataframe["open"] * self.buy_ema_open_mult_1.value))
                 & ((dataframe["ema_26"].shift() - dataframe["ema_12"].shift()) > (dataframe["open"] / 100))
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v8_buy_condition_4_enable.value == True)
+                & (self.v8_buy_condition_4_enable.value is True)
             ),
             "v8_buy_condition_4_enable",
         ] = 1
@@ -532,7 +532,7 @@ class BinClucMadDevelop(IStrategy):
                     dataframe["open"] - dataframe["close"]
                     < dataframe["bb_upperband"].shift(2) - dataframe["bb_lowerband"].shift(2)
                 )
-                & (self.v9_buy_condition_1_enable.value == True)
+                & (self.v9_buy_condition_1_enable.value is True)
             ),
             "v9_buy_condition_1_enable",
         ] = 1
@@ -546,7 +546,7 @@ class BinClucMadDevelop(IStrategy):
                     dataframe["open"] - dataframe["close"]
                     < dataframe["bb_upperband"].shift(2) - dataframe["bb_lowerband"].shift(2)
                 )
-                & (self.v9_buy_condition_2_enable.value == True)
+                & (self.v9_buy_condition_2_enable.value is True)
             ),
             "v9_buy_condition_2_enable",
         ] = 1
@@ -556,7 +556,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["close"] < dataframe["bb_lowerband"])
                 & (dataframe["rsi"] < self.buy_rsi_3.value)
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
-                & (self.v9_buy_condition_3_enable.value == True)
+                & (self.v9_buy_condition_3_enable.value is True)
             ),
             "v9_buy_condition_3_enable",
         ] = 1
@@ -565,7 +565,7 @@ class BinClucMadDevelop(IStrategy):
                 (dataframe["rsi_1h"] < self.buy_rsi_1h_1.value)
                 & (dataframe["close"] < dataframe["bb_lowerband"])
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
-                & (self.v9_buy_condition_4_enable.value == True)
+                & (self.v9_buy_condition_4_enable.value is True)
             ),
             "v9_buy_condition_4_enable",
         ] = 1
@@ -579,7 +579,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
                 & (dataframe["volume_mean_slow"] > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value)
-                & (self.v9_buy_condition_5_enable.value == True)
+                & (self.v9_buy_condition_5_enable.value is True)
             ),
             "v9_buy_condition_5_enable",
         ] = 1
@@ -590,7 +590,7 @@ class BinClucMadDevelop(IStrategy):
                 & ((dataframe["ema_26"].shift() - dataframe["ema_12"].shift()) > (dataframe["open"] / 100))
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
-                & (self.v9_buy_condition_6_enable.value == True)
+                & (self.v9_buy_condition_6_enable.value is True)
             ),
             "v9_buy_condition_6_enable",
         ] = 1
@@ -602,7 +602,7 @@ class BinClucMadDevelop(IStrategy):
                 & ((dataframe["ema_26"].shift() - dataframe["ema_12"].shift()) > (dataframe["open"] / 100))
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
                 & (dataframe["volume_mean_slow"] > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value)
-                & (self.v9_buy_condition_7_enable.value == True)
+                & (self.v9_buy_condition_7_enable.value is True)
             ),
             "v9_buy_condition_7_enable",
         ] = 1
@@ -612,7 +612,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["rsi"] < self.buy_rsi_1.value)
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
                 & (dataframe["volume_mean_slow"] > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value)
-                & (self.v9_buy_condition_8_enable.value == True)
+                & (self.v9_buy_condition_8_enable.value is True)
             ),
             "v9_buy_condition_8_enable",
         ] = 1
@@ -622,7 +622,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["rsi"] < self.buy_rsi_2.value)
                 & (dataframe["volume"] < (dataframe["volume"].shift() * self.buy_volume_drop_1.value))
                 & (dataframe["volume_mean_slow"] > dataframe["volume_mean_slow"].shift(30) * self.buy_volume_pump_1.value)
-                & (self.v9_buy_condition_9_enable.value == True)
+                & (self.v9_buy_condition_9_enable.value is True)
             ),
             "v9_buy_condition_9_enable",
         ] = 1
@@ -632,7 +632,7 @@ class BinClucMadDevelop(IStrategy):
                 & (dataframe["ssl_up_1h"] > dataframe["ssl_down_1h"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - 43.276)
-                & (self.v9_buy_condition_10_enable.value == True)
+                & (self.v9_buy_condition_10_enable.value is True)
             ),
             "v9_buy_condition_10_enable",
         ] = 1
@@ -646,7 +646,7 @@ class BinClucMadDevelop(IStrategy):
                     (dataframe["volume"] < (dataframe["volume_mean_slow"].shift(1) * 21))
                     | (dataframe["volume_mean_slow"] > (dataframe["volume_mean_slow"].shift(30) * 0.4))
                 )
-                & (self.v6_buy_condition_0_enable.value == True)
+                & (self.v6_buy_condition_0_enable.value is True)
             ),
             "v6_buy_condition_0_enable",
         ] = 1
@@ -660,7 +660,7 @@ class BinClucMadDevelop(IStrategy):
                 )
                 & (dataframe["rsi_1h"] < 15)  # Don't buy if someone drop the market.
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
-                & (self.v6_buy_condition_1_enable.value == True)
+                & (self.v6_buy_condition_1_enable.value is True)
             ),
             "v6_buy_condition_1_enable",
         ] = 1
@@ -676,7 +676,7 @@ class BinClucMadDevelop(IStrategy):
                     | (dataframe["volume_mean_slow"] > dataframe["volume_mean_slow"].shift(30) * 0.4)
                 )
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_2_enable.value == True)
+                & (self.v6_buy_condition_2_enable.value is True)
             ),
             "v6_buy_condition_2_enable",
         ] = 1
@@ -687,7 +687,7 @@ class BinClucMadDevelop(IStrategy):
                 & ((dataframe["ema_26"].shift() - dataframe["ema_12"].shift()) > (dataframe["open"] / 100))
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_3_enable.value == True)
+                & (self.v6_buy_condition_3_enable.value is True)
             ),
             "v6_buy_condition_3_enable",
         ] = 1
@@ -723,7 +723,7 @@ class BinClucMadDevelop(IStrategy):
             dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         # verbose logging enable only for verbose information or troubleshooting
-        if self.cust_log_verbose == True:
+        if self.cust_log_verbose is True:
             for index, row in dataframe.iterrows():
                 if row["enter_long"] == 1:
                     # buy_cond_details = f"count={int(row['conditions_count'])}/bin={int(row['buy_cond_bin'])}/cluc={int(row['buy_cond_cluc'])}/v9_={int(row['buy_cond_long'])}"

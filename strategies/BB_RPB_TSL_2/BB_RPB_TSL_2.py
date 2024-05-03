@@ -379,11 +379,11 @@ class BB_RPB_TSL_2(IStrategy):
             elif (max_profit > (current_profit + 0.01)) and (last_candle['rsi'] < 44.0) and (last_candle['cmf'] < -0.25):
                 return 'sell_profit_t_1_12'
 
-        if (last_candle['momdiv_sell_1h'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell_1h'] is True) and (current_profit > 0.02):
             return 'signal_profit_q_momdiv_1h'
-        if (last_candle['momdiv_sell'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell'] is True) and (current_profit > 0.02):
             return 'signal_profit_q_momdiv'
-        if (last_candle['momdiv_coh'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_coh'] is True) and (current_profit > 0.02):
             return 'signal_profit_q_momdiv_coh'
 
         # sell bear

@@ -207,7 +207,7 @@ class TrixV23Strategy(IStrategy):
         #-- ATR based stoploss --#
         #------------------------#
 
-        if self.sell_atr_enabled.value == False:
+        if self.sell_atr_enabled.value is False:
             return 1
 
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)

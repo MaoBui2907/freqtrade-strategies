@@ -616,11 +616,11 @@ class BB_RPB_TSL_Tranz(IStrategy):
 
         # main sell
         if current_profit > 0.02:
-            if (last_candle['momdiv_sell_1h'] == True):
+            if (last_candle['momdiv_sell_1h'] is True):
                 return f"signal_profit_q_momdiv_1h( {buy_tag})"
-            if (last_candle['momdiv_sell'] == True):
+            if (last_candle['momdiv_sell'] is True):
                 return f"signal_profit_q_momdiv( {buy_tag})"
-            if (last_candle['momdiv_coh'] == True):
+            if (last_candle['momdiv_coh'] is True):
                 return f"signal_profit_q_momdiv_coh( {buy_tag})"
 
         # sell bear
@@ -1740,7 +1740,7 @@ class BB_RPB_TSL_Tranz_TrailingBuy(BB_RPB_TSL_Tranz):
                     else:
                         logger.info(f"Wait for next buy signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_buy_info(pair, rate)
                     self.trailing_buy(pair, reinit=True)
                     logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -1763,7 +1763,7 @@ class BB_RPB_TSL_Tranz_TrailingBuy(BB_RPB_TSL_Tranz):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']

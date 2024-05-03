@@ -75,7 +75,7 @@ class Ichimoku_v32(IStrategy):
                 (qtpylib.crossed_below(dataframe['tenkan'], dataframe['kijun'])) &
                 (dataframe['ha_close'] < dataframe['senkou_a']) &
                 (dataframe['ha_close'] < dataframe['senkou_b']) &
-                (dataframe['cloud_red'] == True)
+                (dataframe['cloud_red'] is True)
             ),
             'exit_long'] = 1
 

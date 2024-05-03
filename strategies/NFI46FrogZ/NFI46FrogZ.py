@@ -1338,7 +1338,7 @@ class NFI46FrogZ(IStrategy):
                 (
                     (
                         ## potential uptick incoming so buy
-                        (dataframe['bbw_expansion'] == 1) & (dataframe['sqzmi'] == False)
+                        (dataframe['bbw_expansion'] == 1) & (dataframe['sqzmi'] is False)
                         &
                         (
                             (dataframe['mfi'] < 20)
@@ -1370,7 +1370,7 @@ class NFI46FrogZ(IStrategy):
                             ## if nothing else is making a buy signal
                             ## just throw in any old SQZMI shit based fastd
                             ## this needs work!
-                            (dataframe['sqzmi'] == True)
+                            (dataframe['sqzmi'] is True)
                             &
                             ((dataframe['fastd'] > dataframe['fastk']) & (dataframe['fastd'] < 20))
                         )

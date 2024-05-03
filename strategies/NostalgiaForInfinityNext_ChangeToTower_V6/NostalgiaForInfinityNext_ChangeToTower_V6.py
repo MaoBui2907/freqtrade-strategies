@@ -2044,7 +2044,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
         return False, None
 
     def sell_trail_main(self, current_profit: float, last_candle, max_profit: float) -> tuple:
-        if (self.sell_trail_profit_max_1.value > current_profit >= self.sell_trail_profit_min_1.value) and (self.sell_trail_rsi_min_1.value < last_candle['rsi_14'] < self.sell_trail_rsi_max_1.value) and (max_profit > (current_profit + self.sell_trail_down_1.value)) and (last_candle['moderi_96'] == False):
+        if (self.sell_trail_profit_max_1.value > current_profit >= self.sell_trail_profit_min_1.value) and (self.sell_trail_rsi_min_1.value < last_candle['rsi_14'] < self.sell_trail_rsi_max_1.value) and (max_profit > (current_profit + self.sell_trail_down_1.value)) and (last_candle['moderi_96'] is False):
             return True, 'signal_profit_t_1'
         elif (self.sell_trail_profit_max_2.value > current_profit >= self.sell_trail_profit_min_2.value) and (self.sell_trail_rsi_min_2.value < last_candle['rsi_14'] < self.sell_trail_rsi_max_2.value) and (max_profit > (current_profit + self.sell_trail_down_2.value)) and (last_candle['ema_25'] < last_candle['ema_50']):
             return True, 'signal_profit_t_2'
@@ -2066,7 +2066,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
         return False, None
 
     def sell_under_min(self, current_profit: float, last_candle) -> tuple:
-        if ((last_candle['moderi_96']) == False):
+        if ((last_candle['moderi_96']) is False):
             # Downtrend
             if (self.sell_custom_profit_under_profit_max_1.value > current_profit >= self.sell_custom_profit_under_profit_min_1.value) and (last_candle['close'] < last_candle['ema_200']) and (((last_candle['ema_200'] - last_candle['close']) / last_candle['close']) < self.sell_custom_profit_under_rel_1.value) and (last_candle['rsi_14'] > last_candle['rsi_14_1h'] + self.sell_custom_profit_under_rsi_diff_1.value):
                 return True, 'signal_profit_u_e_1'
@@ -3254,9 +3254,9 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
                     item_buy_logic.append(dataframe['close'] > dataframe['ema_100_1h'])
                     item_buy_logic.append(dataframe['rsi_14_1h'] > self.buy_rsi_1h_min_19.value)
                     item_buy_logic.append(dataframe['chop'] < self.buy_chop_max_19.value)
-                    item_buy_logic.append(dataframe['moderi_32'] == True)
-                    item_buy_logic.append(dataframe['moderi_64'] == True)
-                    item_buy_logic.append(dataframe['moderi_96'] == True)
+                    item_buy_logic.append(dataframe['moderi_32'] is True)
+                    item_buy_logic.append(dataframe['moderi_64'] is True)
+                    item_buy_logic.append(dataframe['moderi_96'] is True)
 
                 # Condition #20
                 elif index == 20:
@@ -3354,7 +3354,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
                     # Non-Standard protections
 
                     # Logic
-                    item_buy_logic.append(dataframe['moderi_64'] == True)
+                    item_buy_logic.append(dataframe['moderi_64'] is True)
                     item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * self.buy_28_ma_offset.value)
                     item_buy_logic.append(dataframe['ewo'] > self.buy_28_ewo.value)
                     item_buy_logic.append(dataframe['rsi_14'] < self.buy_28_rsi.value)
@@ -3365,7 +3365,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
                     # Non-Standard protections
 
                     # Logic
-                    item_buy_logic.append(dataframe['moderi_64'] == True)
+                    item_buy_logic.append(dataframe['moderi_64'] is True)
                     item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * self.buy_29_ma_offset.value)
                     item_buy_logic.append(dataframe['ewo'] < self.buy_29_ewo.value)
                     item_buy_logic.append(dataframe['cti'] < self.buy_29_cti.value)
@@ -3375,7 +3375,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
                     # Non-Standard protections
 
                     # Logic
-                    item_buy_logic.append(dataframe['moderi_64'] == False)
+                    item_buy_logic.append(dataframe['moderi_64'] is False)
                     item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * self.buy_30_ma_offset.value)
                     item_buy_logic.append(dataframe['ewo'] > self.buy_30_ewo.value)
                     item_buy_logic.append(dataframe['rsi_14'] < self.buy_30_rsi.value)
@@ -3386,7 +3386,7 @@ class NostalgiaForInfinityNext_ChangeToTower_V6(IStrategy):
                     # Non-Standard protections
 
                     # Logic
-                    item_buy_logic.append(dataframe['moderi_64'] == False)
+                    item_buy_logic.append(dataframe['moderi_64'] is False)
                     item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * self.buy_31_ma_offset.value )
                     item_buy_logic.append(dataframe['ewo'] < self.buy_31_ewo.value)
                     item_buy_logic.append(dataframe['r_480'] < self.buy_31_wr.value)

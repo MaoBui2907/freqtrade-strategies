@@ -597,7 +597,7 @@ class CoreStrategy(IStrategy):
                 (dataframe["close"] < dataframe["ma_buy"])
                 & (dataframe["EWO"] > self.ewo_high.value)
                 & (dataframe["rsi"] < self.rsi_buy.value)
-                & (self.smaoffset_buy_condition_0_enable.value == True)
+                & (self.smaoffset_buy_condition_0_enable.value is True)
             ),
             ['smaoffset_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_smaoffset_0')
 
@@ -606,7 +606,7 @@ class CoreStrategy(IStrategy):
             (
                 (dataframe["close"] < dataframe["ma_buy"])
                 & (dataframe["EWO"] < self.ewo_low.value)
-                & (self.smaoffset_buy_condition_1_enable.value == True)
+                & (self.smaoffset_buy_condition_1_enable.value is True)
             ),
             ['smaoffset_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_smaoffset_1')
 
@@ -642,7 +642,7 @@ class CoreStrategy(IStrategy):
                 )
                 & dataframe["close"].lt(dataframe["lower"].shift())
                 & dataframe["close"].le(dataframe["close"].shift())
-                & (self.v8_buy_condition_0_enable.value == True)
+                & (self.v8_buy_condition_0_enable.value is True)
             ),
             ['v8_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_v8_0')
 
@@ -679,7 +679,7 @@ class CoreStrategy(IStrategy):
                         * self.buy_bb20_volume.value
                     )
                 )
-                & (self.v8_buy_condition_1_enable.value == True)
+                & (self.v8_buy_condition_1_enable.value is True)
             ),
             ['v8_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v8_1')
 
@@ -711,7 +711,7 @@ class CoreStrategy(IStrategy):
                     < self.buy_dip_threshold_3.value
                 )
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - self.buy_rsi_diff.value)
-                & (self.v8_buy_condition_2_enable.value == True)
+                & (self.v8_buy_condition_2_enable.value is True)
             ),
             ['v8_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v8_2')
 
@@ -752,7 +752,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["rsi_1h"] > self.buy_rsi_1h.value)
                 & (dataframe["rsi"] < self.buy_rsi.value)
                 & (dataframe["mfi"] < self.buy_mfi.value)
-                & (self.v8_buy_condition_3_enable.value == True)
+                & (self.v8_buy_condition_3_enable.value is True)
             ),
             ['v8_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v8_3')
 
@@ -796,7 +796,7 @@ class CoreStrategy(IStrategy):
                     > (dataframe["open"] / 100)
                 )
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v8_buy_condition_4_enable.value == True)
+                & (self.v8_buy_condition_4_enable.value is True)
             ),
             ['v8_buy_condition_4_enable', 'buy_tag']] = (1, 'buy_signal_v8_4')
 
@@ -824,7 +824,7 @@ class CoreStrategy(IStrategy):
                     < dataframe["bb_upperband"].shift(2)
                     - dataframe["bb_lowerband"].shift(2)
                 )
-                & (self.v9_buy_condition_1_enable.value == True)
+                & (self.v9_buy_condition_1_enable.value is True)
             ),
             ['v9_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v9_1')
 
@@ -850,7 +850,7 @@ class CoreStrategy(IStrategy):
                     < dataframe["bb_upperband"].shift(2)
                     - dataframe["bb_lowerband"].shift(2)
                 )
-                & (self.v9_buy_condition_2_enable.value == True)
+                & (self.v9_buy_condition_2_enable.value is True)
             ),
             ['v9_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v9_2')
 
@@ -863,7 +863,7 @@ class CoreStrategy(IStrategy):
                     dataframe["volume"]
                     < (dataframe["volume"].shift() * self.buy_volume_drop_1.value)
                 )
-                & (self.v9_buy_condition_3_enable.value == True)
+                & (self.v9_buy_condition_3_enable.value is True)
             ),
             ['v9_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v9_3')
 
@@ -875,7 +875,7 @@ class CoreStrategy(IStrategy):
                     dataframe["volume"]
                     < (dataframe["volume"].shift() * self.buy_volume_drop_1.value)
                 )
-                & (self.v9_buy_condition_4_enable.value == True)
+                & (self.v9_buy_condition_4_enable.value is True)
             ),
             ['v9_buy_condition_4_enable', 'buy_tag']] = (1, 'buy_signal_v9_4')
         dataframe.loc[
@@ -901,7 +901,7 @@ class CoreStrategy(IStrategy):
                     > dataframe["volume_mean_slow"].shift(30)
                     * self.buy_volume_pump_1.value
                 )
-                & (self.v9_buy_condition_5_enable.value == True)
+                & (self.v9_buy_condition_5_enable.value is True)
             ),
             ['v9_buy_condition_5_enable', 'buy_tag']] = (1, 'buy_signal_v9_5')
         dataframe.loc[
@@ -920,7 +920,7 @@ class CoreStrategy(IStrategy):
                     dataframe["volume"]
                     < (dataframe["volume"].shift() * self.buy_volume_drop_1.value)
                 )
-                & (self.v9_buy_condition_6_enable.value == True)
+                & (self.v9_buy_condition_6_enable.value is True)
             ),
             ['v9_buy_condition_6_enable', 'buy_tag']] = (1, 'buy_signal_v9_6')
         dataframe.loc[
@@ -944,7 +944,7 @@ class CoreStrategy(IStrategy):
                     > dataframe["volume_mean_slow"].shift(30)
                     * self.buy_volume_pump_1.value
                 )
-                & (self.v9_buy_condition_7_enable.value == True)
+                & (self.v9_buy_condition_7_enable.value is True)
             ),
             ['v9_buy_condition_7_enable', 'buy_tag']] = (1, 'buy_signal_v9_7')
         dataframe.loc[
@@ -960,7 +960,7 @@ class CoreStrategy(IStrategy):
                     > dataframe["volume_mean_slow"].shift(30)
                     * self.buy_volume_pump_1.value
                 )
-                & (self.v9_buy_condition_8_enable.value == True)
+                & (self.v9_buy_condition_8_enable.value is True)
             ),
             ['v9_buy_condition_8_enable', 'buy_tag']] = (1, 'buy_signal_v9_8')
         dataframe.loc[
@@ -976,7 +976,7 @@ class CoreStrategy(IStrategy):
                     > dataframe["volume_mean_slow"].shift(30)
                     * self.buy_volume_pump_1.value
                 )
-                & (self.v9_buy_condition_9_enable.value == True)
+                & (self.v9_buy_condition_9_enable.value is True)
             ),
             ['v9_buy_condition_9_enable', 'buy_tag']] = (1, 'buy_signal_v9_9')
         dataframe.loc[
@@ -985,7 +985,7 @@ class CoreStrategy(IStrategy):
                 & (dataframe["ssl_up_1h"] > dataframe["ssl_down_1h"])
                 & (dataframe["ema_50_1h"] > dataframe["ema_200_1h"])
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - 43.276)
-                & (self.v9_buy_condition_10_enable.value == True)
+                & (self.v9_buy_condition_10_enable.value is True)
             ),
             ['v9_buy_condition_10_enable', 'buy_tag']] = (1, 'buy_signal_v9_10')
         dataframe.loc[
@@ -1004,7 +1004,7 @@ class CoreStrategy(IStrategy):
                         > (dataframe["volume_mean_slow"].shift(30) * 0.4)
                     )
                 )
-                & (self.v6_buy_condition_0_enable.value == True)
+                & (self.v6_buy_condition_0_enable.value is True)
             ),
             ['v6_buy_condition_0_enable', 'buy_tag']] = (1, 'buy_signal_v6_0')
 
@@ -1024,7 +1024,7 @@ class CoreStrategy(IStrategy):
                 )
                 & (dataframe["rsi_1h"] < 15)  # Don't buy if someone drop the market.
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
-                & (self.v6_buy_condition_1_enable.value == True)
+                & (self.v6_buy_condition_1_enable.value is True)
             ),
             ['v6_buy_condition_1_enable', 'buy_tag']] = (1, 'buy_signal_v6_1')
 
@@ -1050,7 +1050,7 @@ class CoreStrategy(IStrategy):
                     )
                 )
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_2_enable.value == True)
+                & (self.v6_buy_condition_2_enable.value is True)
             ),
             ['v6_buy_condition_2_enable', 'buy_tag']] = (1, 'buy_signal_v6_2')
 
@@ -1067,7 +1067,7 @@ class CoreStrategy(IStrategy):
                 )
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_3_enable.value == True)
+                & (self.v6_buy_condition_3_enable.value is True)
             ),
             ['v6_buy_condition_3_enable', 'buy_tag']] = (1, 'buy_signal_v6_3')
 
@@ -1107,7 +1107,7 @@ class CoreStrategy(IStrategy):
             dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         # verbose logging enable only for verbose information or troubleshooting
-        if self.cust_log_verbose == True:
+        if self.cust_log_verbose is True:
             for index, row in dataframe.iterrows():
                 if row["enter_long"] == 1:
                     buy_cond_details = f"count={int(row['conditions_count'])}/v9_1={int(row['v9_buy_condition_1_enable'])}/v9_2={int(row['v9_buy_condition_2_enable'])}/v9_3={int(row['v9_buy_condition_3_enable'])}/v9_4={int(row['v9_buy_condition_4_enable'])}/v9_5={int(row['v9_buy_condition_5_enable'])}/v9_6={int(row['v9_buy_condition_6_enable'])}/v9_7={int(row['v9_buy_condition_7_enable'])}/v9_8={int(row['v9_buy_condition_8_enable'])}/v9_9={int(row['v9_buy_condition_9_enable'])}/v9_10={int(row['v9_buy_condition_10_enable'])}/v6_0={int(row['v6_buy_condition_0_enable'])}/v6_1={int(row['v6_buy_condition_1_enable'])}/v6_2={int(row['v6_buy_condition_2_enable'])}/v6_3={int(row['v6_buy_condition_3_enable'])}/v8_0={int(row['v8_buy_condition_0_enable'])}/v8_1={int(row['v8_buy_condition_1_enable'])}/v8_2={int(row['v8_buy_condition_2_enable'])}/v8_3={int(row['v8_buy_condition_3_enable'])}/v8_4={int(row['v8_buy_condition_4_enable'])}/sma_0={int(row['smaoffset_buy_condition_0_enable'])}/sma_1={int(row['smaoffset_buy_condition_1_enable'])}"

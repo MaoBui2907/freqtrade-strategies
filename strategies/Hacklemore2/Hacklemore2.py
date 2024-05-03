@@ -71,7 +71,7 @@ class Hacklemore2(IStrategy):
 
         if not active_trade:
             conditions.append(
-            (   (dataframe['up_trend'] == True) &
+            (   (dataframe['up_trend'] is True) &
                 (dataframe['RMI'] > 55) &
                 (dataframe['RMI'] >= dataframe['RMI'].rolling(3).mean()) &
                 (dataframe['close'] > dataframe['close'].shift()) &
@@ -110,7 +110,7 @@ class Hacklemore2(IStrategy):
 
             conditions.append(
                 (dataframe['entry'] == 0) &
-                (dataframe['dn_trend'] == True) &
+                (dataframe['dn_trend'] is True) &
                 (dataframe['RMI'] < 30) &
                 (current_profit > -0.03) &
                 (dataframe['volume'].gt(0))

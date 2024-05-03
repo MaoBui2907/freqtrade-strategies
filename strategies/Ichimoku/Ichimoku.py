@@ -67,7 +67,7 @@ class Ichimoku(IStrategy):
             (
                 (dataframe['tenkan'].shift(1)<dataframe['kijun'].shift(1)) &
                 (dataframe['tenkan']>dataframe['kijun']) &
-                (dataframe['cloud_red']==True)
+                (dataframe['cloud_red'] is True)
             ),
             'enter_long'] = 1
 

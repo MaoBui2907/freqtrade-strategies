@@ -163,7 +163,7 @@ class ichiV1_Marius(IStrategy):
     def custom_stake_amount(self, pair: str, current_time: datetime, current_rate: float,
                             proposed_stake: float, min_stake: float, max_stake: float,
                             **kwargs) -> float:
-        if (self.config['position_adjustment_enable'] == True) and (self.config['stake_amount'] == 'unlimited'):
+        if (self.config['position_adjustment_enable'] is True) and (self.config['stake_amount'] == 'unlimited'):
             return self.wallets.get_total_stake_amount() / self.config['max_open_trades'] / self.max_dca_multiplier
         else:
             return proposed_stake

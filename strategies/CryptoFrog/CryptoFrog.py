@@ -306,7 +306,7 @@ class CryptoFrog(IStrategy):
                 (
                     (
                         ## potential uptick incoming so buy
-                        (dataframe['bbw_expansion'] == 1) & (dataframe['sqzmi'] == False)
+                        (dataframe['bbw_expansion'] == 1) & (dataframe['sqzmi'] is False)
                         &
                         (
                             (dataframe['mfi'] < 20)
@@ -338,7 +338,7 @@ class CryptoFrog(IStrategy):
                             ## if nothing else is making a buy signal
                             ## just throw in any old SQZMI shit based fastd
                             ## this needs work!
-                            (dataframe['sqzmi'] == True)
+                            (dataframe['sqzmi'] is True)
                             &
                             ((dataframe['fastd'] > dataframe['fastk']) & (dataframe['fastd'] < 20))
                         )
@@ -451,11 +451,11 @@ class CryptoFrog(IStrategy):
                     in_trend = True
 
             # Force the ROI value high if in trend
-            if (in_trend == True):
+            if (in_trend is True):
                 min_roi = 100
                 # If pullback is enabled, allow to sell if a pullback from peak has happened regardless of trend
-                if self.droi_pullback.value == True and (current_profit < pullback_value):
-                    if self.droi_pullback_respect_table.value == True:
+                if self.droi_pullback.value is True and (current_profit < pullback_value):
+                    if self.droi_pullback_respect_table.value is True:
                         min_roi = table_roi
                     else:
                         min_roi = current_profit / 2

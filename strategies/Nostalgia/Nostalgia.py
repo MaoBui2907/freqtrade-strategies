@@ -3294,7 +3294,7 @@ class Nostalgia(IStrategy):
             # Logic
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[27]))
-            item_buy_logic.append(dataframe['moderi_64'] == True)
+            item_buy_logic.append(dataframe['moderi_64'] is True)
             item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * 0.92)
             item_buy_logic.append(dataframe['ewo'] > 12.4)
             item_buy_logic.append(dataframe['rsi'] < 38.0)
@@ -3308,7 +3308,7 @@ class Nostalgia(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[28]))
-            item_buy_logic.append(dataframe['moderi_64'] == True)
+            item_buy_logic.append(dataframe['moderi_64'] is True)
             item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * 0.9)
             item_buy_logic.append(dataframe['ewo'] < -4.0)
             item_buy_logic.append(dataframe['volume'] > 0)
@@ -3321,7 +3321,7 @@ class Nostalgia(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[29]))
-            item_buy_logic.append(dataframe['moderi_64'] == False)
+            item_buy_logic.append(dataframe['moderi_64'] is False)
             item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * 0.97)
             item_buy_logic.append(dataframe['ewo'] > 9.0)
             item_buy_logic.append(dataframe['rsi'] < 42.0)
@@ -3335,7 +3335,7 @@ class Nostalgia(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[30]))
-            item_buy_logic.append(dataframe['moderi_64'] == False)
+            item_buy_logic.append(dataframe['moderi_64'] is False)
             item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * 0.94)
             item_buy_logic.append(dataframe['ewo'] < -19.0)
             item_buy_logic.append(dataframe['r_480'] < -99.0)

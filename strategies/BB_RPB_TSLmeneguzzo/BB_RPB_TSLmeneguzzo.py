@@ -478,11 +478,11 @@ class BB_RPB_TSLmeneguzzo(IStrategy):
 
         # main sell
         if current_profit > 0.02:
-            if (last_candle['momdiv_sell_1h'] == True):
+            if (last_candle['momdiv_sell_1h'] is True):
                 return f"signal_profit_q_momdiv_1h( {buy_tag})"
-            if (last_candle['momdiv_sell'] == True):
+            if (last_candle['momdiv_sell'] is True):
                 return f"signal_profit_q_momdiv( {buy_tag})"
-            if (last_candle['momdiv_coh'] == True):
+            if (last_candle['momdiv_coh'] is True):
                 return f"signal_profit_q_momdiv_coh( {buy_tag})"
 
         # sell bear

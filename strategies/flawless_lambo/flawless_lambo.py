@@ -1241,7 +1241,7 @@ class flawless_lambo(IStrategy):
                     else:
                         self.logger.info(f"Wait for next sell signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_sell_info(pair, rate)
                     self.trailing_sell(pair, reinit=True)
                     self.logger.info(f'STOP trailing sell for {pair} because I SOLD it')
@@ -1288,7 +1288,7 @@ class flawless_lambo(IStrategy):
                         initial_sell_tag = last_candle['sell_tag'] if 'sell_tag' in last_candle else 'sell signal'
                         dataframe.loc[:, 'sell_tag'] = f"{initial_sell_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_sell['trailing_sell_order_started'] == True):
+                if (trailing_sell['trailing_sell_order_started'] is True):
                     self.logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger sell signal!")
                     dataframe.loc[:,'exit_long'] = 1
                     dataframe.loc[:, 'sell_tag'] = trailing_sell['sell_tag']

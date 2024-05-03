@@ -48,7 +48,7 @@ class Ichimoku_SenkouSpanCross(IStrategy):
                 (qtpylib.crossed_above(dataframe['senkou_a'], dataframe['senkou_b'])) &
                 (dataframe['close'] > dataframe['senkou_a']) &
                 (dataframe['close'] > dataframe['senkou_b']) &
-                (dataframe['cloud_green'] == True)
+                (dataframe['cloud_green'] is True)
             ),
             'enter_long'] = 1
         return dataframe
@@ -58,7 +58,7 @@ class Ichimoku_SenkouSpanCross(IStrategy):
                 (qtpylib.crossed_above(dataframe['senkou_b'], dataframe['senkou_a'])) &
                 (dataframe['close'] < dataframe['senkou_a']) &
                 (dataframe['close'] < dataframe['senkou_b']) &
-                (dataframe['cloud_red'] == True)
+                (dataframe['cloud_red'] is True)
             ),
             'exit_long'] = 1
         return dataframe

@@ -112,7 +112,7 @@ class StrategyScalpingFast2(IStrategy):
             conditions.append(dataframe['fastk'] < self.buy_params['fastk-value'])
         if self.buy_params['fastd-enabled']:
             conditions.append(dataframe['fastd'] < self.buy_params['fastd-value'])
-        if self.buy_params['fastk-enabled'] == True & self.buy_params['fastd-enabled'] == True:
+        if self.buy_params['fastk-enabled'] == True & self.buy_params['fastd-enabled'] is True:
             conditions.append(qtpylib.crossed_above(dataframe['fastk'], dataframe['fastd']))
         
         # |
@@ -128,14 +128,14 @@ class StrategyScalpingFast2(IStrategy):
         conditions = []
         conditions.append(dataframe['open'] >= dataframe['ema_high'])
 
-        if self.sell_params['sell-fastd-enabled'] == True | self.sell_params['sell-fastk-enabled'] == True:
+        if self.sell_params['sell-fastd-enabled'] == True | self.sell_params['sell-fastk-enabled'] is True:
             conditions.append((qtpylib.crossed_above(dataframe['fastk'], self.sell_params['sell-fastk-value'])) |
                               (qtpylib.crossed_above(dataframe['fastd'], self.sell_params['sell-fastd-value'])))
-        if self.sell_params['sell-cci-enabled'] == True:
+        if self.sell_params['sell-cci-enabled'] is True:
             conditions.append(dataframe['cci'] > 100)
-        if self.sell_params['sell-mfi-enabled'] == True:
+        if self.sell_params['sell-mfi-enabled'] is True:
             conditions.append(dataframe['mfi'] > self.sell_params['sell-mfi-value'])
-        if self.sell_params['sell-adx-enabled'] == True:
+        if self.sell_params['sell-adx-enabled'] is True:
             conditions.append(dataframe["adx"] < self.sell_params['sell-adx-value'])            
 
         if conditions:

@@ -646,7 +646,7 @@ class BcmbigzDevelop(IStrategy):
                 )
                 & dataframe["close"].lt(dataframe["lower"].shift())
                 & dataframe["close"].le(dataframe["close"].shift())
-                & (self.v8_buy_condition_0_enable.value == True)
+                & (self.v8_buy_condition_0_enable.value is True)
             ),
             "v8_buy_condition_0_enable",
         ] = 1
@@ -683,7 +683,7 @@ class BcmbigzDevelop(IStrategy):
                         * self.buy_bb20_volume.value
                     )
                 )
-                & (self.v8_buy_condition_1_enable.value == True)
+                & (self.v8_buy_condition_1_enable.value is True)
             ),
             "v8_buy_condition_1_enable",
         ] = 1
@@ -715,7 +715,7 @@ class BcmbigzDevelop(IStrategy):
                     < self.buy_dip_threshold_3.value
                 )
                 & (dataframe["rsi"] < dataframe["rsi_1h"] - self.buy_rsi_diff.value)
-                & (self.v8_buy_condition_2_enable.value == True)
+                & (self.v8_buy_condition_2_enable.value is True)
             ),
             "v8_buy_condition_2_enable",
         ] = 1
@@ -754,7 +754,7 @@ class BcmbigzDevelop(IStrategy):
                 & (dataframe["rsi_1h"] > self.buy_rsi_1h.value)
                 & (dataframe["rsi"] < self.buy_rsi.value)
                 & (dataframe["mfi"] < self.buy_mfi.value)
-                & (self.v8_buy_condition_3_enable.value == True)
+                & (self.v8_buy_condition_3_enable.value is True)
             ),
             "v8_buy_condition_3_enable",
         ] = 1
@@ -797,7 +797,7 @@ class BcmbigzDevelop(IStrategy):
                     > (dataframe["open"] / 100)
                 )
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v8_buy_condition_4_enable.value == True)
+                & (self.v8_buy_condition_4_enable.value is True)
             ),
             "v8_buy_condition_4_enable",
         ] = 1
@@ -819,7 +819,7 @@ class BcmbigzDevelop(IStrategy):
                         > (dataframe["volume_mean_slow"].shift(30) * 0.4)
                     )
                 )
-                & (self.v6_buy_condition_0_enable.value == True)
+                & (self.v6_buy_condition_0_enable.value is True)
             ),
             "v6_buy_condition_0_enable",
         ] = 1
@@ -839,7 +839,7 @@ class BcmbigzDevelop(IStrategy):
                 )
                 & (dataframe["rsi_1h"] < 15)  # Don't buy if someone drop the market.
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
-                & (self.v6_buy_condition_1_enable.value == True)
+                & (self.v6_buy_condition_1_enable.value is True)
             ),
             "v6_buy_condition_1_enable",
         ] = 1
@@ -864,7 +864,7 @@ class BcmbigzDevelop(IStrategy):
                     )
                 )
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_2_enable.value == True)
+                & (self.v6_buy_condition_2_enable.value is True)
             ),
             "v6_buy_condition_2_enable",
         ] = 1
@@ -881,7 +881,7 @@ class BcmbigzDevelop(IStrategy):
                 )
                 & (dataframe["volume"] < (dataframe["volume"].shift() * 4))
                 & (dataframe["close"] < (dataframe["bb_lowerband"]))
-                & (self.v6_buy_condition_3_enable.value == True)
+                & (self.v6_buy_condition_3_enable.value is True)
             ),
             "v6_buy_condition_3_enable",
         ] = 1
@@ -1180,7 +1180,7 @@ class BcmbigzDevelop(IStrategy):
             dataframe.loc[reduce(lambda x, y: x & y, conditions), "enter_long"] = 1
 
         # verbose logging enable only for verbose information or troubleshooting
-        if self.cust_log_verbose == True:
+        if self.cust_log_verbose is True:
             for index, row in dataframe.iterrows():
                 if row["enter_long"] == 1:
                     buy_cond_details = f"count={int(row['conditions_count'])}/bzv7_1={int(row['bzv7_buy_condition_1_enable'])}/bzv7_2={int(row['bzv7_buy_condition_2_enable'])}/bzv7_3={int(row['bzv7_buy_condition_3_enable'])}/bzv7_4={int(row['bzv7_buy_condition_4_enable'])}/bzv7_5={int(row['bzv7_buy_condition_5_enable'])}/bzv7_6={int(row['bzv7_buy_condition_6_enable'])}/bzv7_7={int(row['bzv7_buy_condition_7_enable'])}/bzv7_8={int(row['bzv7_buy_condition_8_enable'])}/bzv7_9={int(row['bzv7_buy_condition_9_enable'])}/bzv7_10={int(row['bzv7_buy_condition_10_enable'])}/bzv7_11={int(row['bzv7_buy_condition_11_enable'])}/bzv7_12={int(row['bzv7_buy_condition_12_enable'])}/bzv7_13={int(row['bzv7_buy_condition_13_enable'])}/bzv7_0={int(row['bzv7_buy_condition_0_enable'])}/v6_0={int(row['v6_buy_condition_0_enable'])}/v6_1={int(row['v6_buy_condition_1_enable'])}/v6_2={int(row['v6_buy_condition_2_enable'])}/v6_3={int(row['v6_buy_condition_3_enable'])}/v8_0={int(row['v8_buy_condition_0_enable'])}/v8_1={int(row['v8_buy_condition_1_enable'])}/v8_2={int(row['v8_buy_condition_2_enable'])}/v8_3={int(row['v8_buy_condition_3_enable'])}/v8_4={int(row['v8_buy_condition_4_enable'])}"

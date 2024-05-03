@@ -259,7 +259,7 @@ class Schism2(IStrategy):
                     conditions.append(trade_data['avg_other_profit'] >= hold_pct)
                 else:
                     # if were out of slots, allow the biggest losing trade to sell regardless of avg profit
-                    conditions.append(trade_data['biggest_loser'] == True)
+                    conditions.append(trade_data['biggest_loser'] is True)
 
         # Impossible condition to satisfy the bot when it looks here and theres no active trade
         else:

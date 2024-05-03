@@ -103,12 +103,12 @@ class Ichimoku_v37(IStrategy):
         (
           (dataframe['ha_4h_close'].crossed_above(dataframe['senkou_a_1d'])) &
           (dataframe['ha_4h_close'].shift() < (dataframe['senkou_a_1d'])) &
-          (dataframe['cloud_green_1d'] == True)
+          (dataframe['cloud_green_1d'] is True)
         ) |
         (
           (dataframe['ha_4h_close'].crossed_above(dataframe['senkou_b_1d'])) &
           (dataframe['ha_4h_close'].shift() < (dataframe['senkou_b_1d'])) &
-          (dataframe['cloud_red_1d'] == True)
+          (dataframe['cloud_red_1d'] is True)
         )
       ),
       'enter_long'] = 1

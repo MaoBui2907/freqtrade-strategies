@@ -268,7 +268,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
         
         dataframe['avg_volume'] = ta.SMA(dataframe['volume'], timeperiod=200)
         dataframe['vroc_bool'] = (dataframe['avg_volume'] > dataframe['avg_volume'].shift(1)) & (dataframe['close'] > dataframe['close'].shift(1))
-        dataframe['vroc'] = np.where(dataframe['vroc_bool'] == True, ((dataframe['avg_volume'] - dataframe['avg_volume'].shift(1)) * (100 / dataframe['avg_volume'].shift(1))), 0)
+        dataframe['vroc'] = np.where(dataframe['vroc_bool'] is True, ((dataframe['avg_volume'] - dataframe['avg_volume'].shift(1)) * (100 / dataframe['avg_volume'].shift(1))), 0)
         #dataframe['vroc'] = (dataframe['avg_volume'] - dataframe['avg_volume'].shift(1)) * (100 / dataframe['avg_volume'].shift(1))
         #if (dataframe['vroc'] > dataframe['historicMax'].rolling(200).max()):
         #    dataframe['historicMax'] = dataframe['vroc']
@@ -278,7 +278,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
         dataframe['historicMax'] = np.where(dataframe['vroc_max'] > 10, dataframe['vroc_max'], 10)
         dataframe['historicMax'] = dataframe['historicMax'].rolling(200).max()
         dataframe['vroc_normalized'] = 100 * dataframe['vroc'] / dataframe['historicMax']
-        dataframe['recent_pump'] = ((dataframe['vroc_normalized'].rolling(96).max() > 90) | (dataframe['vroc_normalized'].rolling(48).max() > 10) | (dataframe['vroc_normalized'].rolling(24).max() > 5)) & (dataframe['vroc_bool'] == True)
+        dataframe['recent_pump'] = ((dataframe['vroc_normalized'].rolling(96).max() > 90) | (dataframe['vroc_normalized'].rolling(48).max() > 10) | (dataframe['vroc_normalized'].rolling(24).max() > 5)) & (dataframe['vroc_bool'] is True)
 
         # Cofi
         stoch_fast = ta.STOCHF(dataframe, 5, 3, 0, 3, 0)
@@ -369,7 +369,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['rsi_4'] < int(self.lambo1_rsi_4_limit.value)) &
             (dataframe['rsi_14'] < int(self.lambo1_rsi_14_limit.value)) &
             (dataframe['cti'] < -0.5) &
-            (dataframe['recent_pump'] == False) 
+            (dataframe['recent_pump'] is False) 
         )
         dataframe.loc[lambo1, 'buy_tag'] += 'lambo1_'
         conditions.append(lambo1)
@@ -380,7 +380,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['rsi_4'] < int(self.lambo2_rsi_4_limit.value)) &
             (dataframe['rsi_14'] < int(self.lambo2_rsi_14_limit.value)) &
             (dataframe['cti'] < -0.5) &
-            (dataframe['recent_pump'] == False) 
+            (dataframe['recent_pump'] is False) 
         )
         dataframe.loc[lambo2, 'buy_tag'] += 'lambo2_'
         conditions.append(lambo2)
@@ -392,7 +392,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['ema_26'].shift() - dataframe['ema_14'].shift() > dataframe['open'] / 100) &
             (dataframe['close'] < dataframe['bb_lowerband2'] * self.local_trend_bb_factor.value) &
             (dataframe['closedelta'] > dataframe['close'] * self.local_trend_closedelta.value / 1000 ) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
             
         )
         dataframe.loc[local_uptrend, 'buy_tag'] += 'local_uptrend_'
@@ -405,7 +405,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['rsi_14'] > self.nfi32_rsi_14.value) &
             (dataframe['close'] < dataframe['sma_15'] * self.nfi32_sma_factor.value) &
             (dataframe['cti'] < self.nfi32_cti_limit.value) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
         )
         dataframe.loc[nfi_32, 'buy_tag'] += 'nfi_32_'
         conditions.append(nfi_32)
@@ -417,7 +417,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['EWO'] > self.ewo_high.value) &
             (dataframe['rsi_14'] < self.ewo_1_rsi_14.value) &
             (dataframe['close'] < (dataframe[f'ma_sell_{self.ewo_candles_sell.value}'] * self.ewo_high_offset.value)) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
         )
         dataframe.loc[ewo_1, 'buy_tag'] += 'ewo1_'
         conditions.append(ewo_1)
@@ -428,7 +428,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['close'] < (dataframe[f'ma_buy_{self.ewo_candles_buy.value}'] * self.ewo_low_offset.value)) &
             (dataframe['EWO'] < self.ewo_low.value) &
             (dataframe['close'] < (dataframe[f'ma_sell_{self.ewo_candles_sell.value}'] * self.ewo_high_offset.value)) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
         )
         dataframe.loc[ewo_low, 'buy_tag'] += 'ewo_low_'
         conditions.append(ewo_low)
@@ -441,7 +441,7 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
             (dataframe['fastd'] < self.cofi_fastd.value) &
             (dataframe['adx'] > self.cofi_adx.value) &
             (dataframe['EWO'] > self.cofi_ewo_high.value) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
         )
         dataframe.loc[cofi, 'buy_tag'] += 'cofi_'
         conditions.append(cofi)
@@ -456,12 +456,12 @@ class ClucHAnix_BB_RPB_MOD_CTT(IStrategy):
                 (dataframe['tail'].lt(dataframe['bbdelta'] * self.clucha_bbdelta_tail.value)) &
                 (dataframe['ha_close'].lt(dataframe['lower'].shift())) &
                 (dataframe['ha_close'].le(dataframe['ha_close'].shift())) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
             ) |
             (
                 (dataframe['ha_close'] < dataframe['ema_slow']) &
                 (dataframe['ha_close'] < self.clucha_close_bblower.value * dataframe['bb_lowerband']) &
-            (dataframe['recent_pump'] == False)
+            (dataframe['recent_pump'] is False)
             ))
         )
         dataframe.loc[clucHA, 'buy_tag'] += 'clucHA_'
@@ -711,7 +711,7 @@ class ClucHAnix_BB_RPB_MOD_CTT_STB(ClucHAnix_BB_RPB_MOD_CTT):
                     else:
                         logger.info(f"Wait for next buy signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_buy_info(pair, rate)
                     self.trailing_buy(pair, reinit=True)
                     logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -734,7 +734,7 @@ class ClucHAnix_BB_RPB_MOD_CTT_STB(ClucHAnix_BB_RPB_MOD_CTT):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']
@@ -930,7 +930,7 @@ class ClucHAnix_BB_RPB_MOD_CTT_DTB(ClucHAnix_BB_RPB_MOD_CTT):
                     else:
                         logger.info(f"Wait for next buy signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_buy_info(pair, rate)
                     self.trailing_buy(pair, reinit=True)
                     logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -953,7 +953,7 @@ class ClucHAnix_BB_RPB_MOD_CTT_DTB(ClucHAnix_BB_RPB_MOD_CTT):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']

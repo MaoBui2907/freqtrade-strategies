@@ -168,7 +168,7 @@ class TrixV21Strategy(IStrategy):
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
 
-        if self.sell_atr_enabled.value == False:
+        if self.sell_atr_enabled.value is False:
             return 1
 
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)

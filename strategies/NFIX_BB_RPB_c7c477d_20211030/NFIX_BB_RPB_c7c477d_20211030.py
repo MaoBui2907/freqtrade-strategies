@@ -2028,7 +2028,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_1_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 77.0) and (last_candle['cci'] > 360.0) and (last_candle['r_480_1h'] > -2.0):
                 return True, 'sell_profit_w_1_6'
-            elif (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_1_7'
             elif (last_candle['r_14'] >= -2.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 80.0) and (last_candle['cti'] > 0.9):
                 return True, 'sell_profit_w_1_8'
@@ -2063,7 +2063,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_2_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 76.0) and (last_candle['cci'] > 350.0) and (last_candle['r_480_1h'] > -4.0):
                 return True, 'sell_profit_w_2_6'
-            elif (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_2_7'
             elif (last_candle['r_14'] >= -3.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.9):
                 return True, 'sell_profit_w_2_8'
@@ -2098,7 +2098,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_3_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 75.0) and (last_candle['cci'] > 340.0) and (last_candle['r_480_1h'] > -4.0):
                 return True, 'sell_profit_w_3_6'
-            elif (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_3_7'
             elif (last_candle['r_14'] >= -4.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_3_8'
@@ -2133,7 +2133,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_4_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 74.0) and (last_candle['cci'] > 330.0) and (last_candle['r_480_1h'] > -6.0):
                 return True, 'sell_profit_w_4_6'
-            elif (last_candle['rsi_14'] < 47.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 47.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_4_7'
             elif (last_candle['r_14'] >= -5.0) and (last_candle['r_96'] >= -3.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_4_8'
@@ -2168,7 +2168,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_5_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 73.0) and (last_candle['cci'] > 320.0) and (last_candle['r_480_1h'] > -8.0):
                 return True, 'sell_profit_w_5_6'
-            elif (last_candle['rsi_14'] < 48.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 48.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_5_7'
             elif (last_candle['r_14'] >= -5.0) and (last_candle['r_96'] >= -3.0) and (last_candle['rsi_14'] > 78.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_5_8'
@@ -2203,7 +2203,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_6_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 72.0) and (last_candle['cci'] > 310.0) and (last_candle['r_480_1h'] > -10.0):
                 return True, 'sell_profit_w_6_6'
-            elif (last_candle['rsi_14'] < 47.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 47.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_6_7'
             elif (last_candle['r_14'] >= -5.0) and (last_candle['r_96'] >= -3.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_6_8'
@@ -2238,7 +2238,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_7_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 71.0) and (last_candle['cci'] > 300.0) and (last_candle['r_480_1h'] > -12.0):
                 return True, 'sell_profit_w_7_6'
-            elif (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_7_7'
             elif (last_candle['r_14'] >= -4.0) and (last_candle['r_96'] >= -3.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_7_8'
@@ -2273,7 +2273,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_8_5'
             elif (last_candle['r_14'] > -3.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 72.0) and (last_candle['cci'] > 310.0) and (last_candle['r_480_1h'] > -10.0):
                 return True, 'sell_profit_w_8_6'
-            elif (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_8_7'
             elif (last_candle['r_14'] >= -3.0) and (last_candle['r_96'] >= -3.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_8_8'
@@ -2308,7 +2308,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_9_5'
             elif (last_candle['r_14'] > -2.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 73.0) and (last_candle['cci'] > 320.0) and (last_candle['r_480_1h'] > -8.0):
                 return True, 'sell_profit_w_9_6'
-            elif (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_9_7'
             elif (last_candle['r_14'] >= -3.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.85):
                 return True, 'sell_profit_w_9_8'
@@ -2343,7 +2343,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_10_5'
             elif (last_candle['r_14'] > -2.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 74.0) and (last_candle['cci'] > 330.0) and (last_candle['r_480_1h'] > -6.0):
                 return True, 'sell_profit_w_10_6'
-            elif (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_10_7'
             elif (last_candle['r_14'] >= -2.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.9):
                 return True, 'sell_profit_w_10_8'
@@ -2378,7 +2378,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_11_5'
             elif (last_candle['r_14'] > -2.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 75.0) and (last_candle['cci'] > 340.0) and (last_candle['r_480_1h'] > -4.0):
                 return True, 'sell_profit_w_11_6'
-            elif (last_candle['rsi_14'] < 40.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 40.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_11_7'
             elif (last_candle['r_14'] >= -1.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 79.0) and (last_candle['cti'] > 0.9):
                 return True, 'sell_profit_w_11_8'
@@ -2413,7 +2413,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_w_12_5'
             elif (last_candle['r_14'] > -2.0) and (last_candle['r_32'] > -2.0) and (last_candle['r_96'] > -2.0) and (last_candle['rsi_14'] > 76.0) and (last_candle['cci'] > 360.0) and (last_candle['r_480_1h'] > -2.0):
                 return True, 'sell_profit_w_12_6'
-            elif (last_candle['rsi_14'] < 38.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
+            elif (last_candle['rsi_14'] < 38.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf_1h'] < -0.1) and (last_candle['r_480_1h'] > -25.0):
                 return True, 'sell_profit_w_12_7'
             elif (last_candle['r_14'] >= -1.0) and (last_candle['r_96'] >= -2.0) and (last_candle['rsi_14'] > 80.0) and (last_candle['cti'] > 0.9):
                 return True, 'sell_profit_w_12_8'
@@ -2457,7 +2457,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_1_4'
             elif (max_profit > (current_profit + 0.04)) and (last_candle['rsi_14'] < 49.0) and (last_candle['cmf_1h'] < -0.0):
                 return True, 'sell_profit_t_1_5'
-            elif (max_profit > (current_profit + 0.015)) and (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.015)) and (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_1_6'
             elif (max_profit > (current_profit + 0.06)) and (last_candle['rsi_14'] < 43.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_1_7'
@@ -2478,7 +2478,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_2_3'
             elif (max_profit > (current_profit + 0.02)) and (last_candle['rsi_14'] < 47.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_2_4'
-            elif (max_profit > (current_profit + 0.02)) and (last_candle['rsi_14'] < 43.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.02)) and (last_candle['rsi_14'] < 43.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_2_6'
             elif (max_profit > (current_profit + 0.065)) and (last_candle['rsi_14'] < 44.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_2_7'
@@ -2499,7 +2499,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_3_3'
             elif (max_profit > (current_profit + 0.025)) and (last_candle['rsi_14'] < 47.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_3_4'
-            elif (max_profit > (current_profit + 0.025)) and (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.025)) and (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_3_6'
             elif (max_profit > (current_profit + 0.07)) and (last_candle['rsi_14'] < 45.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_3_7'
@@ -2520,7 +2520,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_4_3'
             elif (max_profit > (current_profit + 0.03)) and (last_candle['rsi_14'] < 47.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_4_4'
-            elif (max_profit > (current_profit + 0.03)) and (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.03)) and (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_4_6'
             elif (max_profit > (current_profit + 0.075)) and (last_candle['rsi_14'] < 46.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_4_7'
@@ -2541,7 +2541,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_5_3'
             elif (max_profit > (current_profit + 0.035)) and (last_candle['rsi_14'] < 46.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_5_4'
-            elif (max_profit > (current_profit + 0.035)) and (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.035)) and (last_candle['rsi_14'] < 46.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_5_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 47.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_5_7'
@@ -2562,7 +2562,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_6_3'
             elif (max_profit > (current_profit + 0.04)) and (last_candle['rsi_14'] < 46.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_6_4'
-            elif (max_profit > (current_profit + 0.04)) and (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.04)) and (last_candle['rsi_14'] < 45.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_6_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 46.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_6_7'
@@ -2583,7 +2583,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_7_3'
             elif (max_profit > (current_profit + 0.045)) and (last_candle['rsi_14'] < 45.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_7_4'
-            elif (max_profit > (current_profit + 0.045)) and (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.045)) and (last_candle['rsi_14'] < 44.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_7_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 45.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_7_7'
@@ -2604,7 +2604,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_8_3'
             elif (max_profit > (current_profit + 0.05)) and (last_candle['rsi_14'] < 44.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_8_4'
-            elif (max_profit > (current_profit + 0.05)) and (last_candle['rsi_14'] < 43.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.05)) and (last_candle['rsi_14'] < 43.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_8_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 44.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_8_7'
@@ -2625,7 +2625,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_9_3'
             elif (max_profit > (current_profit + 0.055)) and (last_candle['rsi_14'] < 43.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_9_4'
-            elif (max_profit > (current_profit + 0.055)) and (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.055)) and (last_candle['rsi_14'] < 42.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_9_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 43.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_9_7'
@@ -2646,7 +2646,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_10_3'
             elif (max_profit > (current_profit + 0.06)) and (last_candle['rsi_14'] < 42.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_10_4'
-            elif (max_profit > (current_profit + 0.06)) and (last_candle['rsi_14'] < 41.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.06)) and (last_candle['rsi_14'] < 41.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_10_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 40.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_10_7'
@@ -2667,7 +2667,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_11_3'
             elif (max_profit > (current_profit + 0.065)) and (last_candle['rsi_14'] < 40.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_11_4'
-            elif (max_profit > (current_profit + 0.065)) and (last_candle['rsi_14'] < 40.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.065)) and (last_candle['rsi_14'] < 40.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_11_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 38.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_11_7'
@@ -2688,7 +2688,7 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
                 return True, 'sell_profit_t_12_3'
             elif (max_profit > (current_profit + 0.07)) and (last_candle['rsi_14'] < 38.0) and (last_candle['cmf'] < -0.0) and (last_candle['cti_1h'] > 0.8):
                 return True, 'sell_profit_t_12_4'
-            elif (max_profit > (current_profit + 0.07)) and (last_candle['rsi_14'] < 38.0) and (last_candle['btc_not_downtrend_1h'] == False) and (last_candle['cmf'] < -0.0):
+            elif (max_profit > (current_profit + 0.07)) and (last_candle['rsi_14'] < 38.0) and (last_candle['btc_not_downtrend_1h'] is False) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_12_6'
             elif (max_profit > (current_profit + 0.08)) and (last_candle['rsi_14'] < 36.0) and (last_candle['cmf'] < -0.0):
                 return True, 'sell_profit_t_12_7'
@@ -3486,11 +3486,11 @@ class NFIX_BB_RPB_c7c477d_20211030(IStrategy):
         if (0.045 > current_profit > 0.005) and (last_candle['pm'] > last_candle['pmax_thresh']) and (last_candle['close'] > last_candle['sma_21'] * 1.016):
             return True, 'signal_profit_q_pmax_bear'
 
-        if (last_candle['momdiv_sell_1h'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell_1h'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv_1h'
-        if (last_candle['momdiv_sell'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv'
-        if (last_candle['momdiv_coh'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_coh'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv_coh'
 
         return False, None

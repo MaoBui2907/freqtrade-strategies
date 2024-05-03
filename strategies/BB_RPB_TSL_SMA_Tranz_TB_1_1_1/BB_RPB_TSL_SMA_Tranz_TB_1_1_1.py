@@ -2918,7 +2918,7 @@ class BB_RPB_TSL_Tranz_TrailingBuy(BB_RPB_TSL_SMA_Tranz_TB_1_1_1):
                     else:
                         log.info(f"Wait for next buy signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_buy_info(pair, rate)
                     self.trailing_buy(pair, reinit=True)
                     log.info(f'STOP trailing buy for {pair} because I buy it')
@@ -2941,7 +2941,7 @@ class BB_RPB_TSL_Tranz_TrailingBuy(BB_RPB_TSL_SMA_Tranz_TB_1_1_1):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     log.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']

@@ -2667,7 +2667,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
         return False, None
 
     def sell_trail_main(self, current_profit: float, last_candle, max_profit: float) -> tuple:
-        if (self.sell_trail_profit_max_1.value > current_profit > self.sell_trail_profit_min_1.value) & (self.sell_trail_rsi_min_1.value < last_candle['rsi'] < self.sell_trail_rsi_max_1.value) & (max_profit > (current_profit + self.sell_trail_down_1.value)) & (last_candle['moderi_96'] == False):
+        if (self.sell_trail_profit_max_1.value > current_profit > self.sell_trail_profit_min_1.value) & (self.sell_trail_rsi_min_1.value < last_candle['rsi'] < self.sell_trail_rsi_max_1.value) & (max_profit > (current_profit + self.sell_trail_down_1.value)) & (last_candle['moderi_96'] is False):
             return True, 'signal_profit_t_1'
         elif (self.sell_trail_profit_max_2.value > current_profit > self.sell_trail_profit_min_2.value) & (self.sell_trail_rsi_min_2.value < last_candle['rsi'] < self.sell_trail_rsi_max_2.value) & (max_profit > (current_profit + self.sell_trail_down_2.value)) & (last_candle['ema_25'] < last_candle['ema_50']):
             return True, 'signal_profit_t_2'
@@ -2689,7 +2689,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
         return False, None
 
     def sell_under_min(self, current_profit: float, last_candle) -> tuple:
-        if ((last_candle['moderi_96']) == False):
+        if ((last_candle['moderi_96']) is False):
             # Downtrend
             if (current_profit > self.sell_custom_profit_under_profit_1.value) & (last_candle['close'] < last_candle['ema_200']) & (((last_candle['ema_200'] - last_candle['close']) / last_candle['close']) < self.sell_custom_profit_under_rel_1.value) & (last_candle['rsi'] > last_candle['rsi_1h'] + self.sell_custom_profit_under_rsi_diff_1.value):
                 return True, 'signal_profit_u_e_1'
@@ -2705,11 +2705,11 @@ class NFINextMultiOffsetAndHO(IStrategy):
             return True, 'signal_stoploss_u_1'
 
         # Under EMA200, pair & BTC negative, low max rate
-        elif (-0.1 > current_profit > -0.14) & (last_candle['btc_not_downtrend_1h'] == False) & (last_candle['moderi_32'] == False) & (last_candle['moderi_64'] == False) & (max_profit < 0.005) & (max_loss < 0.14) & (last_candle['sma_200_dec_24']) & (last_candle['cmf'] < -0.0) & (last_candle['close'] < last_candle['ema_200']) & (last_candle['ema_25'] < last_candle['ema_50']) & (last_candle['cti'] < -0.8) & (last_candle['r_480'] < -50.0):
+        elif (-0.1 > current_profit > -0.14) & (last_candle['btc_not_downtrend_1h'] is False) & (last_candle['moderi_32'] is False) & (last_candle['moderi_64'] is False) & (max_profit < 0.005) & (max_loss < 0.14) & (last_candle['sma_200_dec_24']) & (last_candle['cmf'] < -0.0) & (last_candle['close'] < last_candle['ema_200']) & (last_candle['ema_25'] < last_candle['ema_50']) & (last_candle['cti'] < -0.8) & (last_candle['r_480'] < -50.0):
             return True, 'signal_stoploss_u_b_1'
 
         # Under EMA200, pair & BTC negative, CTI, Elder Ray Index negative, normal max rate
-        elif (-0.1 > current_profit > -0.2) & (last_candle['btc_not_downtrend_1h'] == False) & (last_candle['moderi_32'] == False) & (last_candle['moderi_64'] == False) & (last_candle['moderi_96'] == False) & (max_profit < 0.05) & (max_loss < 0.2) & (last_candle['sma_200_dec_24']) & (last_candle['sma_200_dec_20_1h']) & (last_candle['cmf'] < -0.45) & (last_candle['close'] < last_candle['ema_200']) & (last_candle['ema_25'] < last_candle['ema_50']) & (last_candle['cti'] < -0.8) & (last_candle['r_480'] < -97.0):
+        elif (-0.1 > current_profit > -0.2) & (last_candle['btc_not_downtrend_1h'] is False) & (last_candle['moderi_32'] is False) & (last_candle['moderi_64'] is False) & (last_candle['moderi_96'] is False) & (max_profit < 0.05) & (max_loss < 0.2) & (last_candle['sma_200_dec_24']) & (last_candle['sma_200_dec_20_1h']) & (last_candle['cmf'] < -0.45) & (last_candle['close'] < last_candle['ema_200']) & (last_candle['ema_25'] < last_candle['ema_50']) & (last_candle['cti'] < -0.8) & (last_candle['r_480'] < -97.0):
             return True, 'signal_stoploss_u_b_2'
 
         elif (self.sell_custom_stoploss_long_profit_min_1.value < current_profit < self.sell_custom_stoploss_long_profit_max_1.value) & (current_profit > (-max_loss + self.sell_custom_stoploss_long_recover_1.value)) & (last_candle['cmf'] < 0.0) & (last_candle['close'] < last_candle['ema_200']) & (last_candle['rsi'] > last_candle['rsi_1h'] + self.sell_custom_stoploss_long_rsi_diff_1.value) & (last_candle['sma_200_dec_24']) & (current_time - timedelta(minutes=1200) > trade.open_date_utc):
@@ -3880,7 +3880,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
             item_buy_logic.append(dataframe['close'] > dataframe['ema_100_1h'])
             item_buy_logic.append(dataframe['rsi_1h'] > self.buy_rsi_1h_min_19.value)
             item_buy_logic.append(dataframe['chop'] < self.buy_chop_min_19.value)
-            item_buy_logic.append(dataframe['moderi_64'] == True)
+            item_buy_logic.append(dataframe['moderi_64'] is True)
             item_buy_logic.append(dataframe['volume'] > 0)
             conditions.append(reduce(lambda x, y: x & y, item_buy_logic))
 
@@ -4030,7 +4030,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
             # Logic
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[27]))
-            item_buy_logic.append(dataframe['moderi_64'] == True)
+            item_buy_logic.append(dataframe['moderi_64'] is True)
             item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * 0.92)
             item_buy_logic.append(dataframe['ewo'] > 12.4)
             item_buy_logic.append(dataframe['rsi'] < 38.0)
@@ -4045,7 +4045,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[28]))
-            item_buy_logic.append(dataframe['moderi_64'] == True)
+            item_buy_logic.append(dataframe['moderi_64'] is True)
             item_buy_logic.append(dataframe['close'] < dataframe['hull_75'] * 0.9)
             item_buy_logic.append(dataframe['ewo'] < -4.0)
             item_buy_logic.append(dataframe['volume'] > 0)
@@ -4058,7 +4058,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[29]))
-            item_buy_logic.append(dataframe['moderi_64'] == False)
+            item_buy_logic.append(dataframe['moderi_64'] is False)
             item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * 0.97)
             item_buy_logic.append(dataframe['ewo'] > 9.0)
             item_buy_logic.append(dataframe['rsi'] < 42.0)
@@ -4072,7 +4072,7 @@ class NFINextMultiOffsetAndHO(IStrategy):
 
             item_buy_logic = []
             item_buy_logic.append(reduce(lambda x, y: x & y, buy_protection_list[30]))
-            item_buy_logic.append(dataframe['moderi_64'] == False)
+            item_buy_logic.append(dataframe['moderi_64'] is False)
             item_buy_logic.append(dataframe['close'] < dataframe['zlema_68'] * 0.94)
             item_buy_logic.append(dataframe['ewo'] < -19.0)
             item_buy_logic.append(dataframe['r_480'] < -99.0)

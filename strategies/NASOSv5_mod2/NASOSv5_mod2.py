@@ -463,7 +463,7 @@ class NASOSv5PD(NASOSv5_mod2):
         )
 
         dont_buy_conditions.append(
-            (dataframe['recentispumping'] == True)
+            (dataframe['recentispumping'] is True)
         )
 
         dataframe.loc[
@@ -666,7 +666,7 @@ class TrailingBuyStrat(NASOSv5_mod2):
             dataframe["close_5m_last_buy"] = dataframe.loc[shifted_loc_index, "close_5m"].values
 
             dataframe.loc[:, 'close_lower'] = dataframe.loc[:, 'close'].expanding().apply(get_local_min)
-            dataframe['close_lower'] = np.where(dataframe['close_lower'].isna() == True, dataframe['close'], dataframe['close_lower'])
+            dataframe['close_lower'] = np.where(dataframe['close_lower'].isna() is True, dataframe['close'], dataframe['close_lower'])
             dataframe['close_lower_offset'] = dataframe['close_lower'] * (1 + self.trailing_buy_offset)
             dataframe['trailing_buy_order_uplimit'] = np.where(dataframe['barssince_last_buy'] < 20, pd.DataFrame([dataframe['close_5m_last_buy'], dataframe['close_lower_offset']]).min(), np.nan)
 

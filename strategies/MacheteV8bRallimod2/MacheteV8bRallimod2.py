@@ -268,9 +268,9 @@ class MacheteV8bRallimod2(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (self.get_buy_signal_offset_strategy(dataframe) == True)
+                (self.get_buy_signal_offset_strategy(dataframe) is True)
                 |
-                (self.get_buy_signal_bbrsi_strategy(dataframe) == True)
+                (self.get_buy_signal_bbrsi_strategy(dataframe) is True)
             )
             #(dataframe['sslUp_inf'] > dataframe['sslDown_inf'])
         ,'enter_long'] = 1
@@ -281,7 +281,7 @@ class MacheteV8bRallimod2(IStrategy):
         signal = (
             
             
-            (self.buy_should_use_get_buy_signal_offset_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_offset_strategy.value is True) &
             (dataframe['sma_9'] < dataframe[f'ma_buy_{self.base_nb_candles_buy.value}'])&
             (dataframe['rsi_fast']< dataframe['rsi_slow'])&
             (dataframe['rsi_fast'] <35)&
@@ -298,7 +298,7 @@ class MacheteV8bRallimod2(IStrategy):
         signal = (
             
             
-            (self.buy_should_use_get_buy_signal_bbrsi_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_bbrsi_strategy.value is True) &
             (dataframe['sslUp_inf'] > dataframe['sslDown_inf'])&
             (dataframe['uptrend_5m'] == 0)&
             (dataframe['rsi'] < 40) &
@@ -415,11 +415,11 @@ class MacheteV8bRallimod2(IStrategy):
                     in_trend = True
 
             # Force the ROI value high if in trend
-            if (in_trend == True):
+            if (in_trend is True):
                 min_roi = 100
                 # If pullback is enabled, allow to sell if a pullback from peak has happened regardless of trend
-                if self.droi_pullback.value == True and (current_profit < pullback_value):
-                    if self.droi_pullback_respect_table.value == True:
+                if self.droi_pullback.value is True and (current_profit < pullback_value):
+                    if self.droi_pullback_respect_table.value is True:
                         min_roi = table_roi
                     else:
                         min_roi = current_profit / 1.5

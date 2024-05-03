@@ -82,7 +82,7 @@ class DIV_v1(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (dataframe["bullish_divergence"] == True) &
+                (dataframe["bullish_divergence"] is True) &
                 (dataframe['rsi'] < 30) &
                 (dataframe["volume"] > 0)
             ), 'entry'

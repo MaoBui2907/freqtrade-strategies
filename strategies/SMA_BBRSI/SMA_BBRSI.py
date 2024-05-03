@@ -411,7 +411,7 @@ class SMA_BBRSI(IStrategy):
 #                (qtpylib.crossed_above(dataframe['hlc3OTF'], dataframe['zlema_4']))
                 # &
                 # (dataframe["roc_bbwidth_max"] < 70)
-            ) & (dataframe['moderi_96'] == True)
+            ) & (dataframe['moderi_96'] is True)
         )
 
         if conditions:
@@ -445,7 +445,7 @@ class SMA_BBRSI(IStrategy):
                     # disp_down = basis - ((upper - lower) * for_sigma) // Минимально-допустимый порог в области мувинга, который должен преодолеть RSI (снизу)
                     # disp_down = basis - ((2* dev * for_sigma) // Минимально-допустимый порог в области мувинга, который должен преодолеть RSI (снизу)
                     (dataframe['rsi'] > dataframe[f'basis_{self.for_ma_length_sell.value}'] + ((dataframe[f'dev_{self.for_ma_length_sell.value}'] * self.for_sigma_sell.value)))
-                ) & (dataframe['moderi_96'] == True)) |
+                ) & (dataframe['moderi_96'] is True)) |
                 (
                     (qtpylib.crossed_below(dataframe['close'], dataframe['atr_high']))
                 ))&

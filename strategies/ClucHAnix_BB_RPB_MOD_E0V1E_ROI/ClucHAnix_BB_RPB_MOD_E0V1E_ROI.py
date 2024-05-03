@@ -719,7 +719,7 @@ class ClucHAnix_BB_RPB_MOD_E0V1E_ROI_DYNAMIC_TB(ClucHAnix_BB_RPB_MOD_E0V1E_ROI):
                     else:
                         logger.info(f"Wait for next buy signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_buy_info(pair, rate)
                     self.trailing_buy(pair, reinit=True)
                     logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -742,7 +742,7 @@ class ClucHAnix_BB_RPB_MOD_E0V1E_ROI_DYNAMIC_TB(ClucHAnix_BB_RPB_MOD_E0V1E_ROI):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']

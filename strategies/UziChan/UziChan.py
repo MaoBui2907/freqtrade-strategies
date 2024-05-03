@@ -364,7 +364,7 @@ class UziChanTB(UziChan):
                         else:
                             logger.info(f"Wait for next buy signal for {pair}")
 
-                    if (val == True):
+                    if (val is True):
                         self.trailing_buy_info(pair, rate)
                         self.trailing_buy(pair, reinit=True)
                         logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -439,7 +439,7 @@ class UziChanTB(UziChan):
                     else:
                         logger.info(f"Wait for next sell signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_sell_info(pair, rate)
                     self.trailing_sell(pair, reinit=True)
                     logger.info(f'STOP trailing sell for {pair} because I SOLD it')
@@ -466,7 +466,7 @@ class UziChanTB(UziChan):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"                        
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']
@@ -499,7 +499,7 @@ class UziChanTB(UziChan):
                         initial_sell_tag = last_candle['sell_tag'] if 'sell_tag' in last_candle else 'sell signal'
                         dataframe.loc[:, 'sell_tag'] = f"{initial_sell_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_sell['trailing_sell_order_started'] == True):
+                if (trailing_sell['trailing_sell_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger sell signal!")
                     dataframe.loc[:,'exit_long'] = 1
                     dataframe.loc[:, 'sell_tag'] = trailing_sell['sell_tag']

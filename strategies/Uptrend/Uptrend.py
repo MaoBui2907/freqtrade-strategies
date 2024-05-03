@@ -422,7 +422,7 @@ class SuperBuy(Uptrend):
         elif self.config['runmode'].value in ('hyperopt'):  # hyperopt, we want to test new buy signals
             is_additional_check = (
                     (  # main buy signals found
-                        (dataframe['not_res1_1h'] == True)
+                        (dataframe['not_res1_1h'] is True)
                     )
                     & (  # protections
                             (dataframe['rsi_fast_lower_20'] == 0) &

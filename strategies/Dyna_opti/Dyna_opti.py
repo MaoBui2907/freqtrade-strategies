@@ -527,11 +527,11 @@ class Dyna_opti(IStrategy):
                     in_trend = True
 
             # Force the ROI value high if in trend
-            if (in_trend == True):
+            if (in_trend is True):
                 min_roi = 100
                 # If pullback is enabled, allow to sell if a pullback from peak has happened regardless of trend
-                if self.droi_pullback.value == True and (current_profit < pullback_value):
-                    if self.droi_pullback_respect_table.value == True:
+                if self.droi_pullback.value is True and (current_profit < pullback_value):
+                    if self.droi_pullback_respect_table.value is True:
                         min_roi = table_roi
                     else:
                         min_roi = current_profit / 2

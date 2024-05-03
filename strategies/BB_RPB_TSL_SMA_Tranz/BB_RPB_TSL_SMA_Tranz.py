@@ -2378,7 +2378,7 @@ class BB_RPB_TSL_SMA_Tranz(IStrategy):
 
         check_pump_01 = (dataframe['pump'].rolling(20).max() < 1)
 
-        check_pump_02 = (dataframe['recentispumping'] == False)
+        check_pump_02 = (dataframe['recentispumping'] is False)
 
         is_btc_safe = (
                 #(dataframe['btc_diff'] > self.buy_btc_safe.value) &
@@ -2409,7 +2409,7 @@ class BB_RPB_TSL_SMA_Tranz(IStrategy):
                 (dataframe['bb_width_1h'] < self.buy_bb_width_1h.value) &
                 (dataframe['close_1h'].rolling(288).max() >= (dataframe['close'] * 1.03 )) &
                 (dataframe['close'] < (dataframe['ema_sell'] * self.high_offset_sell_ema.value)) &
-                (dataframe['sqzmi'] == False) &
+                (dataframe['sqzmi'] is False) &
                 (dataframe['volume'] > 0) &
                 (dataframe['volume'] < (dataframe['volume'].shift() * 4))
             )
@@ -2444,7 +2444,7 @@ class BB_RPB_TSL_SMA_Tranz(IStrategy):
                 (dataframe['bb_width_1h'] < self.buy_bb_width_1h.value) &
                 (dataframe['close_1h'].rolling(288).max() >= (dataframe['close'] * 1.03 )) &
                 (dataframe['close'] < (dataframe['ema_sell'] * self.high_offset_sell_ema.value)) &
-                (dataframe['sqzmi'] == False) &
+                (dataframe['sqzmi'] is False) &
                 (dataframe['volume'] > 0) &
                 (dataframe['volume'] < (dataframe['volume'].shift() * 4)) &
                 check_pump_01 &
@@ -3746,7 +3746,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                         else:
                             logger.info(f"Wait for next buy signal for {pair}")
 
-                    if (val == True):
+                    if (val is True):
                         self.trailing_buy_info(pair, rate)
                         self.trailing_buy(pair, reinit=True)
                         logger.info(f'STOP trailing buy for {pair} because I buy it')
@@ -3821,7 +3821,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                     else:
                         logger.info(f"Wait for next sell signal for {pair}")
 
-                if (val == True):
+                if (val is True):
                     self.trailing_sell_info(pair, rate)
                     self.trailing_sell(pair, reinit=True)
                     logger.info(f'STOP trailing sell for {pair} because I SOLD it')
@@ -3849,7 +3849,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                         initial_buy_tag = last_candle['buy_tag'] if 'buy_tag' in last_candle else 'buy signal'
                         dataframe.loc[:, 'buy_tag'] = f"{initial_buy_tag} (start trail price {last_candle['close']})"                        
             else:
-                if (trailing_buy['trailing_buy_order_started'] == True):
+                if (trailing_buy['trailing_buy_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
                     dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']
@@ -3882,7 +3882,7 @@ class UziChanTB2(BB_RPB_TSL_SMA_Tranz):
                         initial_sell_tag = last_candle['sell_tag'] if 'sell_tag' in last_candle else 'sell signal'
                         dataframe.loc[:, 'sell_tag'] = f"{initial_sell_tag} (start trail price {last_candle['close']})"
             else:
-                if (trailing_sell['trailing_sell_order_started'] == True):
+                if (trailing_sell['trailing_sell_order_started'] is True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger sell signal!")
                     dataframe.loc[:,'exit_long'] = 1
                     dataframe.loc[:, 'sell_tag'] = trailing_sell['sell_tag']

@@ -419,23 +419,23 @@ class MacheteV8b(IStrategy):
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                (self.get_buy_signal_awesome_macd(dataframe) == True)
-                | (self.get_buy_signal_adx_momentum(dataframe) == True)
-                | (self.get_buy_signal_adx_smas(dataframe) == True)
-                | (self.get_buy_signal_asdts_rockwelltrading(dataframe) == True)
-                | (self.get_buy_signal_averages_strategy(dataframe) == True)
-                | (self.get_buy_signal_fisher_hull(dataframe) == True)
-                | (self.get_buy_signal_gettin_moist(dataframe) == True)
-                | (self.get_buy_signal_hlhb(dataframe) == True)
-                | (self.get_buy_signal_macd_strategy_crossed(dataframe) == True)
-                | (self.get_buy_signal_macd_strategy(dataframe) == True)
-                | (self.get_buy_signal_pmax(dataframe) == True)
-                | (self.get_buy_signal_quickie(dataframe) == True)
-                | (self.get_buy_signal_scalp(dataframe) == True)
-                | (self.get_buy_signal_simple(dataframe) == True)
-                | (self.get_buy_signal_strategy001(dataframe) == True)
-                | (self.get_buy_signal_technical_example_strategy(dataframe) == True)
-                | (self.get_buy_signal_tema_rsi_strategy(dataframe) == True)
+                (self.get_buy_signal_awesome_macd(dataframe) is True)
+                | (self.get_buy_signal_adx_momentum(dataframe) is True)
+                | (self.get_buy_signal_adx_smas(dataframe) is True)
+                | (self.get_buy_signal_asdts_rockwelltrading(dataframe) is True)
+                | (self.get_buy_signal_averages_strategy(dataframe) is True)
+                | (self.get_buy_signal_fisher_hull(dataframe) is True)
+                | (self.get_buy_signal_gettin_moist(dataframe) is True)
+                | (self.get_buy_signal_hlhb(dataframe) is True)
+                | (self.get_buy_signal_macd_strategy_crossed(dataframe) is True)
+                | (self.get_buy_signal_macd_strategy(dataframe) is True)
+                | (self.get_buy_signal_pmax(dataframe) is True)
+                | (self.get_buy_signal_quickie(dataframe) is True)
+                | (self.get_buy_signal_scalp(dataframe) is True)
+                | (self.get_buy_signal_simple(dataframe) is True)
+                | (self.get_buy_signal_strategy001(dataframe) is True)
+                | (self.get_buy_signal_technical_example_strategy(dataframe) is True)
+                | (self.get_buy_signal_tema_rsi_strategy(dataframe) is True)
             ) &
             (dataframe['sslUp_inf'] > dataframe['sslDown_inf']) &
             (dataframe['up_trend_inf'] > 0) &
@@ -449,7 +449,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_awesome_macd(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_awesome_macd.value == True) &
+            (self.buy_should_use_get_buy_signal_awesome_macd.value is True) &
             (dataframe['macd'] > 0) &
             (dataframe['ao'] > 0) &
             (dataframe['ao'].shift() < 0)
@@ -458,7 +458,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_adx_momentum(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_adx_momentum.value == True) &
+            (self.buy_should_use_get_buy_signal_adx_momentum.value is True) &
             (dataframe['adx'] > 25) &
             (dataframe['mom'] > 0) &
             (dataframe['plus_di'] > 25) &
@@ -468,7 +468,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_adx_smas(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_adx_smas.value == True) &
+            (self.buy_should_use_get_buy_signal_adx_smas.value is True) &
             (dataframe['adx'] > 25) &
             (qtpylib.crossed_above(dataframe['short'], dataframe['long']))
         )
@@ -476,7 +476,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_asdts_rockwelltrading(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_asdts_rockwelltrading.value == True) &
+            (self.buy_should_use_get_buy_signal_asdts_rockwelltrading.value is True) &
             (dataframe['macd'] > 0) &
             (dataframe['macdhist'].shift(1) < dataframe['macdhist']) &
             (dataframe['macd'] > dataframe['macdsignal'])
@@ -485,14 +485,14 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_averages_strategy(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_averages_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_averages_strategy.value is True) &
             qtpylib.crossed_above(dataframe['maShort'], dataframe['maMedium'])
         )
         return signal
 
     def get_buy_signal_fisher_hull(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_fisher_hull.value == True) &
+            (self.buy_should_use_get_buy_signal_fisher_hull.value is True) &
             (dataframe['hma'] < dataframe['hma'].shift()) &
             (dataframe['cci'] <= -50.0) &
             (dataframe['fisher_rsi'] < -0.5)
@@ -501,7 +501,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_gettin_moist(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_gettin_moist.value == True) &
+            (self.buy_should_use_get_buy_signal_gettin_moist.value is True) &
             (dataframe['primed']) &
             (dataframe['moist']) &
             (dataframe['throbbing']) &
@@ -511,7 +511,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_hlhb(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_hlhb.value == True) &
+            (self.buy_should_use_get_buy_signal_hlhb.value is True) &
             (qtpylib.crossed_above(dataframe['rsi_10'], 50)) &
             (qtpylib.crossed_above(dataframe['ema5'], dataframe['ema10'])) &
             (dataframe['adx'] > 25)
@@ -520,7 +520,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_macd_strategy_crossed(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_macd_strategy_crossed.value == True) &
+            (self.buy_should_use_get_buy_signal_macd_strategy_crossed.value is True) &
             qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal']) &
             (dataframe['cci'] <= -50.0)
         )
@@ -528,7 +528,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_macd_strategy(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_macd_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_macd_strategy.value is True) &
             (dataframe['macd'] > dataframe['macdsignal']) &
             (dataframe['cci'] <= -50.0)
         )
@@ -536,14 +536,14 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_pmax(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_pmax.value == True) &
+            (self.buy_should_use_get_buy_signal_pmax.value is True) &
             (qtpylib.crossed_above(dataframe['ZLEMA'], dataframe['pm_10_3_10_9']))
         )
         return signal
 
     def get_buy_signal_quickie(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_quickie.value == True) &
+            (self.buy_should_use_get_buy_signal_quickie.value is True) &
             (dataframe['adx'] > 30) &
             (dataframe['tema'] < dataframe['bb_middleband']) &
             (dataframe['tema'] > dataframe['tema'].shift(1)) &
@@ -553,7 +553,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_scalp(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_scalp.value == True) &
+            (self.buy_should_use_get_buy_signal_scalp.value is True) &
             (dataframe['open'] < dataframe['ema_low']) &
             (dataframe['adx'] > 30) &
             (
@@ -566,7 +566,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_simple(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_simple.value == True) &
+            (self.buy_should_use_get_buy_signal_simple.value is True) &
             (dataframe['macd'] > 0)  # over 0
             & (dataframe['macd'] > dataframe['macdsignal'])  # over signal
             & (dataframe['bb_upperband'] > dataframe['bb_upperband'].shift(1))  # pointed up
@@ -577,7 +577,7 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_strategy001(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_strategy001.value == True) &
+            (self.buy_should_use_get_buy_signal_strategy001.value is True) &
             qtpylib.crossed_above(dataframe['ema50'], dataframe['ema100']) &
             (dataframe['ha_close'] < dataframe['ema20']) &
             (dataframe['ha_open'] > dataframe['ha_close'])  # red bar
@@ -586,14 +586,14 @@ class MacheteV8b(IStrategy):
 
     def get_buy_signal_technical_example_strategy(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_technical_example_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_technical_example_strategy.value is True) &
             (dataframe['cmf'] < 0)
         )
         return signal
 
     def get_buy_signal_tema_rsi_strategy(self, dataframe: DataFrame):
         signal = (
-            (self.buy_should_use_get_buy_signal_tema_rsi_strategy.value == True) &
+            (self.buy_should_use_get_buy_signal_tema_rsi_strategy.value is True) &
             (qtpylib.crossed_above(dataframe['rsi'], 30)) &  # Signal: RSI crosses above 30
             (dataframe['tema'] <= dataframe['bb_middleband']) &  # Guard: tema below BB middle
             (dataframe['tema'] > dataframe['tema'].shift(1))
@@ -696,11 +696,11 @@ class MacheteV8b(IStrategy):
                     in_trend = True
 
             # Force the ROI value high if in trend
-            if (in_trend == True):
+            if (in_trend is True):
                 min_roi = 100
                 # If pullback is enabled, allow to sell if a pullback from peak has happened regardless of trend
-                if self.droi_pullback.value == True and (current_profit < pullback_value):
-                    if self.droi_pullback_respect_table.value == True:
+                if self.droi_pullback.value is True and (current_profit < pullback_value):
+                    if self.droi_pullback_respect_table.value is True:
                         min_roi = table_roi
                     else:
                         min_roi = current_profit / 2

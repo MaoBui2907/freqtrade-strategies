@@ -286,9 +286,9 @@ class CombinedBinHAndClucV6H(IStrategy):
                         (dataframe['close'] > dataframe['ema_200_1h']) &
                         (dataframe['ema_50'] > dataframe['ema_200']) &
                         (dataframe['ema_50_1h'] > dataframe['ema_200_1h']) &
-                        (self.buy_bin_guard.value == True)
+                        (self.buy_bin_guard.value is True)
                     ) |
-                    (self.buy_bin_guard.value == False)
+                    (self.buy_bin_guard.value is False)
                 ) &
 
                 # strategy BinHV45
@@ -300,7 +300,7 @@ class CombinedBinHAndClucV6H(IStrategy):
 
                 dataframe['close'].lt(dataframe['lower'].shift()) &
                 dataframe['close'].le(dataframe['close'].shift()) &
-                (self.buy_bin_enable.value == True)
+                (self.buy_bin_enable.value is True)
             ),
             'buy_cond_bin'
         ] = 1
@@ -313,16 +313,16 @@ class CombinedBinHAndClucV6H(IStrategy):
                     (
                         (dataframe['close'] > dataframe['ema_200']) &
                         (dataframe['close'] > dataframe['ema_200_1h']) &
-                        (self.buy_cluc_guard.value == True)
+                        (self.buy_cluc_guard.value is True)
                     ) |
-                    (self.buy_cluc_guard.value == False)
+                    (self.buy_cluc_guard.value is False)
                 ) &
 
                 # strategy ClucMay72018
                 (dataframe['close'] < dataframe['ema_50']) &
                 (dataframe['close'] < self.buy_cluc_close_bblowerband.value * dataframe['bb_lowerband']) &
                 (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * self.buy_cluc_volume.value)) &
-                (self.buy_cluc_enable.value == True)
+                (self.buy_cluc_enable.value is True)
             ),
             'buy_cond_cluc'
         ] = 1
@@ -335,7 +335,7 @@ class CombinedBinHAndClucV6H(IStrategy):
                 (dataframe['ema_50'] > dataframe['ema_200']) &
                 (dataframe['ema_50_1h'] > dataframe['ema_200_1h']) &
                 (dataframe['rsi'] < dataframe['rsi_1h'] - self.buy_long_rsi_diff.value) &
-                (self.buy_long_enable.value == True)
+                (self.buy_long_enable.value is True)
             ),
             'buy_cond_long'
         ] = 1
@@ -354,7 +354,7 @@ class CombinedBinHAndClucV6H(IStrategy):
             ] = 1
 
         # verbose logging enable only for verbose information or troubleshooting
-        if self.cust_log_verbose == True:
+        if self.cust_log_verbose is True:
             for index, row in dataframe.iterrows():
                 if row['entry'] == 1:               
                     buy_cond_details = f"count={int(row['conditions_count'])}/bin={int(row['buy_cond_bin'])}/cluc={int(row['buy_cond_cluc'])}/long={int(row['buy_cond_long'])}"
@@ -403,7 +403,7 @@ class CombinedBinHAndClucV6H(IStrategy):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
 
-        if self.cust_log_verbose == True:
+        if self.cust_log_verbose is True:
             logger.info(f"{pair} - candle: {last_candle['date']} - exit trade {sell_reason} with profit {trade.calc_profit_ratio(rate)}")
 
         # failsafe for user triggered forced sells > always have highest prio!
@@ -417,7 +417,7 @@ class CombinedBinHAndClucV6H(IStrategy):
                 rsi = last_candle['rsi']
            
             if ( (rsi >= self.sell_roi_override_rsi_threshold.value) ):
-                if self.cust_log_verbose == True:
+                if self.cust_log_verbose is True:
                     logger.info(f"{pair} - candle: {last_candle['date']} - not exiting trade with current profit {trade.calc_profit_ratio(rate)}, rsi = {rsi} which is > than {self.sell_roi_override_rsi_threshold.value}")
                 return False
             else:

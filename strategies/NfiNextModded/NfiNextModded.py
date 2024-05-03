@@ -3387,7 +3387,7 @@ class NfiNextModded(IStrategy):
     def sell_trail_main(self, current_profit: float, last_candle, max_profit: float) -> tuple:
         if (self.sell_trail_profit_max_1 > current_profit >= self.sell_trail_profit_min_1) and (
                 self.sell_trail_rsi_min_1 < last_candle['rsi_14'] < self.sell_trail_rsi_max_1) and (
-                max_profit > (current_profit + self.sell_trail_down_1)) and (last_candle['moderi_96'] == False):
+                max_profit > (current_profit + self.sell_trail_down_1)) and (last_candle['moderi_96'] is False):
             return True, 'signal_profit_t_1'
         elif (self.sell_trail_profit_max_2 > current_profit >= self.sell_trail_profit_min_2) and (
                 self.sell_trail_rsi_min_2 < last_candle['rsi_14'] < self.sell_trail_rsi_max_2) and (
@@ -3417,7 +3417,7 @@ class NfiNextModded(IStrategy):
         return False, None
 
     def sell_under_min(self, current_profit: float, last_candle) -> tuple:
-        if ((last_candle['moderi_96']) == False):
+        if ((last_candle['moderi_96']) is False):
             # Downtrend
             if (
                     self.sell_custom_profit_under_profit_max_1 > current_profit >= self.sell_custom_profit_under_profit_min_1) and (
@@ -3477,7 +3477,7 @@ class NfiNextModded(IStrategy):
                 and (last_candle['ema_vwma_osc_96'] < 0.0)
                 and (last_candle['cmf'] < -0.0)
                 and (last_candle['cmf_1h'] < -0.0)
-                and (last_candle['btc_not_downtrend_1h'] == False)
+                and (last_candle['btc_not_downtrend_1h'] is False)
                 and (current_time - timedelta(minutes=1440) > trade.open_date_utc)
         ):
             return True, 'signal_stoploss_u_e_doom'
@@ -3485,7 +3485,7 @@ class NfiNextModded(IStrategy):
         # Under EMA200, pair and BTC negative, low max rate
         if (
                 (-0.05 > current_profit > -0.09)
-                and (last_candle['btc_not_downtrend_1h'] == False)
+                and (last_candle['btc_not_downtrend_1h'] is False)
                 and (last_candle['ema_vwma_osc_32'] < 0.0)
                 and (last_candle['ema_vwma_osc_64'] < 0.0)
                 and (max_profit < 0.005)
@@ -3502,7 +3502,7 @@ class NfiNextModded(IStrategy):
         # Under EMA200, pair and BTC negative, CTI, Elder Ray Index negative, normal max rate
         elif (
                 (-0.1 > current_profit > -0.2)
-                and (last_candle['btc_not_downtrend_1h'] == False)
+                and (last_candle['btc_not_downtrend_1h'] is False)
                 and (last_candle['ema_vwma_osc_32'] < 0.0)
                 and (last_candle['ema_vwma_osc_64'] < 0.0)
                 and (last_candle['ema_vwma_osc_96'] < 0.0)
@@ -3837,11 +3837,11 @@ class NfiNextModded(IStrategy):
                 last_candle['close'] > last_candle['sma_21'] * 1.016):
             return True, 'signal_profit_q_pmax_bear'
 
-        if (last_candle['momdiv_sell_1h'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell_1h'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv_1h'
-        if (last_candle['momdiv_sell'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_sell'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv'
-        if (last_candle['momdiv_coh'] == True) and (current_profit > 0.02):
+        if (last_candle['momdiv_coh'] is True) and (current_profit > 0.02):
             return True, 'signal_profit_q_momdiv_coh'
 
         return False, None
