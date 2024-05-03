@@ -115,24 +115,24 @@ class EI3v2_tag_cofi_green(IStrategy):
     stoploss = -0.99
 
     # SMAOffset
-    base_nb_candles_buy = IntParameter(8, 20, default=buy_params['base_nb_candles_buy'], space='buy', optimize=False)
-    base_nb_candles_sell = IntParameter(8, 20, default=sell_params['base_nb_candles_sell'], space='sell', optimize=False)
-    low_offset = DecimalParameter(0.985, 0.995, default=buy_params['low_offset'], space='buy', optimize=True)
-    high_offset = DecimalParameter(1.005, 1.015, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2 = DecimalParameter(1.010, 1.020, default=sell_params['high_offset_2'], space='sell', optimize=True)
+    base_nb_candles_buy = IntParameter(8, 20, default=buy_params['base_nb_candles_buy'], space='entry', optimize=False)
+    base_nb_candles_sell = IntParameter(8, 20, default=sell_params['base_nb_candles_sell'], space='exit', optimize=False)
+    low_offset = DecimalParameter(0.985, 0.995, default=buy_params['low_offset'], space='entry', optimize=True)
+    high_offset = DecimalParameter(1.005, 1.015, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2 = DecimalParameter(1.010, 1.020, default=sell_params['high_offset_2'], space='exit', optimize=True)
 
     # lambo2
-    lambo2_ema_14_factor = DecimalParameter(0.8, 1.2, decimals=3,  default=buy_params['lambo2_ema_14_factor'], space='buy', optimize=True)
-    lambo2_rsi_4_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_4_limit'], space='buy', optimize=True)
-    lambo2_rsi_14_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_14_limit'], space='buy', optimize=True)
+    lambo2_ema_14_factor = DecimalParameter(0.8, 1.2, decimals=3,  default=buy_params['lambo2_ema_14_factor'], space='entry', optimize=True)
+    lambo2_rsi_4_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_4_limit'], space='entry', optimize=True)
+    lambo2_rsi_14_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_14_limit'], space='entry', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
 
-    ewo_low = DecimalParameter(-20.0, -8.0,default=buy_params['ewo_low'], space='buy', optimize=True)
-    ewo_high = DecimalParameter(3.0, 3.4, default=buy_params['ewo_high'], space='buy', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=False)
+    ewo_low = DecimalParameter(-20.0, -8.0,default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_high = DecimalParameter(3.0, 3.4, default=buy_params['ewo_high'], space='entry', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=False)
 
     # Trailing stop:
     trailing_stop = True
@@ -150,15 +150,15 @@ class EI3v2_tag_cofi_green(IStrategy):
     
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     ## Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
 
     # Optimal timeframe for the strategy
@@ -176,7 +176,7 @@ class EI3v2_tag_cofi_green(IStrategy):
     }
 
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs):
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs):
         # Sell any positions at a loss if they are held for more than 7 days.
         if current_profit < -0.04 and (current_time - trade.open_date_utc).days >= 4:
             return 'unclog'
@@ -303,7 +303,7 @@ class EI3v2_tag_cofi_green(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dataframe.loc[:, 'buy_tag'] = ''
 
@@ -352,7 +352,7 @@ class EI3v2_tag_cofi_green(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
 
@@ -366,13 +366,13 @@ class EI3v2_tag_cofi_green(IStrategy):
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
         return dataframe
 
 
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -396,7 +396,7 @@ class EI3v2_tag_cofi_green(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
 
@@ -427,7 +427,7 @@ class EI3v2_tag_cofi_dca_green(EI3v2_tag_cofi_green):
     # append buy_params of parent class
     buy_params.update(EI3v2_tag_cofi_green.buy_params)
 
-    dca_min_rsi = IntParameter(35, 75, default=buy_params['dca_min_rsi'], space='buy', optimize=True)
+    dca_min_rsi = IntParameter(35, 75, default=buy_params['dca_min_rsi'], space='entry', optimize=True)
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe = super().populate_indicators(dataframe, metadata)
@@ -451,7 +451,7 @@ class EI3v2_tag_cofi_dca_green(EI3v2_tag_cofi_green):
 
         count_of_buys = 0
         for order in trade.orders:
-            if order.ft_is_open or order.ft_order_side != 'buy':
+            if order.ft_is_open or order.ft_order_side != 'entry':
                 continue
             if order.status == "closed":
                 count_of_buys += 1

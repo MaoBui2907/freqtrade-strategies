@@ -1,8 +1,8 @@
 """
 Supertrend strategy:
-* Description: Generate a 3 supertrend indicators for 'buy' strategies & 3 supertrend indicators for 'sell' strategies
-               Buys if the 3 'buy' indicators are 'up'
-               Sells if the 3 'sell' indicators are 'down'
+* Description: Generate a 3 supertrend indicators for 'entry' strategies & 3 supertrend indicators for 'exit' strategies
+               Buys if the 3 'entry' indicators are 'up'
+               Sells if the 3 'exit' indicators are 'down'
 * Author: @juankysoriano (Juan Carlos Soriano)
 * github: https://github.com/juankysoriano/
 
@@ -108,7 +108,7 @@ class FastSupertrend(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                (dataframe[f'supertrend_1_buy_{self.buy_m1.value}_{self.buy_p1.value}'] == 'up') &
@@ -116,11 +116,11 @@ class FastSupertrend(IStrategy):
                (dataframe[f'supertrend_3_buy_{self.buy_m3.value}_{self.buy_p3.value}'] == 'up') & # The three indicators are 'up' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
         ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                (dataframe[f'supertrend_1_sell_{self.sell_m1.value}_{self.sell_p1.value}'] == 'down') &
@@ -128,7 +128,7 @@ class FastSupertrend(IStrategy):
                (dataframe[f'supertrend_3_sell_{self.sell_m3.value}_{self.sell_p3.value}'] == 'down') & # The three indicators are 'down' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe
 

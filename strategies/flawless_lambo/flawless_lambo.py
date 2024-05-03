@@ -805,11 +805,11 @@ class flawless_lambo(IStrategy):
     # Optimal timeframe for the strategy.
     timeframe = '15m'
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    # sell_profit_offset = 0.019
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = False
+    # exit_profit_offset = 0.019
+    ignore_roi_if_entry_signal = False
 
 
     # hyperopt params
@@ -844,16 +844,16 @@ class flawless_lambo(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
     
     @property
@@ -1016,7 +1016,7 @@ class flawless_lambo(IStrategy):
         current_time = datetime.now(timezone.utc)
         trailing_duration =  current_time - trailing_sell['start_trailing_time']
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
-            if ((current_trailing_sell_profit_ratio > 0) and (last_candle['sell'] != 0)):
+            if ((current_trailing_sell_profit_ratio > 0) and (last_candle['exit_long'] != 0)):
                 # more than 1h, price over first signal, sell signal still active -> sell
                 return 'forcesell'
             else:
@@ -1193,7 +1193,7 @@ class flawless_lambo(IStrategy):
                     trailing_sell_offset = self.trailing_sell_offset(dataframe, pair, current_price)
 
                     if trailing_sell['allow_sell_trailing']:
-                        if (not trailing_sell['trailing_sell_order_started'] and (last_candle['sell'] != 0)):
+                        if (not trailing_sell['trailing_sell_order_started'] and (last_candle['exit_long'] != 0)):
                             trailing_sell['trailing_sell_order_started'] = True
                             trailing_sell['trailing_sell_order_downlimit'] = last_candle['close']
                             trailing_sell['start_trailing_sell_price'] = last_candle['close']
@@ -1250,12 +1250,12 @@ class flawless_lambo(IStrategy):
                     self.trailing_sell(pair, reinit=True)
                     self.logger.info(f'STOP trailing sell for {pair} because I SOLD it')
 
-        if sell_reason != 'sell_signal':
+        if sell_reason != 'exit_signal':
             val = True
 
         return val
         
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
             (dataframe['volume'] > 0) &
@@ -1263,11 +1263,11 @@ class flawless_lambo(IStrategy):
             (dataframe['plus.di.slope'] > 0) &
             (dataframe['williamspercent'] < -66) &
             (qtpylib.crossed_above(dataframe['close'], dataframe['bb.lower']))
-            ),'buy'] = 1
+            ),'enter_long'] = 1
         
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
@@ -1277,12 +1277,12 @@ class flawless_lambo(IStrategy):
                 (dataframe['williamspercent'] >= self.sell_williams.value) &
                 (dataframe['rsi'] >= self.sell_rsi.value)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         if self.trailing_sell_order_enabled and self.config['runmode'].value in ('live', 'dry_run'): 
             last_candle = dataframe.iloc[-1].squeeze()
             trailing_sell = self.trailing_sell(metadata['pair'])
-            if (last_candle['sell'] != 0):
+            if (last_candle['exit_long'] != 0):
                 if not trailing_sell['trailing_sell_order_started']:
                     open_trades = Trade.get_trades([Trade.pair == metadata['pair'], Trade.is_open.is_(True), ]).all()
                     if open_trades:
@@ -1294,7 +1294,7 @@ class flawless_lambo(IStrategy):
             else:
                 if (trailing_sell['trailing_sell_order_started'] == True):
                     self.logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger sell signal!")
-                    dataframe.loc[:,'sell'] = 1
+                    dataframe.loc[:,'exit_long'] = 1
                     dataframe.loc[:, 'sell_tag'] = trailing_sell['sell_tag']
 
         return dataframe

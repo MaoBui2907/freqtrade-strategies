@@ -56,39 +56,39 @@ class MultiOffsetLamboV0(IStrategy):
 
     # Offset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=20, load=True, space='buy', optimize=True)
+        5, 80, default=20, load=True, space='entry', optimize=True)
     base_nb_candles_sell = IntParameter(
-        5, 80, default=20, load=True, space='sell', optimize=True)
+        5, 80, default=20, load=True, space='exit', optimize=True)
     low_offset_sma = DecimalParameter(
-        0.9, 0.99, default=0.958, load=True, space='buy', optimize=True)
+        0.9, 0.99, default=0.958, load=True, space='entry', optimize=True)
     high_offset_sma = DecimalParameter(
-        0.99, 1.1, default=1.012, load=True, space='sell', optimize=True)
+        0.99, 1.1, default=1.012, load=True, space='exit', optimize=True)
     low_offset_ema = DecimalParameter(
-        0.9, 0.99, default=0.958, load=True, space='buy', optimize=True)
+        0.9, 0.99, default=0.958, load=True, space='entry', optimize=True)
     high_offset_ema = DecimalParameter(
-        0.99, 1.1, default=1.012, load=True, space='sell', optimize=True)
+        0.99, 1.1, default=1.012, load=True, space='exit', optimize=True)
     low_offset_trima = DecimalParameter(
-        0.9, 0.99, default=0.958, load=True, space='buy', optimize=True)
+        0.9, 0.99, default=0.958, load=True, space='entry', optimize=True)
     high_offset_trima = DecimalParameter(
-        0.99, 1.1, default=1.012, load=True, space='sell', optimize=True)
+        0.99, 1.1, default=1.012, load=True, space='exit', optimize=True)
     low_offset_t3 = DecimalParameter(
-        0.9, 0.99, default=0.958, load=True, space='buy', optimize=True)
+        0.9, 0.99, default=0.958, load=True, space='entry', optimize=True)
     high_offset_t3 = DecimalParameter(
-        0.99, 1.1, default=1.012, load=True, space='sell', optimize=True)
+        0.99, 1.1, default=1.012, load=True, space='exit', optimize=True)
     low_offset_kama = DecimalParameter(
-        0.9, 0.99, default=0.958, load=True, space='buy', optimize=True)
+        0.9, 0.99, default=0.958, load=True, space='entry', optimize=True)
     high_offset_kama = DecimalParameter(
-        0.99, 1.1, default=1.012, load=True, space='sell', optimize=True)
+        0.99, 1.1, default=1.012, load=True, space='exit', optimize=True)
 
     # Protection
     ewo_low = DecimalParameter(
-        -20.0, -8.0, default=-20.0, load=True, space='buy', optimize=True)
+        -20.0, -8.0, default=-20.0, load=True, space='entry', optimize=True)
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=6.0, load=True, space='buy', optimize=True)
+        2.0, 12.0, default=6.0, load=True, space='entry', optimize=True)
     fast_ewo = IntParameter(
-        10, 50, default=50, load=True, space='buy', optimize=False)
+        10, 50, default=50, load=True, space='entry', optimize=False)
     slow_ewo = IntParameter(
-        100, 200, default=200, load=True, space='buy', optimize=False)
+        100, 200, default=200, load=True, space='entry', optimize=False)
 
     # MA list
     ma_types = ['sma', 'ema', 'trima', 't3', 'kama']
@@ -127,17 +127,17 @@ class MultiOffsetLamboV0(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = True
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
     informative_timeframe = '1h'
 
-    use_sell_signal = True
-    sell_profit_only = False
+    use_exit_signal = True
+    exit_profit_only = False
 
     process_only_new_candles = True
     startup_candle_count = 30
@@ -167,7 +167,7 @@ class MultiOffsetLamboV0(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         for i in self.ma_types:
@@ -183,12 +183,12 @@ class MultiOffsetLamboV0(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         for i in self.ma_types:
@@ -202,7 +202,7 @@ class MultiOffsetLamboV0(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

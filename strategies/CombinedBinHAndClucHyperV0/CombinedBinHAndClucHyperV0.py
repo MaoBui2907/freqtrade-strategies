@@ -15,9 +15,9 @@ import math
 class CombinedBinHAndClucHyperV0(IStrategy):
     timeframe = '1m'
 
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # ----------------------------------------------------------------
     # Hyper Params
@@ -124,7 +124,7 @@ class CombinedBinHAndClucHyperV0(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         buy_a_time_window = self.buy_a_time_window.value if isinstance(self.buy_a_time_window, ABC) else self.buy_a_time_window
         buy_a_bbdelta_rate = self.buy_a_bbdelta_rate.value if isinstance(self.buy_a_bbdelta_rate, ABC) else self.buy_a_bbdelta_rate
         buy_a_closedelta_rate = self.buy_a_closedelta_rate.value if isinstance(self.buy_a_closedelta_rate, ABC) else self.buy_a_closedelta_rate
@@ -154,12 +154,12 @@ class CombinedBinHAndClucHyperV0(IStrategy):
                     (dataframe['close'] < buy_b_close_rate * dataframe[f'bb_lowerband_{buy_b_time_window}']) &
                     (dataframe['volume'] < (dataframe[f'volume_mean_slow_{buy_b_volume_mean_slow_window}'].shift(1) * buy_b_volume_mean_slow_num))
             ),
-            'buy'
+            'entry'
         ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         sell_bb_middleband_window = self.sell_bb_middleband_window.value if isinstance(self.sell_bb_middleband_window, ABC) else self.sell_bb_middleband_window
-        dataframe.loc[(dataframe['close'] > dataframe[f'bb_middleband_{sell_bb_middleband_window}']), 'sell'] = 1
+        dataframe.loc[(dataframe['close'] > dataframe[f'bb_middleband_{sell_bb_middleband_window}']), 'exit_long'] = 1
         return dataframe

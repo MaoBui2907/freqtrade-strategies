@@ -575,15 +575,15 @@ class DevilStra(IStrategy):
     ]
 
     buy_spell = CategoricalParameter(
-        spell_pot, default=spell_pot[0], space='buy')
+        spell_pot, default=spell_pot[0], space='entry')
     sell_spell = CategoricalParameter(
-        spell_pot, default=spell_pot[0], space='sell')
+        spell_pot, default=spell_pot[0], space='exit')
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         pairs = self.dp.current_whitelist()
         pairs_len = len(pairs)
@@ -601,7 +601,7 @@ class DevilStra(IStrategy):
 
         buy_params_index = buy_spells[pair_index]
 
-        params = spell_finder(buy_params_index, 'buy')
+        params = spell_finder(buy_params_index, 'entry')
         conditions = list()
         # TODO: Its not dry code!
         buy_indicator = params['buy_indicator0']
@@ -647,13 +647,13 @@ class DevilStra(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy']=1
+                'entry']=1
 
         # print(len(dataframe.keys()))
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         pairs = self.dp.current_whitelist()
         pairs_len = len(pairs)
@@ -671,7 +671,7 @@ class DevilStra(IStrategy):
 
         sell_params_index = sell_spells[pair_index]
 
-        params = spell_finder(sell_params_index, 'sell')
+        params = spell_finder(sell_params_index, 'exit')
 
         conditions = list()
         # TODO: Its not dry code!
@@ -717,5 +717,5 @@ class DevilStra(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell']=1
+                'exit_long']=1
         return dataframe

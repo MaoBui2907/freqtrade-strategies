@@ -243,26 +243,26 @@ class Dyna_opti(IStrategy):
     ## Buy Space Hyperopt Variables
 
     # Base Pair Params
-    bbdelta_close = DecimalParameter(0.0, 0.1, default=0.025, space='buy')
-    closedelta_close = DecimalParameter(0.0, 0.5, default=0.018, space='buy')
-    tail_bbdelta = DecimalParameter(0.0, 1, default=0.945, space='buy')
-    inf_guard = CategoricalParameter(['lower', 'upper', 'both', 'none'], default='lower', space='buy', optimize=True)
-    inf_pct_adr_top = DecimalParameter(0.70, 0.99, default=0.792, space='buy')
-    inf_pct_adr_bot = DecimalParameter(0.01, 0.20, default=0.172, space='buy')
+    bbdelta_close = DecimalParameter(0.0, 0.1, default=0.025, space='entry')
+    closedelta_close = DecimalParameter(0.0, 0.5, default=0.018, space='entry')
+    tail_bbdelta = DecimalParameter(0.0, 1, default=0.945, space='entry')
+    inf_guard = CategoricalParameter(['lower', 'upper', 'both', 'none'], default='lower', space='entry', optimize=True)
+    inf_pct_adr_top = DecimalParameter(0.70, 0.99, default=0.792, space='entry')
+    inf_pct_adr_bot = DecimalParameter(0.01, 0.20, default=0.172, space='entry')
 
     ## Sell Space Params are being "hijacked" for custom_stoploss and dynamic_roi
 
     # Dynamic ROI
-    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default='any', space='sell', optimize=True)
-    droi_pullback = CategoricalParameter([True, False], default=False, space='sell', optimize=True)
-    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=0.015, space='sell')
-    droi_pullback_respect_table = CategoricalParameter([True, False], default=True, space='sell', optimize=True)
+    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default='any', space='exit', optimize=True)
+    droi_pullback = CategoricalParameter([True, False], default=False, space='exit', optimize=True)
+    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=0.015, space='exit')
+    droi_pullback_respect_table = CategoricalParameter([True, False], default=True, space='exit', optimize=True)
 
     # Custom Stoploss
-    cstp_threshold = DecimalParameter(-0.15, 0, default=-0.05, space='sell')
-    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default='time', space='sell', optimize=True)
-    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=--0.018, space='sell')
-    cstp_bail_time = IntParameter(720, 1440, default=961, space='sell')
+    cstp_threshold = DecimalParameter(-0.15, 0, default=-0.05, space='exit')
+    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default='time', space='exit', optimize=True)
+    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=--0.018, space='exit')
+    cstp_bail_time = IntParameter(720, 1440, default=961, space='exit')
     
     timeframe = '5m'
     inf_timeframe = '1h'
@@ -313,9 +313,9 @@ class Dyna_opti(IStrategy):
     #stoploss = -0.234
 
     # Recommended
-    use_sell_signal = False
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = False
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = True
 
     # Required
     startup_candle_count: int = 233
@@ -426,7 +426,7 @@ class Dyna_opti(IStrategy):
     """
     Buy Signal
     """ 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         if self.inf_guard.value == 'upper' or self.inf_guard.value == 'both':
             conditions.append(
@@ -455,16 +455,16 @@ class Dyna_opti(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
     """
     Sell Signal
     """
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
   
-        dataframe['sell'] = 0
+        dataframe['exit_long'] = 0
 
         return dataframe
 
@@ -564,17 +564,17 @@ class Dyna_opti(IStrategy):
     Trade Timeout Overloads
     """
     def check_buy_timeout(self, pair: str, trade: Trade, order: dict, **kwargs) -> bool:
-        bid_strategy = self.config.get('bid_strategy', {})
+        entry_pricing = self.config.get('entry_pricing', {})
         ob = self.dp.orderbook(pair, 1)
-        current_price = ob[f"{bid_strategy['price_side']}s"][0][0]
+        current_price = ob[f"{entry_pricing['price_side']}s"][0][0]
         if current_price > order['price'] * 1.01:
             return True
         return False
 
     def check_sell_timeout(self, pair: str, trade: Trade, order: dict, **kwargs) -> bool:
-        ask_strategy = self.config.get('ask_strategy', {})
+        exit_pricing = self.config.get('exit_pricing', {})
         ob = self.dp.orderbook(pair, 1)
-        current_price = ob[f"{ask_strategy['price_side']}s"][0][0]
+        current_price = ob[f"{exit_pricing['price_side']}s"][0][0]
         if current_price < order['price'] * 0.99:
             return True
         return False
@@ -606,9 +606,9 @@ class Dyna_opti(IStrategy):
                         dynamic_roi = custom_params['dynamic_roi']
                     break
             
-        if params == 'buy':
+        if params == 'entry':
             return buy_params
-        if params == 'sell':
+        if params == 'exit':
             return sell_params
         if params == 'minimal_roi':
             return minimal_roi
@@ -627,10 +627,10 @@ class Dyna_opti(IStrategy):
             if rate:
                 return rate
 
-        ask_strategy = self.config.get('ask_strategy', {})
-        if ask_strategy.get('use_order_book', False):
+        exit_pricing = self.config.get('exit_pricing', {})
+        if exit_pricing.get('use_order_book', False):
             ob = self.dp.orderbook(pair, 1)
-            rate = ob[f"{ask_strategy['price_side']}s"][0][0]
+            rate = ob[f"{exit_pricing['price_side']}s"][0][0]
         else:
             ticker = self.dp.ticker(pair)
             rate = ticker['last']

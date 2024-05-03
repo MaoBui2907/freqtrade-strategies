@@ -31,7 +31,7 @@ from functools import reduce
 ##   Prefer stable coin (USDT, BUSDT etc) pairs, instead of BTC or ETH pairs.                            ##
 ##   Highly recommended to blacklist leveraged tokens (*BULL, *BEAR, *UP, *DOWN etc).                    ##
 ##   Ensure that you don't override any variables in you config.json. Especially                         ##
-##   the timeframe (must be 5m) & sell_profit_only (must be true).                                       ##
+##   the timeframe (must be 5m) & exit_profit_only (must be true).                                       ##
 ##                                                                                                       ##
 ###########################################################################################################
 ##               DONATIONS                                                                               ##
@@ -77,10 +77,10 @@ class CombinedBinHAndClucV6H(IStrategy):
     process_only_new_candles = False
 
 
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.001
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.001
+    ignore_roi_if_entry_signal = True
 
     # hyperspace default buy params 
     buy_params = {
@@ -146,33 +146,33 @@ class CombinedBinHAndClucV6H(IStrategy):
     }
 
     # bin buy parameters
-    buy_bin_bbdelta_close =  DecimalParameter(0.0, 0.05, default=0.031, space='buy', optimize=cust_optimize['buy_bin_bbdelta_close'], load=True)
-    buy_bin_closedelta_close = DecimalParameter(0.0, 0.03, default=0.018, decimals=4, space='buy', optimize=cust_optimize['buy_bin_closedelta_close'], load=True)
-    buy_bin_tail_bbdelta = DecimalParameter(0.0, 1.0, default=0.233, decimals=3, space='buy', optimize=cust_optimize['buy_bin_tail_bbdelta'], load=True)
-    buy_bin_guard = CategoricalParameter([True, False], default=True, space='buy', optimize=cust_optimize['buy_bin_guard'], load=True)
+    buy_bin_bbdelta_close =  DecimalParameter(0.0, 0.05, default=0.031, space='entry', optimize=cust_optimize['buy_bin_bbdelta_close'], load=True)
+    buy_bin_closedelta_close = DecimalParameter(0.0, 0.03, default=0.018, decimals=4, space='entry', optimize=cust_optimize['buy_bin_closedelta_close'], load=True)
+    buy_bin_tail_bbdelta = DecimalParameter(0.0, 1.0, default=0.233, decimals=3, space='entry', optimize=cust_optimize['buy_bin_tail_bbdelta'], load=True)
+    buy_bin_guard = CategoricalParameter([True, False], default=True, space='entry', optimize=cust_optimize['buy_bin_guard'], load=True)
 
     # cluc buy parameters
-    buy_cluc_close_bblowerband = DecimalParameter(0.0, 1.5, default=0.993, decimals=3, space='buy', optimize=cust_optimize['buy_cluc_close_bblowerband'], load=True)
-    buy_cluc_volume = IntParameter(10, 40, default=21, space='buy', optimize=cust_optimize['buy_cluc_volume'], load=True)
-    buy_cluc_guard = CategoricalParameter([True, False], default=True, space='buy', optimize=cust_optimize['buy_cluc_guard'], load=True)
+    buy_cluc_close_bblowerband = DecimalParameter(0.0, 1.5, default=0.993, decimals=3, space='entry', optimize=cust_optimize['buy_cluc_close_bblowerband'], load=True)
+    buy_cluc_volume = IntParameter(10, 40, default=21, space='entry', optimize=cust_optimize['buy_cluc_volume'], load=True)
+    buy_cluc_guard = CategoricalParameter([True, False], default=True, space='entry', optimize=cust_optimize['buy_cluc_guard'], load=True)
 
     # log buy parameters
-    buy_long_rsi_diff = DecimalParameter(40, 45, default=43.276, decimals=3, space='buy', optimize=cust_optimize['buy_long_rsi_diff'], load=True)
+    buy_long_rsi_diff = DecimalParameter(40, 45, default=43.276, decimals=3, space='entry', optimize=cust_optimize['buy_long_rsi_diff'], load=True)
 
     # enable bin, cluc or long 
-    buy_bin_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=cust_optimize['buy_bin_enable'], load=True)
-    buy_cluc_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=cust_optimize['buy_cluc_enable'], load=True)
-    buy_long_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=cust_optimize['buy_long_enable'], load=True)
+    buy_bin_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=cust_optimize['buy_bin_enable'], load=True)
+    buy_cluc_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=cust_optimize['buy_cluc_enable'], load=True)
+    buy_long_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=cust_optimize['buy_long_enable'], load=True)
     
     # minimum conditions to match in buy
-    buy_minimum_conditions = IntParameter(1, 2, default=1, space='buy', optimize=cust_optimize['buy_minimum_conditions'], load=True)
+    buy_minimum_conditions = IntParameter(1, 2, default=1, space='entry', optimize=cust_optimize['buy_minimum_conditions'], load=True)
 
     # if RSI above threshold, override ROI
-    sell_roi_override_rsi_threshold = IntParameter(40, 70, default=50, space='sell', optimize=cust_optimize['sell_roi_override_rsi_threshold'], load=True)
+    sell_roi_override_rsi_threshold = IntParameter(40, 70, default=50, space='exit', optimize=cust_optimize['sell_roi_override_rsi_threshold'], load=True)
 
     # custom stoploss, if trade open > x hours and loss > threshold then sell    
-    cstp_bail_time = IntParameter(1, 36, default=5, space='sell', optimize=cust_optimize['cstp_bail_time'])
-    cstp_loss_threshold = DecimalParameter(-0.25, 0, default=0, decimals=2, space='sell', optimize=cust_optimize['cstp_loss_threshold'])
+    cstp_bail_time = IntParameter(1, 36, default=5, space='exit', optimize=cust_optimize['cstp_bail_time'])
+    cstp_loss_threshold = DecimalParameter(-0.25, 0, default=0, decimals=2, space='exit', optimize=cust_optimize['cstp_loss_threshold'])
 
 
     """
@@ -267,7 +267,7 @@ class CombinedBinHAndClucV6H(IStrategy):
     """
     Buy Signal
     """
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
       
@@ -351,13 +351,13 @@ class CombinedBinHAndClucV6H(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'
+                'entry'
             ] = 1
 
         # verbose logging enable only for verbose information or troubleshooting
         if self.cust_log_verbose == True:
             for index, row in dataframe.iterrows():
-                if row['buy'] == 1:               
+                if row['entry'] == 1:               
                     buy_cond_details = f"count={int(row['conditions_count'])}/bin={int(row['buy_cond_bin'])}/cluc={int(row['buy_cond_cluc'])}/long={int(row['buy_cond_long'])}"
                     logger.info(f"{metadata['pair']} - candle: {row['date']} - buy condition - details: {buy_cond_details}")
 
@@ -367,7 +367,7 @@ class CombinedBinHAndClucV6H(IStrategy):
     """
     Sell Signal
     """
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
 
@@ -380,7 +380,7 @@ class CombinedBinHAndClucV6H(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'
+                'exit'
             ] = 1
 
         return dataframe
@@ -408,7 +408,7 @@ class CombinedBinHAndClucV6H(IStrategy):
             logger.info(f"{pair} - candle: {last_candle['date']} - exit trade {sell_reason} with profit {trade.calc_profit_ratio(rate)}")
 
         # failsafe for user triggered forced sells > always have highest prio!
-        if sell_reason == 'force_sell':
+        if sell_reason == 'force_exit':
             return True
 
         # Prevent ROI trigger, if there is more potential, in order to maximize profit

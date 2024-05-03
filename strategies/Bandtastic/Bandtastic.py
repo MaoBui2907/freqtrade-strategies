@@ -53,14 +53,14 @@ class Bandtastic(IStrategy):
     buy_trigger = CategoricalParameter(["bb_lower1", "bb_lower2", "bb_lower3", "bb_lower4"], default="bb_lower1", space="buy")
 
     # Hyperopt Sell Parameters
-    sell_fastema = IntParameter(low=1, high=365, default=7, space='sell', optimize=True, load=True)
-    sell_slowema = IntParameter(low=1, high=365, default=6, space='sell', optimize=True, load=True)
-    sell_rsi = IntParameter(low=30, high=100, default=57, space='sell', optimize=True, load=True)
-    sell_mfi = IntParameter(low=30, high=100, default=46, space='sell', optimize=True, load=True)
+    sell_fastema = IntParameter(low=1, high=365, default=7, space='exit', optimize=True, load=True)
+    sell_slowema = IntParameter(low=1, high=365, default=6, space='exit', optimize=True, load=True)
+    sell_rsi = IntParameter(low=30, high=100, default=57, space='exit', optimize=True, load=True)
+    sell_mfi = IntParameter(low=30, high=100, default=46, space='exit', optimize=True, load=True)
 
-    sell_rsi_enabled = CategoricalParameter([True, False], space='sell', optimize=True, default=False)
-    sell_mfi_enabled = CategoricalParameter([True, False], space='sell', optimize=True, default=True)
-    sell_ema_enabled = CategoricalParameter([True, False], space='sell', optimize=True, default=False)
+    sell_rsi_enabled = CategoricalParameter([True, False], space='exit', optimize=True, default=False)
+    sell_mfi_enabled = CategoricalParameter([True, False], space='exit', optimize=True, default=True)
+    sell_ema_enabled = CategoricalParameter([True, False], space='exit', optimize=True, default=False)
     sell_trigger = CategoricalParameter(["sell-bb_upper1", "sell-bb_upper2", "sell-bb_upper3", "sell-bb_upper4"], default="sell-bb_upper2", space="sell")
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -90,7 +90,7 @@ class Bandtastic(IStrategy):
         dataframe['bb_upperband4'] = bollinger4['upper']
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         # GUARDS
@@ -120,11 +120,11 @@ class Bandtastic(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         # GUARDS
@@ -154,6 +154,6 @@ class Bandtastic(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
 
         return dataframe

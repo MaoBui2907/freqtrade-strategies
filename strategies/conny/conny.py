@@ -22,9 +22,9 @@ class conny(IStrategy):
 
     process_only_new_candles = True
 
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = True
 
     startup_candle_count: int = 30
 
@@ -57,28 +57,28 @@ class conny(IStrategy):
         c.evaluate_williams()
         c.evaluate_momentum()
         c.evaluate_adx()
-        dataframe['consensus_buy'] = c.score()['buy']
-        dataframe['consensus_sell'] = c.score()['sell']
+        dataframe['consensus_buy'] = c.score()['entry']
+        dataframe['consensus_sell'] = c.score()['exit_long']
 
 
         print(dataframe)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['consensus_buy'] > 45) &
                 (dataframe['volume'] > 0)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['consensus_sell'] > 88) &
                 (dataframe['volume'] > 0)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

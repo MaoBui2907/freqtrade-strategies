@@ -488,49 +488,49 @@ class GodStraNew40(IStrategy):
     # TODO: Its not dry code!
     # Buy Hyperoptable Parameters/Spaces.
     buy_crossed_indicator0 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator0"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator0"], space='entry')
     buy_crossed_indicator1 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator1"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator1"], space='entry')
     buy_crossed_indicator2 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator2"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_crossed_indicator2"], space='entry')
 
     buy_indicator0 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_indicator0"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_indicator0"], space='entry')
     buy_indicator1 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_indicator1"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_indicator1"], space='entry')
     buy_indicator2 = CategoricalParameter(
-        god_genes_with_timeperiod, default=buy_params["buy_indicator2"], space='buy')
+        god_genes_with_timeperiod, default=buy_params["buy_indicator2"], space='entry')
 
-    buy_operator0 = CategoricalParameter(operators, default=buy_params["buy_operator0"], space='buy')
-    buy_operator1 = CategoricalParameter(operators, default=buy_params["buy_operator1"], space='buy')
-    buy_operator2 = CategoricalParameter(operators, default=buy_params["buy_operator2"], space='buy')
+    buy_operator0 = CategoricalParameter(operators, default=buy_params["buy_operator0"], space='entry')
+    buy_operator1 = CategoricalParameter(operators, default=buy_params["buy_operator1"], space='entry')
+    buy_operator2 = CategoricalParameter(operators, default=buy_params["buy_operator2"], space='entry')
 
-    buy_real_num0 = DecimalParameter(0, 1, decimals=DECIMALS,  default=buy_params["buy_real_num0"], space='buy')
-    buy_real_num1 = DecimalParameter(0, 1, decimals=DECIMALS, default=buy_params["buy_real_num1"], space='buy')
-    buy_real_num2 = DecimalParameter(0, 1, decimals=DECIMALS, default=buy_params["buy_real_num2"], space='buy')
+    buy_real_num0 = DecimalParameter(0, 1, decimals=DECIMALS,  default=buy_params["buy_real_num0"], space='entry')
+    buy_real_num1 = DecimalParameter(0, 1, decimals=DECIMALS, default=buy_params["buy_real_num1"], space='entry')
+    buy_real_num2 = DecimalParameter(0, 1, decimals=DECIMALS, default=buy_params["buy_real_num2"], space='entry')
 
     # Sell Hyperoptable Parameters/Spaces.
     sell_crossed_indicator0 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator0"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator0"], space='exit')
     sell_crossed_indicator1 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator1"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator1"], space='exit')
     sell_crossed_indicator2 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator2"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_crossed_indicator2"], space='exit')
 
     sell_indicator0 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_indicator0"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_indicator0"], space='exit')
     sell_indicator1 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_indicator1"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_indicator1"], space='exit')
     sell_indicator2 = CategoricalParameter(
-        god_genes_with_timeperiod, default=sell_params["sell_indicator2"], space='sell')
+        god_genes_with_timeperiod, default=sell_params["sell_indicator2"], space='exit')
 
-    sell_operator0 = CategoricalParameter(operators, default=sell_params["sell_operator0"], space='sell')
-    sell_operator1 = CategoricalParameter(operators, default=sell_params["sell_operator1"], space='sell')
-    sell_operator2 = CategoricalParameter(operators, default=sell_params["sell_operator2"], space='sell')
+    sell_operator0 = CategoricalParameter(operators, default=sell_params["sell_operator0"], space='exit')
+    sell_operator1 = CategoricalParameter(operators, default=sell_params["sell_operator1"], space='exit')
+    sell_operator2 = CategoricalParameter(operators, default=sell_params["sell_operator2"], space='exit')
 
-    sell_real_num0 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num0"], space='sell')
-    sell_real_num1 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num1"], space='sell')
-    sell_real_num2 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num2"], space='sell')
+    sell_real_num0 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num0"], space='exit')
+    sell_real_num1 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num1"], space='exit')
+    sell_real_num2 = DecimalParameter(0, 1, decimals=DECIMALS, default=sell_params["sell_real_num2"], space='exit')
 
     # Stoploss:
     stoploss = -1
@@ -547,7 +547,7 @@ class GodStraNew40(IStrategy):
         '''
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = list()
 
@@ -595,13 +595,13 @@ class GodStraNew40(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy']=1
+                'entry']=1
 
         # print(len(dataframe.keys()))
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = list()
         # TODO: Its not dry code!
@@ -647,5 +647,5 @@ class GodStraNew40(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell']=1
+                'exit_long']=1
         return dataframe

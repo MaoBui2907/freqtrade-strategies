@@ -82,34 +82,34 @@ class custom(IStrategy):
     # Stoploss:
     stoploss = -0.11
 
-    antipump_threshold = DecimalParameter(0, 0.4, default=0.25, space='buy', optimize=True)
+    antipump_threshold = DecimalParameter(0, 0.4, default=0.25, space='entry', optimize=True)
 
     # SMAOffset
-    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    low_offset = DecimalParameter(0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=True)
-    low_offset_2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_2'], space='buy', optimize=True)
-    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)
+    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    low_offset = DecimalParameter(0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+    low_offset_2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_2'], space='entry', optimize=True)
+    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
 
     #SMAOffsetProtectOptV1
-    low_offset2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset2'], space='buy', optimize=True)
-    base_nb_candles_buy2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy2'], space='buy', optimize=True)
-    base_nb_candles_sell2 = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    high_offset2 = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
+    low_offset2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset2'], space='entry', optimize=True)
+    base_nb_candles_buy2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy2'], space='entry', optimize=True)
+    base_nb_candles_sell2 = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    high_offset2 = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
-    ewo_low = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low'], space='buy', optimize=True)
-    ewo_high = DecimalParameter(2.00, 12.0, default=buy_params['ewo_high'], space='buy', optimize=True)
-    ewo_high_2 = DecimalParameter(-6.0, 12.0, default=buy_params['ewo_high_2'], space='buy', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=True)
+    ewo_low = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low'], space='entry', optimize=True)
+    ewo_high = DecimalParameter(2.00, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
+    ewo_high_2 = DecimalParameter(-6.0, 12.0, default=buy_params['ewo_high_2'], space='entry', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
 
     #SMAOffsetProtectOptV1
-    ewo_low2 = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low2'], space='buy', optimize=True)
-    ewo_high2 = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high2'], space='buy', optimize=True)
-    rsi_buy2 = IntParameter(30, 70, default=buy_params['rsi_buy2'], space='buy', optimize=True)
+    ewo_low2 = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low2'], space='entry', optimize=True)
+    ewo_high2 = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high2'], space='entry', optimize=True)
+    rsi_buy2 = IntParameter(30, 70, default=buy_params['rsi_buy2'], space='entry', optimize=True)
 
     # Trailing stop:
     trailing_stop = False
@@ -118,10 +118,10 @@ class custom(IStrategy):
     #trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = False
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = False
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
@@ -347,7 +347,7 @@ class custom(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dont_buy_conditions = []
 
@@ -425,19 +425,19 @@ class custom(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
-        dataframe.loc[:, 'sell'] = 0
+        dataframe.loc[:, 'exit_long'] = 0
 
         """
         conditions.append(
@@ -457,13 +457,13 @@ class custom(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe
 
     #""
-    def custom_sell(self, pair: str, trade: Trade, current_time: datetime, current_rate: float,
+    def custom_exit(self, pair: str, trade: Trade, current_time: datetime, current_rate: float,
                     current_profit: float, **kwargs):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
@@ -504,7 +504,7 @@ class custom(IStrategy):
 
 class SMAoffset_antipump_div(custom):
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dont_buy_conditions = []
 
@@ -581,12 +581,12 @@ class SMAoffset_antipump_div(custom):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
         return dataframe
 

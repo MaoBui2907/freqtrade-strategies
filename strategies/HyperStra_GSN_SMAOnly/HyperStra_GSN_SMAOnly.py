@@ -109,14 +109,14 @@ class HyperStra_GSN_SMAOnly(IStrategy):
 
     # Sell signal
     use_custom_stoploss = False
-    use_sell_signal = True
+    use_exit_signal = True
     timeframe = '5m'
-    ignore_roi_if_buy_signal = False
+    ignore_roi_if_entry_signal = False
     process_only_new_candles = False
     startup_candle_count = 440
 
-    sell_profit_only = False
-    sell_profit_offset = 0.01
+    exit_profit_only = False
+    exit_profit_offset = 0.01
 
     # ##################################################################
     # ##################################################################
@@ -157,39 +157,39 @@ class HyperStra_GSN_SMAOnly(IStrategy):
     # ##################################################################
     # HyperSMA
 
-    # normalizer_lenght = IntParameter(low=1, high=400, default=20, space='buy', optimize=True)
+    # normalizer_lenght = IntParameter(low=1, high=400, default=20, space='entry', optimize=True)
 
     # BUY
-    buy_1_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_1_indicator'], space='buy', optimize=optimize_hypersma_buy_1_1_sma)
-    buy_1_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_1_indicator_sec'], space='buy', optimize=optimize_hypersma_buy_1_1_sma)
-    buy_1_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_1_real_number'], decimals=2, space='buy', optimize=optimize_hypersma_buy_1_1_sma)
-    buy_1_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_1_operator'], space='buy', optimize=optimize_hypersma_buy_1_1_sma)
+    buy_1_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_1_indicator'], space='entry', optimize=optimize_hypersma_buy_1_1_sma)
+    buy_1_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_1_indicator_sec'], space='entry', optimize=optimize_hypersma_buy_1_1_sma)
+    buy_1_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_1_real_number'], decimals=2, space='entry', optimize=optimize_hypersma_buy_1_1_sma)
+    buy_1_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_1_operator'], space='entry', optimize=optimize_hypersma_buy_1_1_sma)
 
-    buy_2_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_2_indicator'], space='buy', optimize=optimize_hypersma_buy_1_2_sma)
-    buy_2_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_2_indicator_sec'], space='buy', optimize=optimize_hypersma_buy_1_2_sma)
-    buy_2_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_2_real_number'], decimals=2, space='buy', optimize=optimize_hypersma_buy_1_2_sma)
-    buy_2_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_2_operator'], space='buy', optimize=optimize_hypersma_buy_1_2_sma)
+    buy_2_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_2_indicator'], space='entry', optimize=optimize_hypersma_buy_1_2_sma)
+    buy_2_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_2_indicator_sec'], space='entry', optimize=optimize_hypersma_buy_1_2_sma)
+    buy_2_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_2_real_number'], decimals=2, space='entry', optimize=optimize_hypersma_buy_1_2_sma)
+    buy_2_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_2_operator'], space='entry', optimize=optimize_hypersma_buy_1_2_sma)
 
-    buy_3_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_3_indicator'], space='buy', optimize=optimize_hypersma_buy_1_3_sma)
-    buy_3_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_3_indicator_sec'], space='buy', optimize=optimize_hypersma_buy_1_3_sma)
-    buy_3_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_3_real_number'], decimals=2, space='buy', optimize=optimize_hypersma_buy_1_3_sma)
-    buy_3_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_3_operator'], space='buy', optimize=optimize_hypersma_buy_1_3_sma)
+    buy_3_indicator = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_3_indicator'], space='entry', optimize=optimize_hypersma_buy_1_3_sma)
+    buy_3_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=buy_params['buy_3_indicator_sec'], space='entry', optimize=optimize_hypersma_buy_1_3_sma)
+    buy_3_real_number = DecimalParameter(low=0, high=0.99, default=buy_params['buy_3_real_number'], decimals=2, space='entry', optimize=optimize_hypersma_buy_1_3_sma)
+    buy_3_operator = CategoricalParameter(categories=sma_operators, default=buy_params['buy_3_operator'], space='entry', optimize=optimize_hypersma_buy_1_3_sma)
 
     # SELL
-    sell_1_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_1_indicator'], space='sell', optimize=optimize_hypersma_sell_1_1_sma)
-    sell_1_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_1_indicator_sec'], space='sell', optimize=optimize_hypersma_sell_1_1_sma)
-    sell_1_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_1_real_number'], decimals=2, space='sell', optimize=optimize_hypersma_sell_1_1_sma)
-    sell_1_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_1_operator'], space='sell', optimize=optimize_hypersma_sell_1_1_sma)
+    sell_1_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_1_indicator'], space='exit', optimize=optimize_hypersma_sell_1_1_sma)
+    sell_1_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_1_indicator_sec'], space='exit', optimize=optimize_hypersma_sell_1_1_sma)
+    sell_1_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_1_real_number'], decimals=2, space='exit', optimize=optimize_hypersma_sell_1_1_sma)
+    sell_1_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_1_operator'], space='exit', optimize=optimize_hypersma_sell_1_1_sma)
 
-    sell_2_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_2_indicator'], space='sell', optimize=optimize_hypersma_sell_1_2_sma)
-    sell_2_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_2_indicator_sec'], space='sell', optimize=optimize_hypersma_sell_1_2_sma)
-    sell_2_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_2_real_number'], decimals=2, space='sell', optimize=optimize_hypersma_sell_1_2_sma)
-    sell_2_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_2_operator'], space='sell', optimize=optimize_hypersma_sell_1_2_sma)
+    sell_2_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_2_indicator'], space='exit', optimize=optimize_hypersma_sell_1_2_sma)
+    sell_2_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_2_indicator_sec'], space='exit', optimize=optimize_hypersma_sell_1_2_sma)
+    sell_2_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_2_real_number'], decimals=2, space='exit', optimize=optimize_hypersma_sell_1_2_sma)
+    sell_2_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_2_operator'], space='exit', optimize=optimize_hypersma_sell_1_2_sma)
 
-    sell_3_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_3_indicator'], space='sell', optimize=optimize_hypersma_sell_1_3_sma)
-    sell_3_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_3_indicator_sec'], space='sell', optimize=optimize_hypersma_sell_1_3_sma)
-    sell_3_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_3_real_number'], decimals=2, space='sell', optimize=optimize_hypersma_sell_1_3_sma)
-    sell_3_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_3_operator'], space='sell', optimize=optimize_hypersma_sell_1_3_sma)
+    sell_3_indicator = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_3_indicator'], space='exit', optimize=optimize_hypersma_sell_1_3_sma)
+    sell_3_indicator_sec = CategoricalParameter(categories=sma_timeperiods, default=sell_params['sell_3_indicator_sec'], space='exit', optimize=optimize_hypersma_sell_1_3_sma)
+    sell_3_real_number = DecimalParameter(low=0, high=0.99, default=sell_params['sell_3_real_number'], decimals=2, space='exit', optimize=optimize_hypersma_sell_1_3_sma)
+    sell_3_operator = CategoricalParameter(categories=sma_operators, default=sell_params['sell_3_operator'], space='exit', optimize=optimize_hypersma_sell_1_3_sma)
 
     # ##################################################################
     # HyperSMA
@@ -203,7 +203,7 @@ class HyperStra_GSN_SMAOnly(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -215,7 +215,7 @@ class HyperStra_GSN_SMAOnly(IStrategy):
                                                      indicator=self.buy_1_indicator.value,
                                                      indicator_sec=self.buy_1_indicator_sec.value,
                                                      real_number=self.buy_1_real_number.value,
-                                                     operator=self.buy_1_operator.value, option='buy')
+                                                     operator=self.buy_1_operator.value, option='entry')
                             )
                             &
                             (
@@ -223,7 +223,7 @@ class HyperStra_GSN_SMAOnly(IStrategy):
                                                      indicator=self.buy_2_indicator.value,
                                                      indicator_sec=self.buy_2_indicator_sec.value,
                                                      real_number=self.buy_2_real_number.value,
-                                                     operator=self.buy_2_operator.value, option='buy')
+                                                     operator=self.buy_2_operator.value, option='entry')
                             )
                             &
                             (
@@ -231,17 +231,17 @@ class HyperStra_GSN_SMAOnly(IStrategy):
                                                      indicator=self.buy_3_indicator.value,
                                                      indicator_sec=self.buy_3_indicator_sec.value,
                                                      real_number=self.buy_3_real_number.value,
-                                                     operator=self.buy_3_operator.value, option='buy')
+                                                     operator=self.buy_3_operator.value, option='entry')
                             )
                     )
             )
         )
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'buy'] = 1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -252,28 +252,28 @@ class HyperStra_GSN_SMAOnly(IStrategy):
                                 self.condition_maker(dataframe=dataframe,
                                                      indicator=self.sell_1_indicator.value, indicator_sec=self.sell_1_indicator_sec.value,
                                                      real_number=self.sell_1_real_number.value,
-                                                     operator=self.sell_1_operator.value, option='sell')
+                                                     operator=self.sell_1_operator.value, option='exit')
                             )
                             &
                             (
                                 self.condition_maker(dataframe=dataframe,
                                                      indicator=self.sell_2_indicator.value, indicator_sec=self.sell_2_indicator_sec.value,
                                                      real_number=self.sell_2_real_number.value,
-                                                     operator=self.sell_2_operator.value, option='sell')
+                                                     operator=self.sell_2_operator.value, option='exit')
                             )
                             &
                             (
                                 self.condition_maker(dataframe=dataframe,
                                                      indicator=self.sell_3_indicator.value, indicator_sec=self.sell_3_indicator_sec.value,
                                                      real_number=self.sell_3_real_number.value,
-                                                     operator=self.sell_3_operator.value, option='sell')
+                                                     operator=self.sell_3_operator.value, option='exit')
                             )
                     )
             )
         )
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'sell'] = 1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'exit_long'] = 1
         return dataframe
 
     def condition_maker(self, dataframe: DataFrame, indicator: int, indicator_sec: int, real_number: float, operator: str, option: str):

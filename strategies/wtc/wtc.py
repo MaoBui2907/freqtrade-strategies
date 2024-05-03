@@ -74,26 +74,26 @@ class wtc(IStrategy):
     ############################## END SETTINGS ##############################
     timeframe = '30m'
 
-    buy_max = DecimalParameter(-1, 1, decimals=4, default=0.4393, space='buy')
-    buy_min = DecimalParameter(-1, 1, decimals=4, default=-0.4676, space='buy')
+    buy_max = DecimalParameter(-1, 1, decimals=4, default=0.4393, space='entry')
+    buy_min = DecimalParameter(-1, 1, decimals=4, default=-0.4676, space='entry')
     sell_max = DecimalParameter(-1, 1, decimals=4,
-                                default=-0.9512, space='sell')
+                                default=-0.9512, space='exit')
     sell_min = DecimalParameter(-1, 1, decimals=4,
-                                default=0.6519, space='sell')
+                                default=0.6519, space='exit')
 
-    buy_max0 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='buy')
-    buy_min0 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='buy')
+    buy_max0 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='entry')
+    buy_min0 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='entry')
     sell_max0 = DecimalParameter(
-        0, 1, decimals=4, default=-0.9512, space='sell')
+        0, 1, decimals=4, default=-0.9512, space='exit')
     sell_min0 = DecimalParameter(
-        0, 1, decimals=4, default=0.6519, space='sell')
+        0, 1, decimals=4, default=0.6519, space='exit')
 
-    buy_max1 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='buy')
-    buy_min1 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='buy')
+    buy_max1 = DecimalParameter(0, 1, decimals=4, default=0.4393, space='entry')
+    buy_min1 = DecimalParameter(0, 1, decimals=4, default=-0.4676, space='entry')
     sell_max1 = DecimalParameter(
-        0, 1, decimals=4, default=-0.9512, space='sell')
+        0, 1, decimals=4, default=-0.9512, space='exit')
     sell_min1 = DecimalParameter(
-        0, 1, decimals=4, default=0.6519, space='sell')
+        0, 1, decimals=4, default=0.6519, space='exit')
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
@@ -128,7 +128,7 @@ class wtc(IStrategy):
             dataframe['wt1'], dataframe['wt2'], dataframe['def'], dataframe['slowk'] = 0, 10, 100, 1000
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (qtpylib.crossed_above(dataframe['wt1'], dataframe['wt2']))
@@ -138,11 +138,11 @@ class wtc(IStrategy):
 
             ),
 
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # print(dataframe['slowk']/dataframe['wt1'])
         dataframe.loc[
             (
@@ -152,5 +152,5 @@ class wtc(IStrategy):
                 & (dataframe['def'].between(self.sell_min.value, self.sell_max.value))
 
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

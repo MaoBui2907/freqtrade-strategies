@@ -93,26 +93,26 @@ class Diamond(IStrategy):
     timeframe = '5m'
     # #################### END OF RESULT PLACE ####################
 
-    buy_vertical_push = DecimalParameter(0.5, 1.5, decimals=3, default=1, space='buy')
-    buy_horizontal_push = IntParameter(0, 10, default=0, space='buy')
+    buy_vertical_push = DecimalParameter(0.5, 1.5, decimals=3, default=1, space='entry')
+    buy_horizontal_push = IntParameter(0, 10, default=0, space='entry')
     buy_fast_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                          #  you can not enable this lines befour you
                                          #  populate an indicator for them and set
                                          #  the same key name for it
                                          #  'ma_fast', 'ma_slow', {...}
-                                         ], default='ma_fast', space='buy')
+                                         ], default='ma_fast', space='entry')
     buy_slow_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                          #  'ma_fast', 'ma_slow', {...}
-                                         ], default='ma_slow', space='buy')
+                                         ], default='ma_slow', space='entry')
 
-    sell_vertical_push = DecimalParameter(0.5, 1.5, decimals=3,  default=1, space='sell')
-    sell_horizontal_push = IntParameter(0, 10, default=0, space='sell')
+    sell_vertical_push = DecimalParameter(0.5, 1.5, decimals=3,  default=1, space='exit')
+    sell_horizontal_push = IntParameter(0, 10, default=0, space='exit')
     sell_fast_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                           #  'ma_fast', 'ma_slow', {...}
-                                          ], default='ma_fast', space='sell')
+                                          ], default='ma_fast', space='exit')
     sell_slow_key = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                           #  'ma_fast', 'ma_slow', {...}
-                                          ], default='ma_slow', space='sell')
+                                          ], default='ma_slow', space='exit')
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # you can add new indicators and enable them inside
@@ -122,7 +122,7 @@ class Diamond(IStrategy):
         # dataframe['{...}'] = ta.{...}(dataframe, timeperiod={...})
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(
             qtpylib.crossed_above
@@ -135,11 +135,11 @@ class Diamond(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy']=1
+                'entry']=1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(
             qtpylib.crossed_below
@@ -151,5 +151,5 @@ class Diamond(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell']=1
+                'exit_long']=1
         return dataframe

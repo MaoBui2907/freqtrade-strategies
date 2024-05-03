@@ -314,17 +314,17 @@ class Ichess(IStrategy):
         return dataframe
 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # exit()
         dataframe.loc[
             # (dataframe['Ichimoku_Score']>0)&
             qtpylib.crossed_above(
                 ta.SMA(dataframe['Ichimoku_Score'], self.buy_fast_timeperiod.value),
                 ta.SMA(dataframe['Ichimoku_Score'], self.buy_slow_timeperiod.value)
-            ), 'buy'] = 1
+            ), 'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
                 # (dataframe['Ichimoku_Score']<0)|
                 (
@@ -332,7 +332,7 @@ class Ichess(IStrategy):
                     ta.SMA(dataframe['Ichimoku_Score'], self.sell_fast_timeperiod.value),
                     ta.SMA(dataframe['Ichimoku_Score'], self.sell_slow_timeperiod.value)
                 )
-            ), 'sell'] = 1
+            ), 'exit_long'] = 1
 
         return dataframe
 

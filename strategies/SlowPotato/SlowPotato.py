@@ -56,14 +56,14 @@ class SlowPotato(IStrategy):
     trailing_stop_positive_offset = 0.03
     
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = True
     
     # Optional order type mapping
     order_types = {
-        'buy': 'market',
-        'sell': 'market',
+        'entry': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -71,8 +71,8 @@ class SlowPotato(IStrategy):
         
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
         }
     # run "populate_indicators" only for new candle
     process_only_new_candles = False
@@ -81,7 +81,7 @@ class SlowPotato(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         If close candle breaks lower or equal to average low for last 5 days buy it
         """
@@ -92,10 +92,10 @@ class SlowPotato(IStrategy):
                 (dataframe['low'] <= dataframe['low'].rolling(1440).mean()) & ## current dataframe is below average low
                 (dataframe['volume'] > 0) # volume above zero
             )
-        ,'buy'] = 1
+        ,'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         If open candle breaks higher or equal to average high for last 5 days sell it
         """
@@ -105,5 +105,5 @@ class SlowPotato(IStrategy):
                 (dataframe['high'] >= dataframe['high'].rolling(1440).mean()) & ## current dataframe is above average high
                 (dataframe['volume'] > 0) # volume above zero
             )
-        ,'sell'] = 1
+        ,'exit_long'] = 1
         return dataframe

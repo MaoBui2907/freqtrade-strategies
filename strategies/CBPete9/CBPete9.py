@@ -39,7 +39,7 @@ from freqtrade.strategy import merge_informative_pair, CategoricalParameter, Dec
 ##   Ensure that you don't override any variables in your config.json. Especially                        ##
 ##   the timeframe (must be 5m).                                                                         ##
 ##                                                                                                       ##
-##   sell_profit_only:                                                                                   ##
+##   exit_profit_only:                                                                                   ##
 ##       True - risk more (gives you higher profit and higher Drawdown)                                  ##
 ##       False (default) - risk less (gives you less ~10-15% profit and much lower Drawdown)             ##
 ##                                                                                                       ##
@@ -80,10 +80,10 @@ class CBPete9(IStrategy):
     inf_1h = '1h'
 
     # Sell signal
-    use_sell_signal = False
-    sell_profit_only = False
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = False
+    exit_profit_only = False
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = False
 
     # Trailing stoploss
     trailing_stop = True
@@ -102,8 +102,8 @@ class CBPete9(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'market',
-        'sell': 'market',
+        'entry': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -129,35 +129,35 @@ class CBPete9(IStrategy):
 
     # Buy
 
-    buy_condition_0_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_1_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_2_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_3_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_4_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_5_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_6_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_7_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_8_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_9_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_10_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+    buy_condition_0_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_1_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_2_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_3_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_4_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_5_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_6_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_7_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_8_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_9_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_10_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
 
-    buy_bb20_close_bblowerband_safe_1 = DecimalParameter(0.7, 1.1, default=0.99, space='buy', optimize=False, load=True)
-    buy_bb20_close_bblowerband_safe_2 = DecimalParameter(0.7, 1.1, default=0.982, space='buy', optimize=False, load=True)
+    buy_bb20_close_bblowerband_safe_1 = DecimalParameter(0.7, 1.1, default=0.99, space='entry', optimize=False, load=True)
+    buy_bb20_close_bblowerband_safe_2 = DecimalParameter(0.7, 1.1, default=0.982, space='entry', optimize=False, load=True)
 
-    buy_volume_pump_1 = DecimalParameter(0.1, 0.9, default=0.4, space='buy', decimals=1, optimize=False, load=True)
-    buy_volume_drop_1 = DecimalParameter(1, 10, default=4, space='buy', decimals=1, optimize=False, load=True)
+    buy_volume_pump_1 = DecimalParameter(0.1, 0.9, default=0.4, space='entry', decimals=1, optimize=False, load=True)
+    buy_volume_drop_1 = DecimalParameter(1, 10, default=4, space='entry', decimals=1, optimize=False, load=True)
 
-    buy_rsi_1h_1 = DecimalParameter(10.0, 40.0, default=16.5, space='buy', decimals=1, optimize=False, load=True)
-    buy_rsi_1h_2 = DecimalParameter(10.0, 40.0, default=15.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_rsi_1h_3 = DecimalParameter(10.0, 40.0, default=20.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_rsi_1h_4 = DecimalParameter(10.0, 40.0, default=35.0, space='buy', decimals=1, optimize=False, load=True)
+    buy_rsi_1h_1 = DecimalParameter(10.0, 40.0, default=16.5, space='entry', decimals=1, optimize=False, load=True)
+    buy_rsi_1h_2 = DecimalParameter(10.0, 40.0, default=15.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_rsi_1h_3 = DecimalParameter(10.0, 40.0, default=20.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_rsi_1h_4 = DecimalParameter(10.0, 40.0, default=35.0, space='entry', decimals=1, optimize=False, load=True)
 
-    buy_rsi_1 = DecimalParameter(10.0, 40.0, default=28.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_rsi_2 = DecimalParameter(7.0, 40.0, default=10.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_rsi_3 = DecimalParameter(7.0, 40.0, default=14.2, space='buy', decimals=1, optimize=False, load=True)
+    buy_rsi_1 = DecimalParameter(10.0, 40.0, default=28.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_rsi_2 = DecimalParameter(7.0, 40.0, default=10.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_rsi_3 = DecimalParameter(7.0, 40.0, default=14.2, space='entry', decimals=1, optimize=False, load=True)
 
-    buy_macd_1 = DecimalParameter(0.01, 0.09, default=0.02, space='buy', decimals=2, optimize=False, load=True)
-    buy_macd_2 = DecimalParameter(0.01, 0.09, default=0.03, space='buy', decimals=2, optimize=False, load=True)
+    buy_macd_1 = DecimalParameter(0.01, 0.09, default=0.02, space='entry', decimals=2, optimize=False, load=True)
+    buy_macd_2 = DecimalParameter(0.01, 0.09, default=0.03, space='entry', decimals=2, optimize=False, load=True)
 
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
@@ -245,7 +245,7 @@ class CBPete9(IStrategy):
         return dataframe
 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (    
@@ -371,18 +371,18 @@ class CBPete9(IStrategy):
                 (dataframe['rsi'] < dataframe['rsi_1h'] - 43.276) &
                 (dataframe['volume'] > 0)
             ),
-            'buy'
+            'entry'
         ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['close'] > dataframe['bb_middleband'] * 1.01) &                  # Don't be gready, sell fast
                 (dataframe['volume'] > 0) # Make sure Volume is not 0
             )
             ,
-            'sell'
+            'exit'
         ] = 1
         return dataframe

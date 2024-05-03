@@ -26,15 +26,15 @@ class bbema(IStrategy):
     # Optional order type mapping
     order_types = {
         'buy': 'market',
-        'sell': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Optional time in force for orders
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc',
+        'entry': 'gtc',
+        'exit': 'gtc',
     }
 
     def informative_pairs(self):
@@ -74,7 +74,7 @@ class bbema(IStrategy):
             
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame
@@ -87,11 +87,11 @@ class bbema(IStrategy):
             (
                 (qtpylib.crossed_above(dataframe['ema10'], dataframe['ema50'])) 
             ), 
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         :param dataframe: DataFrame
@@ -103,5 +103,5 @@ class bbema(IStrategy):
                 (qtpylib.crossed_above(dataframe['ema50'], dataframe['ema10'])) 
                 # (dataframe['close'] < dataframe['close'].shift(periods=-10)) 
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

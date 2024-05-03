@@ -42,15 +42,15 @@ class SwingHighToSky(IStrategy):
 
     minimal_roi = {"0": 0.27058, "33": 0.0853, "64": 0.04093, "244": 0}
 
-    buy_cci = IntParameter(low=-200, high=200, default=100, space='buy', optimize=True)
-    buy_cciTime = IntParameter(low=10, high=80, default=20, space='buy', optimize=True)
-    buy_rsi = IntParameter(low=10, high=90, default=30, space='buy', optimize=True)
-    buy_rsiTime = IntParameter(low=10, high=80, default=26, space='buy', optimize=True)
+    buy_cci = IntParameter(low=-200, high=200, default=100, space='entry', optimize=True)
+    buy_cciTime = IntParameter(low=10, high=80, default=20, space='entry', optimize=True)
+    buy_rsi = IntParameter(low=10, high=90, default=30, space='entry', optimize=True)
+    buy_rsiTime = IntParameter(low=10, high=80, default=26, space='entry', optimize=True)
 
-    sell_cci = IntParameter(low=-200, high=200, default=100, space='sell', optimize=True)
-    sell_cciTime = IntParameter(low=10, high=80, default=20, space='sell', optimize=True)
-    sell_rsi = IntParameter(low=10, high=90, default=30, space='sell', optimize=True)
-    sell_rsiTime = IntParameter(low=10, high=80, default=26, space='sell', optimize=True)
+    sell_cci = IntParameter(low=-200, high=200, default=100, space='exit', optimize=True)
+    sell_cciTime = IntParameter(low=10, high=80, default=20, space='exit', optimize=True)
+    sell_rsi = IntParameter(low=10, high=90, default=30, space='exit', optimize=True)
+    sell_rsiTime = IntParameter(low=10, high=80, default=26, space='exit', optimize=True)
 
     # Buy hyperspace params:
     buy_params = {
@@ -87,24 +87,24 @@ class SwingHighToSky(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
                 (dataframe[f'cci-{self.buy_cciTime.value}'] < self.buy_cci.value) &
                 (dataframe[f'rsi-{self.buy_rsiTime.value}'] < self.buy_rsi.value)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
                 (dataframe[f'cci-sell-{self.sell_cciTime.value}'] > self.sell_cci.value) &
                 (dataframe[f'rsi-sell-{self.sell_rsiTime.value}'] > self.sell_rsi.value)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe

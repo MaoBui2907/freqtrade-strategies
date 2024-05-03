@@ -43,31 +43,31 @@ class Ichimoku_v12(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['close'] > dataframe['senkou_a']) &
                 (dataframe['close'] > dataframe['senkou_b'])
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         dataframe.loc[
             (
                 (dataframe['close'] > dataframe['senkou_a']) &
                 (dataframe['close'] > dataframe['senkou_b'])
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # dataframe.loc[
         #     (
         #         (qtpylib.crossed_below(dataframe['close'], dataframe['senkou_b'])) &
         #         (dataframe['close'] < dataframe['senkou_a']) &
         #         (dataframe['close'] < dataframe['senkou_b'])
         #     ),
-        #     'sell'] = 1
+        #     'exit_long'] = 1
         #
         # dataframe.loc[
         #     (
@@ -75,6 +75,6 @@ class Ichimoku_v12(IStrategy):
         #         (dataframe['close'] < dataframe['senkou_a']) &
         #         (dataframe['close'] < dataframe['senkou_b'])
         #     ),
-        #     'sell'] = 1
+        #     'exit_long'] = 1
 
         return dataframe

@@ -59,35 +59,35 @@ class MultiMA_TSL(IStrategy):
     stoploss = -0.15
 
     # Multi Offset
-    base_nb_candles_sell = IntParameter(5, 80, default=20, space='sell', optimize=False)
-    base_nb_candles_sell_trima = IntParameter(5, 80, default=20, space='sell', optimize=False)
-    high_offset_trima = DecimalParameter(0.99, 1.1, default=1.012, space='sell', optimize=False)
+    base_nb_candles_sell = IntParameter(5, 80, default=20, space='exit', optimize=False)
+    base_nb_candles_sell_trima = IntParameter(5, 80, default=20, space='exit', optimize=False)
+    high_offset_trima = DecimalParameter(0.99, 1.1, default=1.012, space='exit', optimize=False)
 
-    base_nb_candles_buy_ema = IntParameter(5, 80, default=20, space='buy', optimize=False)
-    low_offset_ema = DecimalParameter(0.9, 1.1, default=0.958, space='buy', optimize=False)
-    high_offset_ema = DecimalParameter(0.99, 1.1, default=1.012, space='sell', optimize=False)
-    rsi_buy_ema = IntParameter(30, 70, default=61, space='buy', optimize=False)
+    base_nb_candles_buy_ema = IntParameter(5, 80, default=20, space='entry', optimize=False)
+    low_offset_ema = DecimalParameter(0.9, 1.1, default=0.958, space='entry', optimize=False)
+    high_offset_ema = DecimalParameter(0.99, 1.1, default=1.012, space='exit', optimize=False)
+    rsi_buy_ema = IntParameter(30, 70, default=61, space='entry', optimize=False)
 
-    base_nb_candles_buy_trima = IntParameter(5, 80, default=20, space='buy', optimize=False)
-    low_offset_trima = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=False)
-    rsi_buy_trima = IntParameter(30, 70, default=61, space='buy', optimize=False)
+    base_nb_candles_buy_trima = IntParameter(5, 80, default=20, space='entry', optimize=False)
+    low_offset_trima = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=False)
+    rsi_buy_trima = IntParameter(30, 70, default=61, space='entry', optimize=False)
 
-    base_nb_candles_buy_zema = IntParameter(5, 80, default=20, space='buy', optimize=False)
-    low_offset_zema = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=False)
-    rsi_buy_zema = IntParameter(30, 70, default=61, space='buy', optimize=False)
+    base_nb_candles_buy_zema = IntParameter(5, 80, default=20, space='entry', optimize=False)
+    low_offset_zema = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=False)
+    rsi_buy_zema = IntParameter(30, 70, default=61, space='entry', optimize=False)
 
     buy_condition_enable_optimize = True
-    buy_condition_trima_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)
-    buy_condition_zema_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)
+    buy_condition_trima_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
+    buy_condition_zema_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
 
     # Protection1
-    ewo_low = DecimalParameter(-20.0, -8.0, default=-20.0, space='buy', optimize=False)
-    ewo_high = DecimalParameter(2.0, 12.0, default=6.0, space='buy', optimize=False)
-    fast_ewo = IntParameter(10, 50, default=50, space='buy', optimize=False)
-    slow_ewo = IntParameter(100, 200, default=200, space='buy', optimize=False)
-    buy_roc_max = DecimalParameter(20, 70, default=55, space='buy', optimize=False)
-    buy_peak_max = DecimalParameter(1, 1.1, default=1.03, decimals=3, space='buy', optimize=False)
-    buy_rsi_fast = IntParameter(0, 50, default=35, space='buy', optimize=False)
+    ewo_low = DecimalParameter(-20.0, -8.0, default=-20.0, space='entry', optimize=False)
+    ewo_high = DecimalParameter(2.0, 12.0, default=6.0, space='entry', optimize=False)
+    fast_ewo = IntParameter(10, 50, default=50, space='entry', optimize=False)
+    slow_ewo = IntParameter(100, 200, default=200, space='entry', optimize=False)
+    buy_roc_max = DecimalParameter(20, 70, default=55, space='entry', optimize=False)
+    buy_peak_max = DecimalParameter(1, 1.1, default=1.03, decimals=3, space='entry', optimize=False)
+    buy_rsi_fast = IntParameter(0, 50, default=35, space='entry', optimize=False)
 
     # Trailing stoploss (not used)
     trailing_stop = False
@@ -138,10 +138,10 @@ class MultiMA_TSL(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = True
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 200
@@ -175,7 +175,7 @@ class MultiMA_TSL(IStrategy):
         
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         dataframe['ema_offset_buy'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema.value)) *self.low_offset_ema.value
@@ -184,7 +184,7 @@ class MultiMA_TSL(IStrategy):
         
         dataframe.loc[:, 'buy_tag'] = ''
         dataframe.loc[:, 'buy_copy'] = 0
-        dataframe.loc[:, 'buy'] = 0
+        dataframe.loc[:, 'entry'] = 0
 
         buy_offset_trima = (
             self.buy_condition_trima_enable.value &
@@ -229,12 +229,12 @@ class MultiMA_TSL(IStrategy):
         if conditions:
             dataframe.loc[
                 (add_check & reduce(lambda x, y: x | y, conditions)),
-                ['buy_copy','buy']
+                ['buy_copy','entry']
             ]=(1,1)
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[:, 'sell_copy'] = 0
 
         dataframe['ema_offset_sell'] = ta.EMA(dataframe, int(self.base_nb_candles_sell.value)) *self.high_offset_ema.value
@@ -259,11 +259,11 @@ class MultiMA_TSL(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                ['sell_copy', 'sell']
+                ['sell_copy', 'exit_long']
             ]=(1,1)
 
         if not self.config['runmode'].value in ('backtest', 'hyperopt'):
-            dataframe.loc[:, 'sell'] = 0
+            dataframe.loc[:, 'exit_long'] = 0
 
         return dataframe
 

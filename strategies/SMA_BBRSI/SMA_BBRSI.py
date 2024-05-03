@@ -93,26 +93,26 @@ class SMA_BBRSI(IStrategy):
     # Stoploss:
     stoploss = -0.5
 
-    antipump_threshold = DecimalParameter(0, 0.4, default=0.25, space='buy', optimize=True)
+    antipump_threshold = DecimalParameter(0, 0.4, default=0.25, space='entry', optimize=True)
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
+        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
+        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=True)
+        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
     high_offset = DecimalParameter(
-        0.99, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
+        0.99, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
     ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='buy', optimize=True)
+                               default=buy_params['ewo_low'], space='entry', optimize=True)
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=True)
+        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
 
 
     # Trailing stop:
@@ -122,10 +122,10 @@ class SMA_BBRSI(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
@@ -175,23 +175,23 @@ class SMA_BBRSI(IStrategy):
         },
     ]
 
-    ewo_high_bb = DecimalParameter(0, 7.0, default=buy_params['ewo_high_bb'], space='buy', optimize=True)
-    for_sigma = DecimalParameter(0, 10.0, default=buy_params['for_sigma'], space='buy', optimize=True)
-    for_sigma_sell = DecimalParameter(0, 10.0, default=sell_params['for_sigma_sell'], space='sell', optimize=True)
-    rsi_high = IntParameter(60, 100, default=sell_params['rsi_high'], space='sell', optimize=True)
-    for_ma_length = IntParameter(5, 80, default=buy_params['for_ma_length'], space='buy', optimize=True)
-    for_ma_length_sell = IntParameter(5, 80, default=sell_params['for_ma_length_sell'], space='sell', optimize=True)
+    ewo_high_bb = DecimalParameter(0, 7.0, default=buy_params['ewo_high_bb'], space='entry', optimize=True)
+    for_sigma = DecimalParameter(0, 10.0, default=buy_params['for_sigma'], space='entry', optimize=True)
+    for_sigma_sell = DecimalParameter(0, 10.0, default=sell_params['for_sigma_sell'], space='exit', optimize=True)
+    rsi_high = IntParameter(60, 100, default=sell_params['rsi_high'], space='exit', optimize=True)
+    for_ma_length = IntParameter(5, 80, default=buy_params['for_ma_length'], space='entry', optimize=True)
+    for_ma_length_sell = IntParameter(5, 80, default=sell_params['for_ma_length_sell'], space='exit', optimize=True)
 
 
     is_optimize_trailing = True
-    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
 
     use_custom_stoploss = True
 
@@ -363,7 +363,7 @@ class SMA_BBRSI(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dont_buy_conditions = []
 
@@ -421,16 +421,16 @@ class SMA_BBRSI(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -462,7 +462,7 @@ class SMA_BBRSI(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

@@ -47,8 +47,8 @@ class MACDStrategy(IStrategy):
     # Optimal timeframe for the strategy
     timeframe = '5m'
 
-    buy_cci = IntParameter(low=-700, high=0, default=-50, space='buy', optimize=True)
-    sell_cci = IntParameter(low=0, high=700, default=100, space='sell', optimize=True)
+    buy_cci = IntParameter(low=-700, high=0, default=-50, space='entry', optimize=True)
+    sell_cci = IntParameter(low=0, high=700, default=100, space='exit', optimize=True)
 
     # Buy hyperspace params:
     buy_params = {
@@ -70,7 +70,7 @@ class MACDStrategy(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame
@@ -82,11 +82,11 @@ class MACDStrategy(IStrategy):
                 (dataframe['cci'] <= self.buy_cci.value) &
                 (dataframe['volume'] > 0)  # Make sure Volume is not 0
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         :param dataframe: DataFrame
@@ -98,6 +98,6 @@ class MACDStrategy(IStrategy):
                 (dataframe['cci'] >= self.sell_cci.value) &
                 (dataframe['volume'] > 0)  # Make sure Volume is not 0
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe

@@ -48,22 +48,22 @@ class BBRSI2(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['rsi'] > 35)
                 & (dataframe['close'] < dataframe['bb_lowerband'])
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['rsi'] > 75)
                 & (dataframe['close'] > dataframe['bb_middleband'])
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe

@@ -31,12 +31,12 @@ class UltimateMomentumIndicator(IStrategy):
 
  
 
-    length1_buy = IntParameter(2, 20, default= 13, space='buy')
-    length2_buy = IntParameter(10, 40, default= 19, space='buy')
-    length3_buy = IntParameter(10, 50, default= 21, space='buy')
-    length4_buy = IntParameter(20, 80, default= 39, space='buy')
-    length5_buy = IntParameter(30, 100, default= 50, space='buy')
-    length6_buy = IntParameter(150, 300, default= 200, space='buy')
+    length1_buy = IntParameter(2, 20, default= 13, space='entry')
+    length2_buy = IntParameter(10, 40, default= 19, space='entry')
+    length3_buy = IntParameter(10, 50, default= 21, space='entry')
+    length4_buy = IntParameter(20, 80, default= 39, space='entry')
+    length5_buy = IntParameter(30, 100, default= 50, space='entry')
+    length6_buy = IntParameter(150, 300, default= 200, space='entry')
    
     stoploss = -0.99
     # Optimal stoploss designed for the strategy.
@@ -52,26 +52,26 @@ class UltimateMomentumIndicator(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 30
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
     
     plot_config = {
@@ -116,7 +116,7 @@ class UltimateMomentumIndicator(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
@@ -124,17 +124,17 @@ class UltimateMomentumIndicator(IStrategy):
                  (qtpylib.crossed_above(dataframe['utmi'], 50)) &  
                  (dataframe['volume'] > 0)  # Make sure Volume is not 0
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
              
                 (qtpylib.crossed_below(dataframe['utmi'], 70)) &  
                 (dataframe['volume'] > 0)  # Make sure Volume is not 0
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
     

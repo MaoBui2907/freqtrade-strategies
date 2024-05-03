@@ -25,7 +25,7 @@ from functools import reduce
 ##   Prefer stable coin (USDT, BUSDT etc) pairs, instead of BTC or ETH pairs.                            ##
 ##   Highly recommended to blacklist leveraged tokens (*BULL, *BEAR, *UP, *DOWN etc).                    ##
 ##   Ensure that you don't override any variables in you config.json. Especially                         ##
-##   the timeframe (must be 5m) & sell_profit_only (must be true).                                       ##
+##   the timeframe (must be 5m) & exit_profit_only (must be true).                                       ##
 ##                                                                                                       ##
 ###########################################################################################################
 ##               DONATIONS                                                                               ##
@@ -63,10 +63,10 @@ class CombinedBinHAndClucV7(IStrategy):
     inf_1h = '1h' # informative tf
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
     trailing_stop = True
@@ -85,42 +85,42 @@ class CombinedBinHAndClucV7(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Buy Hyperopt params
 
-    buy_dip_threshold_1 = DecimalParameter(0.08, 0.2, default=0.14, space='buy', decimals=2, optimize=False, load=True)
-    buy_dip_threshold_2 = DecimalParameter(0.02, 0.4, default=0.34, space='buy', decimals=2, optimize=False, load=True)
-    buy_dip_threshold_3 = DecimalParameter(0.25, 0.44, default=0.38, space='buy', decimals=2, optimize=False, load=True)
+    buy_dip_threshold_1 = DecimalParameter(0.08, 0.2, default=0.14, space='entry', decimals=2, optimize=False, load=True)
+    buy_dip_threshold_2 = DecimalParameter(0.02, 0.4, default=0.34, space='entry', decimals=2, optimize=False, load=True)
+    buy_dip_threshold_3 = DecimalParameter(0.25, 0.44, default=0.38, space='entry', decimals=2, optimize=False, load=True)
 
-    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.04, default=0.031, space='buy', optimize=True, load=True)
-    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.021, space='buy', optimize=True, load=True)
-    buy_bb40_tail_bbdelta = DecimalParameter(0.2, 0.4, default=0.264, space='buy', optimize=True, load=True)
+    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.04, default=0.031, space='entry', optimize=True, load=True)
+    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.021, space='entry', optimize=True, load=True)
+    buy_bb40_tail_bbdelta = DecimalParameter(0.2, 0.4, default=0.264, space='entry', optimize=True, load=True)
 
-    buy_bb20_close_bblowerband = DecimalParameter(0.8, 1.1, default=0.992, space='buy', optimize=True, load=True)
-    buy_bb20_volume = IntParameter(18, 36, default=29, space='buy', optimize=True, load=True)
+    buy_bb20_close_bblowerband = DecimalParameter(0.8, 1.1, default=0.992, space='entry', optimize=True, load=True)
+    buy_bb20_volume = IntParameter(18, 36, default=29, space='entry', optimize=True, load=True)
 
-    buy_rsi_diff = DecimalParameter(34.0, 60.0, default=50.48, space='buy', decimals=2, optimize=True, load=True)
+    buy_rsi_diff = DecimalParameter(34.0, 60.0, default=50.48, space='entry', decimals=2, optimize=True, load=True)
 
-    buy_min_inc = DecimalParameter(0.005, 0.05, default=0.01, space='buy', decimals=2, optimize=True, load=True)
-    buy_rsi_1h = DecimalParameter(40.0, 70.0, default=67.0, space='buy', decimals=2, optimize=True, load=True)
-    buy_rsi = DecimalParameter(30.0, 40.0, default=38.5, space='buy', decimals=2, optimize=True, load=True)
-    buy_mfi = DecimalParameter(36.0, 65.0, default=36.0, space='buy', decimals=2, optimize=True, load=True)
+    buy_min_inc = DecimalParameter(0.005, 0.05, default=0.01, space='entry', decimals=2, optimize=True, load=True)
+    buy_rsi_1h = DecimalParameter(40.0, 70.0, default=67.0, space='entry', decimals=2, optimize=True, load=True)
+    buy_rsi = DecimalParameter(30.0, 40.0, default=38.5, space='entry', decimals=2, optimize=True, load=True)
+    buy_mfi = DecimalParameter(36.0, 65.0, default=36.0, space='entry', decimals=2, optimize=True, load=True)
 
     # Sell Hyperopt params
 
-    sell_roi_profit_1 = DecimalParameter(0.08, 0.16, default=0.1, space='sell', decimals=2, optimize=False, load=True)
-    sell_roi_rsi_1 = DecimalParameter(30.0, 38.0, default=34, space='sell', decimals=2, optimize=False, load=True)
-    sell_roi_profit_2 = DecimalParameter(0.02, 0.05, default=0.03, space='sell', decimals=2, optimize=False, load=True)
-    sell_roi_rsi_2 = DecimalParameter(34.0, 44.0, default=38, space='sell', decimals=2, optimize=False, load=True)
-    sell_roi_profit_3 = DecimalParameter(0.0, 0.0, default=0.0, space='sell', decimals=2, optimize=False, load=True)
-    sell_roi_rsi_3 = DecimalParameter(48.0, 56.0, default=50, space='sell', decimals=2, optimize=False, load=True)
+    sell_roi_profit_1 = DecimalParameter(0.08, 0.16, default=0.1, space='exit', decimals=2, optimize=False, load=True)
+    sell_roi_rsi_1 = DecimalParameter(30.0, 38.0, default=34, space='exit', decimals=2, optimize=False, load=True)
+    sell_roi_profit_2 = DecimalParameter(0.02, 0.05, default=0.03, space='exit', decimals=2, optimize=False, load=True)
+    sell_roi_rsi_2 = DecimalParameter(34.0, 44.0, default=38, space='exit', decimals=2, optimize=False, load=True)
+    sell_roi_profit_3 = DecimalParameter(0.0, 0.0, default=0.0, space='exit', decimals=2, optimize=False, load=True)
+    sell_roi_rsi_3 = DecimalParameter(48.0, 56.0, default=50, space='exit', decimals=2, optimize=False, load=True)
 
-    sell_rsi_main = DecimalParameter(72.0, 90.0, default=77, space='sell', decimals=2, optimize=True, load=True)
+    sell_rsi_main = DecimalParameter(72.0, 90.0, default=77, space='exit', decimals=2, optimize=True, load=True)
 
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
@@ -214,7 +214,7 @@ class CombinedBinHAndClucV7(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -285,12 +285,12 @@ class CombinedBinHAndClucV7(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -312,7 +312,7 @@ class CombinedBinHAndClucV7(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ] = 1
 
         return dataframe

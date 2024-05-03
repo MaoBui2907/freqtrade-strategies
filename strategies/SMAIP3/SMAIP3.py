@@ -58,29 +58,29 @@ class SMAIP3(IStrategy):
     trailing_only_offset_is_reached = True
 
     base_nb_candles_buy = IntParameter(
-        16, 60, default=buy_params['base_nb_candles_buy'], space='buy')
+        16, 60, default=buy_params['base_nb_candles_buy'], space='entry')
     base_nb_candles_sell = IntParameter(
-        16, 60, default=sell_params['base_nb_candles_sell'], space='sell')
+        16, 60, default=sell_params['base_nb_candles_sell'], space='exit')
     low_offset = DecimalParameter(
-        0.8, 0.99, default=buy_params['low_offset'], space='buy')
+        0.8, 0.99, default=buy_params['low_offset'], space='entry')
     high_offset = DecimalParameter(
-        0.8, 1.1, default=sell_params['high_offset'], space='sell')
+        0.8, 1.1, default=sell_params['high_offset'], space='exit')
     buy_trigger = CategoricalParameter(
-        ma_types.keys(), default=buy_params['buy_trigger'], space='buy')
+        ma_types.keys(), default=buy_params['buy_trigger'], space='entry')
     sell_trigger = CategoricalParameter(
-        ma_types.keys(), default=sell_params['sell_trigger'], space='sell')
+        ma_types.keys(), default=sell_params['sell_trigger'], space='exit')
 
     pair_is_bad_1_threshold = DecimalParameter(
-        0.00, 0.30, default=0.200, space='buy')
+        0.00, 0.30, default=0.200, space='entry')
     pair_is_bad_2_threshold = DecimalParameter(
-        0.00, 0.25, default=0.072, space='buy')
+        0.00, 0.25, default=0.072, space='entry')
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
 
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     process_only_new_candles = True
     startup_candle_count = 30
@@ -111,7 +111,7 @@ class SMAIP3(IStrategy):
             dataframe['ema_200'] = ta.EMA(dataframe, timeperiod=200)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         if self.config['runmode'].value == 'hyperopt':
             dataframe['ma_offset_buy'] = ma_types[self.buy_trigger.value](dataframe,
                                                                           int(self.base_nb_candles_buy.value)) * self.low_offset.value
@@ -132,10 +132,10 @@ class SMAIP3(IStrategy):
                 (dataframe['close'] < dataframe['ma_offset_buy']) &
                 (dataframe['volume'] > 0)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         if self.config['runmode'].value == 'hyperopt':
             dataframe['ma_offset_sell'] = ma_types[self.sell_trigger.value](dataframe,
                                                                             int(self.base_nb_candles_sell.value)) * self.high_offset.value
@@ -145,5 +145,5 @@ class SMAIP3(IStrategy):
                 (dataframe['close'] > dataframe['ma_offset_sell']) &
                 (dataframe['volume'] > 0)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

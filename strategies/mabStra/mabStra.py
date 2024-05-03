@@ -32,21 +32,21 @@ class MabStra(IStrategy):
     # #################### END OF RESULT PLACE ####################
 
     # buy params
-    buy_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='buy')
-    buy_fast_ma_timeframe = IntParameter(2, 100, default=14, space='buy')
-    buy_slow_ma_timeframe = IntParameter(2, 100, default=28, space='buy')
+    buy_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='entry')
+    buy_fast_ma_timeframe = IntParameter(2, 100, default=14, space='entry')
+    buy_slow_ma_timeframe = IntParameter(2, 100, default=28, space='entry')
     buy_div_max = DecimalParameter(
-        0, 2, decimals=4, default=2.25446, space='buy')
+        0, 2, decimals=4, default=2.25446, space='entry')
     buy_div_min = DecimalParameter(
-        0, 2, decimals=4, default=0.29497, space='buy')
+        0, 2, decimals=4, default=0.29497, space='entry')
     # sell params
-    sell_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='sell')
-    sell_fast_ma_timeframe = IntParameter(2, 100, default=14, space='sell')
-    sell_slow_ma_timeframe = IntParameter(2, 100, default=28, space='sell')
+    sell_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='exit')
+    sell_fast_ma_timeframe = IntParameter(2, 100, default=14, space='exit')
+    sell_slow_ma_timeframe = IntParameter(2, 100, default=28, space='exit')
     sell_div_max = DecimalParameter(
-        0, 2, decimals=4, default=1.54593, space='sell')
+        0, 2, decimals=4, default=1.54593, space='exit')
     sell_div_min = DecimalParameter(
-        0, 2, decimals=4, default=2.81436, space='sell')
+        0, 2, decimals=4, default=2.81436, space='exit')
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # SMA - ex Moving Average
@@ -64,7 +64,7 @@ class MabStra(IStrategy):
                                           timeperiod=self.sell_slow_ma_timeframe.value)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
@@ -77,11 +77,11 @@ class MabStra(IStrategy):
                 (dataframe['buy-fastMA'].div(dataframe['buy-slowMA'])
                     < self.buy_div_max.value)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['sell-fastMA'].div(dataframe['sell-mojoMA'])
@@ -93,5 +93,5 @@ class MabStra(IStrategy):
                 (dataframe['sell-slowMA'].div(dataframe['sell-fastMA'])
                     < self.sell_div_max.value)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

@@ -54,7 +54,7 @@ class Combined_Indicators(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (  # strategy BinHV45
                     dataframe['lower'].shift().gt(0) &
@@ -69,16 +69,16 @@ class Combined_Indicators(IStrategy):
                     (dataframe['close'] < 0.98863 * dataframe['bb_lowerband']) &
                     (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * 34))
             ),
-            'buy'
+            'entry'
         ] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         """
         dataframe.loc[
             (dataframe['close'] > dataframe['bb_middleband']),
-            'sell'
+            'exit'
         ] = 1
 
         return dataframe

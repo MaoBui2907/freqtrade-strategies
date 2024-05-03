@@ -41,24 +41,24 @@ class MACDRSI200(IStrategy):
         dataframe['sell-rsi'] = ta.RSI(dataframe)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['rsi'].rolling(8).min() < 41) &
                     (dataframe['close'] > dataframe['ema200']) &
                     (qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal']))
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['rsi'].rolling(8).max() > 93) &
                     (dataframe['macd'] > 0) &
                     (qtpylib.crossed_below(dataframe['macd'], dataframe['macdsignal']))
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe

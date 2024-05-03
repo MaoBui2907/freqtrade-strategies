@@ -61,10 +61,10 @@ class NostalgiaForInfinityV2(IStrategy):
     custom_info = {}
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
     trailing_stop = False
@@ -82,8 +82,8 @@ class NostalgiaForInfinityV2(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -112,18 +112,18 @@ class NostalgiaForInfinityV2(IStrategy):
         "sell_ema_relative": 0.03,
     }
 
-    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.05, default=0.049, space='buy', optimize=True, load=True)
-    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.023, space='buy', optimize=True, load=True)
-    buy_bb40_tail_bbdelta = DecimalParameter(0.15, 0.45, default=0.287, space='buy', optimize=True, load=True)
-    buy_bb20_close_bblowerband = DecimalParameter(0.8, 1.1, default=0.991, space='buy', optimize=True, load=True)
-    buy_bb20_volume = IntParameter(18, 34, default=20, space='buy', optimize=True, load=True)
-    buy_rsi_diff = DecimalParameter(36.0, 54.0, default=37.0, space='buy', optimize=True, load=True)
+    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.05, default=0.049, space='entry', optimize=True, load=True)
+    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.023, space='entry', optimize=True, load=True)
+    buy_bb40_tail_bbdelta = DecimalParameter(0.15, 0.45, default=0.287, space='entry', optimize=True, load=True)
+    buy_bb20_close_bblowerband = DecimalParameter(0.8, 1.1, default=0.991, space='entry', optimize=True, load=True)
+    buy_bb20_volume = IntParameter(18, 34, default=20, space='entry', optimize=True, load=True)
+    buy_rsi_diff = DecimalParameter(36.0, 54.0, default=37.0, space='entry', optimize=True, load=True)
 
-    sell_rsi_bb = DecimalParameter(60.0, 80.0, default=70, space='sell', optimize=True, load=True)
-    sell_rsi_main = DecimalParameter(72.0, 90.0, default=78.0, space='sell', optimize=True, load=True)
-    sell_rsi_2 = DecimalParameter(72.0, 90.0, default=60.0, space='sell', optimize=True, load=True)
-    sell_ema_relative = DecimalParameter(0.005, 0.1, default=0.03, space='sell', optimize=False, load=True)
-    sell_rsi_diff = DecimalParameter(0.0, 5.0, default=5.0, space='sell', optimize=True, load=True)
+    sell_rsi_bb = DecimalParameter(60.0, 80.0, default=70, space='exit', optimize=True, load=True)
+    sell_rsi_main = DecimalParameter(72.0, 90.0, default=78.0, space='exit', optimize=True, load=True)
+    sell_rsi_2 = DecimalParameter(72.0, 90.0, default=60.0, space='exit', optimize=True, load=True)
+    sell_ema_relative = DecimalParameter(0.005, 0.1, default=0.03, space='exit', optimize=False, load=True)
+    sell_rsi_diff = DecimalParameter(0.0, 5.0, default=5.0, space='exit', optimize=True, load=True)
 
 
     def informative_pairs(self):
@@ -186,7 +186,7 @@ class NostalgiaForInfinityV2(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['close'] < dataframe['sma_9']) &
@@ -225,11 +225,11 @@ class NostalgiaForInfinityV2(IStrategy):
                 (dataframe['volume'] > 0)
             )
             ,
-            'buy'
+            'entry'
         ] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['rsi'] > self.sell_rsi_bb.value) &
@@ -259,6 +259,6 @@ class NostalgiaForInfinityV2(IStrategy):
                 (dataframe['volume'] > 0)
             )
             ,
-            'sell'
+            'exit'
         ] = 1
         return dataframe

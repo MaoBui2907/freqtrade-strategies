@@ -19,8 +19,8 @@ class strato(IStrategy):
     timeframe = '1m'
 
     order_types = {
-        'buy': 'market',
-        'sell': 'market',
+        'entry': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -28,8 +28,8 @@ class strato(IStrategy):
     startup_candle_count: int = 20
 
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc',
+        'entry': 'gtc',
+        'exit': 'gtc',
     }
 
     def informative_pairs(self):
@@ -53,7 +53,7 @@ class strato(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
         (
@@ -61,18 +61,18 @@ class strato(IStrategy):
                 (dataframe['k'] >= dataframe['d'])
                 
 	    ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
                 (dataframe['k'] > 80) &
                 (dataframe['d'] >= dataframe['k'])
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
 
 

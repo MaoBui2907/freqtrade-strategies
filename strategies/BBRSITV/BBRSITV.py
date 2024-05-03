@@ -61,10 +61,10 @@ class BBRSITV(IStrategy):
     trailing_only_offset_is_reached = True  # value loaded from strategy
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
     process_only_new_candles = True
     startup_candle_count = 30
 
@@ -101,10 +101,10 @@ class BBRSITV(IStrategy):
 
     ewo_high = DecimalParameter(0, 7.0, default=buy_params['ewo_high'], space='buy', optimize=True)
     for_sigma = DecimalParameter(0, 10.0, default=buy_params['for_sigma'], space='buy', optimize=True)
-    for_sigma_sell = DecimalParameter(0, 10.0, default=sell_params['for_sigma_sell'], space='sell', optimize=True)
-    rsi_high = IntParameter(60, 100, default=sell_params['rsi_high'], space='sell', optimize=True)
+    for_sigma_sell = DecimalParameter(0, 10.0, default=sell_params['for_sigma_sell'], space='exit', optimize=True)
+    rsi_high = IntParameter(60, 100, default=sell_params['rsi_high'], space='exit', optimize=True)
     for_ma_length = IntParameter(5, 80, default=buy_params['for_ma_length'], space='buy', optimize=True)
-    for_ma_length_sell = IntParameter(5, 80, default=sell_params['for_ma_length_sell'], space='sell', optimize=True)
+    for_ma_length_sell = IntParameter(5, 80, default=sell_params['for_ma_length_sell'], space='exit', optimize=True)
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
@@ -187,7 +187,7 @@ class BBRSITV(IStrategy):
         dataframe['EWO'] = EWO(dataframe, self.fast_ewo, self.slow_ewo)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 # upper = basis + dev
@@ -201,10 +201,10 @@ class BBRSITV(IStrategy):
                 (dataframe['volume'] > 0)
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -218,19 +218,19 @@ class BBRSITV(IStrategy):
                 (dataframe['volume'] > 0)
 
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
 
 class BBRSITV4(BBRSITV):
     minimal_roi = {
         "0": 0.07
     }
-    ignore_roi_if_buy_signal = True
+    ignore_roi_if_entry_signal = True
     startup_candle_count = 400
 
     stoploss = -0.3  # value loaded from strategy
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['rsi'] < (dataframe[f'basis_{self.for_ma_length.value}'] - (dataframe[f'dev_{self.for_ma_length.value}'] * self.for_sigma.value)))
@@ -255,7 +255,7 @@ class BBRSITV4(BBRSITV):
                 # &
                 # (dataframe["roc_bbwidth_max"] < 70)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
@@ -385,7 +385,7 @@ class BBRSITV5(BBRSITV):
     minimal_roi = {
         "0": 0.04
     }
-    ignore_roi_if_buy_signal = True
+    ignore_roi_if_entry_signal = True
     startup_candle_count = 400
     use_custom_stoploss = True
 
@@ -400,14 +400,14 @@ class BBRSITV5(BBRSITV):
     }
     
     is_optimize_trailing = True
-    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='sell', optimize=is_optimize_trailing , load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='exit', optimize=is_optimize_trailing , load=True)
 
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
@@ -436,7 +436,7 @@ class BBRSITV5(BBRSITV):
 
         return stoploss_from_open(sl_profit, current_profit)
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['rsi'] < (dataframe[f'basis_{self.for_ma_length.value}'] - (dataframe[f'dev_{self.for_ma_length.value}'] * self.for_sigma.value)))
@@ -461,6 +461,6 @@ class BBRSITV5(BBRSITV):
                 # &
                 # (dataframe["roc_bbwidth_max"] < 70)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe

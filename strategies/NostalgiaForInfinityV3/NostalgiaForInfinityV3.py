@@ -49,10 +49,10 @@ class NostalgiaForInfinityV3(IStrategy):
     custom_info = {}
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
     trailing_stop = False
@@ -71,8 +71,8 @@ class NostalgiaForInfinityV3(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -111,115 +111,115 @@ class NostalgiaForInfinityV3(IStrategy):
 
     # Buy
 
-    buy_condition_1_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_2_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_3_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_4_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_5_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_6_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_7_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_8_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_9_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_condition_10_enable = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+    buy_condition_1_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_2_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_3_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_4_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_5_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_6_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_7_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_8_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_9_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_condition_10_enable = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
 
-    buy_dip_threshold_0 = DecimalParameter(0.001, 0.1, default=0.03, space='buy', decimals=3, optimize=False, load=True)
-    buy_dip_threshold_1 = DecimalParameter(0.001, 0.2, default=0.12, space='buy', decimals=3, optimize=False, load=True)
-    buy_dip_threshold_2 = DecimalParameter(0.05, 0.4, default=0.3, space='buy', decimals=3, optimize=False, load=True)
-    buy_dip_threshold_3 = DecimalParameter(0.2, 0.5, default=0.4, space='buy', decimals=3, optimize=False, load=True)
+    buy_dip_threshold_0 = DecimalParameter(0.001, 0.1, default=0.03, space='entry', decimals=3, optimize=False, load=True)
+    buy_dip_threshold_1 = DecimalParameter(0.001, 0.2, default=0.12, space='entry', decimals=3, optimize=False, load=True)
+    buy_dip_threshold_2 = DecimalParameter(0.05, 0.4, default=0.3, space='entry', decimals=3, optimize=False, load=True)
+    buy_dip_threshold_3 = DecimalParameter(0.2, 0.5, default=0.4, space='entry', decimals=3, optimize=False, load=True)
 
-    buy_volume_1 = DecimalParameter(1.0, 30.0, default=2.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_min_inc_1 = DecimalParameter(0.005, 0.05, default=0.029, space='buy', decimals=3, optimize=False, load=True)
-    buy_rsi_1h_min_1 = DecimalParameter(40.0, 70.0, default=45.25, space='buy', decimals=2, optimize=False, load=True)
-    buy_rsi_1h_max_1 = DecimalParameter(70.0, 90.0, default=85.06, space='buy', decimals=2, optimize=False, load=True)
-    buy_rsi_1 = DecimalParameter(30.0, 40.0, default=36.64, space='buy', decimals=2, optimize=False, load=True)
-    buy_mfi_1 = DecimalParameter(36.0, 65.0, default=45.25, space='buy', decimals=2, optimize=False, load=True)
+    buy_volume_1 = DecimalParameter(1.0, 30.0, default=2.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_min_inc_1 = DecimalParameter(0.005, 0.05, default=0.029, space='entry', decimals=3, optimize=False, load=True)
+    buy_rsi_1h_min_1 = DecimalParameter(40.0, 70.0, default=45.25, space='entry', decimals=2, optimize=False, load=True)
+    buy_rsi_1h_max_1 = DecimalParameter(70.0, 90.0, default=85.06, space='entry', decimals=2, optimize=False, load=True)
+    buy_rsi_1 = DecimalParameter(30.0, 40.0, default=36.64, space='entry', decimals=2, optimize=False, load=True)
+    buy_mfi_1 = DecimalParameter(36.0, 65.0, default=45.25, space='entry', decimals=2, optimize=False, load=True)
 
-    buy_volume_2 = DecimalParameter(1.0, 10.0, default=2.96, space='buy', decimals=2, optimize=False, load=True)
-    buy_ema_relative_2 = DecimalParameter(0.005, 0.08, default=0.006, space='buy', decimals=3, optimize=False, load=True)
-    buy_rsi_1h_min_2 = DecimalParameter(40.0, 70.0, default=63.91, space='buy', decimals=2, optimize=False, load=True)
-    buy_rsi_1h_max_2 = DecimalParameter(70.0, 95.0, default=89.94, space='buy', decimals=2, optimize=False, load=True)
-    buy_rsi_1h_diff_2 = DecimalParameter(35.0, 55.0, default=38.69, space='buy', decimals=2, optimize=False, load=True)
-    buy_mfi_2 = DecimalParameter(36.0, 65.0, default=53.89, space='buy', decimals=2, optimize=False, load=True)
+    buy_volume_2 = DecimalParameter(1.0, 10.0, default=2.96, space='entry', decimals=2, optimize=False, load=True)
+    buy_ema_relative_2 = DecimalParameter(0.005, 0.08, default=0.006, space='entry', decimals=3, optimize=False, load=True)
+    buy_rsi_1h_min_2 = DecimalParameter(40.0, 70.0, default=63.91, space='entry', decimals=2, optimize=False, load=True)
+    buy_rsi_1h_max_2 = DecimalParameter(70.0, 95.0, default=89.94, space='entry', decimals=2, optimize=False, load=True)
+    buy_rsi_1h_diff_2 = DecimalParameter(35.0, 55.0, default=38.69, space='entry', decimals=2, optimize=False, load=True)
+    buy_mfi_2 = DecimalParameter(36.0, 65.0, default=53.89, space='entry', decimals=2, optimize=False, load=True)
 
-    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.06, default=0.057, space='buy', optimize=False, load=True)
-    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.023, space='buy', optimize=False, load=True)
-    buy_bb40_tail_bbdelta = DecimalParameter(0.15, 0.45, default=0.418, space='buy', optimize=False, load=True)
+    buy_bb40_bbdelta_close = DecimalParameter(0.005, 0.06, default=0.057, space='entry', optimize=False, load=True)
+    buy_bb40_closedelta_close = DecimalParameter(0.01, 0.03, default=0.023, space='entry', optimize=False, load=True)
+    buy_bb40_tail_bbdelta = DecimalParameter(0.15, 0.45, default=0.418, space='entry', optimize=False, load=True)
 
-    buy_bb20_close_bblowerband = DecimalParameter(0.7, 1.1, default=0.98, space='buy', optimize=False, load=True)
-    buy_bb20_volume = IntParameter(18, 35, default=24, space='buy', optimize=False, load=True)
+    buy_bb20_close_bblowerband = DecimalParameter(0.7, 1.1, default=0.98, space='entry', optimize=False, load=True)
+    buy_bb20_volume = IntParameter(18, 35, default=24, space='entry', optimize=False, load=True)
 
-    buy_volume_5 = DecimalParameter(1.0, 10.0, default=4.12, space='buy', decimals=2, optimize=False, load=True)
-    buy_ema_open_mult_5 = DecimalParameter(0.01, 0.04, default=0.019, space='buy', decimals=3, optimize=False, load=True)
+    buy_volume_5 = DecimalParameter(1.0, 10.0, default=4.12, space='entry', decimals=2, optimize=False, load=True)
+    buy_ema_open_mult_5 = DecimalParameter(0.01, 0.04, default=0.019, space='entry', decimals=3, optimize=False, load=True)
 
-    buy_volume_6 = DecimalParameter(1.0, 10.0, default=1.48, space='buy', decimals=2, optimize=False, load=True)
-    buy_ema_open_mult_6 = DecimalParameter(0.025, 0.05, default=0.033, space='buy', decimals=3, optimize=False, load=True)
+    buy_volume_6 = DecimalParameter(1.0, 10.0, default=1.48, space='entry', decimals=2, optimize=False, load=True)
+    buy_ema_open_mult_6 = DecimalParameter(0.025, 0.05, default=0.033, space='entry', decimals=3, optimize=False, load=True)
 
-    buy_volume_7 = DecimalParameter(1.0, 10.0, default=7.04, space='buy', decimals=2, optimize=False, load=True)
-    buy_ema_open_mult_7 = DecimalParameter(0.015, 0.03, default=0.02, space='buy', decimals=3, optimize=False, load=True)
-    buy_rsi_7 = DecimalParameter(24.0, 50.0, default=41.09, space='buy', decimals=2, optimize=False, load=True)
+    buy_volume_7 = DecimalParameter(1.0, 10.0, default=7.04, space='entry', decimals=2, optimize=False, load=True)
+    buy_ema_open_mult_7 = DecimalParameter(0.015, 0.03, default=0.02, space='entry', decimals=3, optimize=False, load=True)
+    buy_rsi_7 = DecimalParameter(24.0, 50.0, default=41.09, space='entry', decimals=2, optimize=False, load=True)
 
-    buy_rsi_8 = DecimalParameter(30.0, 50.0, default=46.0, space='buy', decimals=1, optimize=False, load=True)
+    buy_rsi_8 = DecimalParameter(30.0, 50.0, default=46.0, space='entry', decimals=1, optimize=False, load=True)
 
-    buy_volume_9 = DecimalParameter(1.0, 30.0, default=17.0, space='buy', decimals=1, optimize=False, load=True)
-    buy_bb_offset_9 = DecimalParameter(0.97, 1.05, default=0.98, space='buy', decimals=3, optimize=False, load=True)
+    buy_volume_9 = DecimalParameter(1.0, 30.0, default=17.0, space='entry', decimals=1, optimize=False, load=True)
+    buy_bb_offset_9 = DecimalParameter(0.97, 1.05, default=0.98, space='entry', decimals=3, optimize=False, load=True)
 
-    buy_volume_10 = DecimalParameter(1.0, 26.0, default=9.6, space='buy', decimals=1, optimize=False, load=True)
-    buy_bb_offset_10 = DecimalParameter(0.97, 1.05, default=0.994, space='buy', decimals=3, optimize=False, load=True)
-    buy_rsi_1h_10 = DecimalParameter(15.0, 40.0, default=30.2, space='buy', decimals=1, optimize=False, load=True)
+    buy_volume_10 = DecimalParameter(1.0, 26.0, default=9.6, space='entry', decimals=1, optimize=False, load=True)
+    buy_bb_offset_10 = DecimalParameter(0.97, 1.05, default=0.994, space='entry', decimals=3, optimize=False, load=True)
+    buy_rsi_1h_10 = DecimalParameter(15.0, 40.0, default=30.2, space='entry', decimals=1, optimize=False, load=True)
 
     # Sell
 
-    sell_condition_1_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_2_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_3_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_4_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_5_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_6_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_7_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
-    sell_condition_8_enable = CategoricalParameter([True, False], default=True, space='sell', optimize=False, load=True)
+    sell_condition_1_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_2_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_3_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_4_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_5_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_6_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_7_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
+    sell_condition_8_enable = CategoricalParameter([True, False], default=True, space='exit', optimize=False, load=True)
 
-    sell_rsi_bb_1 = DecimalParameter(60.0, 80.0, default=79.5, space='sell', decimals=1, optimize=False, load=True)
+    sell_rsi_bb_1 = DecimalParameter(60.0, 80.0, default=79.5, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_rsi_bb_2 = DecimalParameter(72.0, 90.0, default=81, space='sell', decimals=1, optimize=False, load=True)
+    sell_rsi_bb_2 = DecimalParameter(72.0, 90.0, default=81, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_rsi_main_3 = DecimalParameter(77.0, 90.0, default=82, space='sell', decimals=1, optimize=False, load=True)
+    sell_rsi_main_3 = DecimalParameter(77.0, 90.0, default=82, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_dual_rsi_rsi_4 = DecimalParameter(72.0, 84.0, default=73.4, space='sell', decimals=1, optimize=False, load=True)
-    sell_dual_rsi_rsi_1h_4 = DecimalParameter(78.0, 92.0, default=79.6, space='sell', decimals=1, optimize=False, load=True)
+    sell_dual_rsi_rsi_4 = DecimalParameter(72.0, 84.0, default=73.4, space='exit', decimals=1, optimize=False, load=True)
+    sell_dual_rsi_rsi_1h_4 = DecimalParameter(78.0, 92.0, default=79.6, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_ema_relative_5 = DecimalParameter(0.005, 0.05, default=0.024, space='sell', optimize=False, load=True)
-    sell_rsi_diff_5 = DecimalParameter(0.0, 20.0, default=4.382, space='sell', optimize=False, load=True)
+    sell_ema_relative_5 = DecimalParameter(0.005, 0.05, default=0.024, space='exit', optimize=False, load=True)
+    sell_rsi_diff_5 = DecimalParameter(0.0, 20.0, default=4.382, space='exit', optimize=False, load=True)
 
-    sell_rsi_under_6 = DecimalParameter(72.0, 90.0, default=87.708, space='sell', decimals=1, optimize=False, load=True)
+    sell_rsi_under_6 = DecimalParameter(72.0, 90.0, default=87.708, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_rsi_1h_7 = DecimalParameter(80.0, 95.0, default=81.7, space='sell', decimals=1, optimize=False, load=True)
+    sell_rsi_1h_7 = DecimalParameter(80.0, 95.0, default=81.7, space='exit', decimals=1, optimize=False, load=True)
 
-    sell_bb_relative_8 = DecimalParameter(1.05, 1.3, default=1.1, space='sell', decimals=3, optimize=False, load=True)
+    sell_bb_relative_8 = DecimalParameter(1.05, 1.3, default=1.1, space='exit', decimals=3, optimize=False, load=True)
 
-    sell_custom_profit_1 = DecimalParameter(0.01, 0.20, default=0.01, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_rsi_1 = DecimalParameter(30.0, 50.0, default=38.65, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_profit_2 = DecimalParameter(0.01, 0.20, default=0.05, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_rsi_2 = DecimalParameter(34.0, 50.0, default=43.37, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_profit_3 = DecimalParameter(0.15, 0.30, default=0.25, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_rsi_3 = DecimalParameter(38.0, 55.0, default=51.87, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_profit_4 = DecimalParameter(0.3, 0.7, default=0.45, space='sell', decimals=2, optimize=False, load=True)
-    sell_custom_rsi_4 = DecimalParameter(40.0, 58.0, default=50.35, space='sell', decimals=2, optimize=False, load=True)
+    sell_custom_profit_1 = DecimalParameter(0.01, 0.20, default=0.01, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_rsi_1 = DecimalParameter(30.0, 50.0, default=38.65, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_profit_2 = DecimalParameter(0.01, 0.20, default=0.05, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_rsi_2 = DecimalParameter(34.0, 50.0, default=43.37, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_profit_3 = DecimalParameter(0.15, 0.30, default=0.25, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_rsi_3 = DecimalParameter(38.0, 55.0, default=51.87, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_profit_4 = DecimalParameter(0.3, 0.7, default=0.45, space='exit', decimals=2, optimize=False, load=True)
+    sell_custom_rsi_4 = DecimalParameter(40.0, 58.0, default=50.35, space='exit', decimals=2, optimize=False, load=True)
 
-    sell_custom_under_profit_1 = DecimalParameter(0.01, 0.10, default=0.02, space='sell', decimals=3, optimize=False, load=True)
-    sell_custom_under_profit_2 = DecimalParameter(0.01, 0.10, default=0.025, space='sell', decimals=3, optimize=False, load=True)
-    sell_custom_under_profit_3 = DecimalParameter(0.05, 0.3, default=0.07, space='sell', decimals=3, optimize=False, load=True)
+    sell_custom_under_profit_1 = DecimalParameter(0.01, 0.10, default=0.02, space='exit', decimals=3, optimize=False, load=True)
+    sell_custom_under_profit_2 = DecimalParameter(0.01, 0.10, default=0.025, space='exit', decimals=3, optimize=False, load=True)
+    sell_custom_under_profit_3 = DecimalParameter(0.05, 0.3, default=0.07, space='exit', decimals=3, optimize=False, load=True)
 
-    sell_trail_profit_min_1 = DecimalParameter(0.1, 0.25, default=0.166, space='sell', decimals=3, optimize=False, load=True)
-    sell_trail_profit_max_1 = DecimalParameter(0.3, 0.5, default=0.38, space='sell', decimals=2, optimize=False, load=True)
-    sell_trail_down_1 = DecimalParameter(0.04, 0.2, default=0.154, space='sell', decimals=3, optimize=False, load=True)
+    sell_trail_profit_min_1 = DecimalParameter(0.1, 0.25, default=0.166, space='exit', decimals=3, optimize=False, load=True)
+    sell_trail_profit_max_1 = DecimalParameter(0.3, 0.5, default=0.38, space='exit', decimals=2, optimize=False, load=True)
+    sell_trail_down_1 = DecimalParameter(0.04, 0.2, default=0.154, space='exit', decimals=3, optimize=False, load=True)
 
-    sell_trail_profit_min_2 = DecimalParameter(0.01, 0.1, default=0.035, space='sell', decimals=3, optimize=False, load=True)
-    sell_trail_profit_max_2 = DecimalParameter(0.08, 0.25, default=0.1, space='sell', decimals=2, optimize=False, load=True)
-    sell_trail_down_2 = DecimalParameter(0.04, 0.2, default=0.045, space='sell', decimals=3, optimize=False, load=True)
+    sell_trail_profit_min_2 = DecimalParameter(0.01, 0.1, default=0.035, space='exit', decimals=3, optimize=False, load=True)
+    sell_trail_profit_max_2 = DecimalParameter(0.08, 0.25, default=0.1, space='exit', decimals=2, optimize=False, load=True)
+    sell_trail_down_2 = DecimalParameter(0.04, 0.2, default=0.045, space='exit', decimals=3, optimize=False, load=True)
 
     ############################################################################
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
                     current_profit: float, **kwargs):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
@@ -339,7 +339,7 @@ class NostalgiaForInfinityV3(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -559,12 +559,12 @@ class NostalgiaForInfinityV3(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -657,7 +657,7 @@ class NostalgiaForInfinityV3(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ] = 1
 
         return dataframe

@@ -47,57 +47,57 @@ class epretrace(IStrategy):
     timeframe = '5m'
 	
     #buy params
-    ep_retracement_window = IntParameter(1, 100, default=50, space='buy')
-    #ep_window = IntParameter(1, 100, default=50, space='buy')
+    ep_retracement_window = IntParameter(1, 100, default=50, space='entry')
+    #ep_window = IntParameter(1, 100, default=50, space='entry')
     ep_retracement = DecimalParameter(
-        0, 1, decimals=2, default=0.95, space='buy')
+        0, 1, decimals=2, default=0.95, space='entry')
     ep_retracement2 = DecimalParameter(
-        0, 1, decimals=2, default=0.75, space='buy')
-    #epma1 = IntParameter(2, 210, default=50, space='buy')
-    #epma2 = IntParameter(2, 210, default=200, space='buy')
+        0, 1, decimals=2, default=0.75, space='entry')
+    #epma1 = IntParameter(2, 210, default=50, space='entry')
+    #epma2 = IntParameter(2, 210, default=200, space='entry')
     #epma1 = 50
     #epma2 = 200
     epcat1 = CategoricalParameter(['open', 'high', 'low', 'close',
                                           #  'ma_fast', 'ma_slow', {...}
-                                          ], default='close', space='buy')
+                                          ], default='close', space='entry')
     #sell params
     ep_target = DecimalParameter(
-        0, 1, decimals=2, default=0.31, space='sell')
+        0, 1, decimals=2, default=0.31, space='exit')
     ep_stop = DecimalParameter(
-        0, 1, decimals=2, default=0.21, space='sell')
+        0, 1, decimals=2, default=0.21, space='exit')
     #ep_retracement_window = 35
     #ep_retracement = 0.90
     #ep_window = 3
     #ep_target = 0.3
     #ep_stop = 0.2
     # buy params
-    """epwindow = IntParameter(2, 100, default=7, space='buy')
-    #buy_fast_ma_timeframe = IntParameter(2, 100, default=14, space='buy')
-    #buy_slow_ma_timeframe = IntParameter(2, 100, default=28, space='buy')
+    """epwindow = IntParameter(2, 100, default=7, space='entry')
+    #buy_fast_ma_timeframe = IntParameter(2, 100, default=14, space='entry')
+    #buy_slow_ma_timeframe = IntParameter(2, 100, default=28, space='entry')
     eptarg = DecimalParameter(
-        0, 4, decimals=4, default=2.25446, space='sell')
+        0, 4, decimals=4, default=2.25446, space='exit')
     epstop = DecimalParameter(
-        0, 4, decimals=4, default=0.29497, space='sell')
+        0, 4, decimals=4, default=0.29497, space='exit')
     epcat1 = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                           #  'ma_fast', 'ma_slow', {...}
-                                          ], default='close', space='buy')
+                                          ], default='close', space='entry')
     epcat2 = CategoricalParameter(['open', 'high', 'low', 'close', 'volume',
                                           #  'ma_fast', 'ma_slow', {...}
-                                          ], default='close', space='buy')
-    epma1 = IntParameter(2, 100, default=25, space='buy')
-    epma2 = IntParameter(2, 100, default=50, space='buy')
-    epma3 = IntParameter(2, 100, default=100, space='buy')
-    epma4 = IntParameter(2, 100, default=100, space='buy')
-    epma5 = IntParameter(2, 100, default=100, space='buy')
-    epma6 = IntParameter(2, 100, default=100, space='sell')
+                                          ], default='close', space='entry')
+    epma1 = IntParameter(2, 100, default=25, space='entry')
+    epma2 = IntParameter(2, 100, default=50, space='entry')
+    epma3 = IntParameter(2, 100, default=100, space='entry')
+    epma4 = IntParameter(2, 100, default=100, space='entry')
+    epma5 = IntParameter(2, 100, default=100, space='entry')
+    epma6 = IntParameter(2, 100, default=100, space='exit')
     # sell params
-    #sell_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='sell')
-    #sell_fast_ma_timeframe = IntParameter(2, 100, default=14, space='sell')
-    #sell_slow_ma_timeframe = IntParameter(2, 100, default=28, space='sell')
+    #sell_mojo_ma_timeframe = IntParameter(2, 100, default=7, space='exit')
+    #sell_fast_ma_timeframe = IntParameter(2, 100, default=14, space='exit')
+    #sell_slow_ma_timeframe = IntParameter(2, 100, default=28, space='exit')
     #sell_div_max = DecimalParameter(
-    #    0, 2, decimals=4, default=1.54593, space='sell')
+    #    0, 2, decimals=4, default=1.54593, space='exit')
     #sell_div_min = DecimalParameter(
-    #    0, 2, decimals=4, default=2.81436, space='sell')
+    #    0, 2, decimals=4, default=2.81436, space='exit')
     """
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
@@ -132,7 +132,7 @@ class epretrace(IStrategy):
         
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         #Buy if last 5 candles show a strong downtrend (linear regression angle) and close is inferior to the 25 candle linear regression line - 1 * ATR (over 25 candles)
         dataframe.loc[
             (
@@ -148,9 +148,9 @@ class epretrace(IStrategy):
                 #qtpylib.crossed_above(dataframe['ema25'], dataframe['ema50']) &
                 (dataframe['volume'] > 0)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # Sell if RSI is greater than 31 and close is superior to the 25 candle linear regression line
         dataframe.loc[
             (
@@ -159,7 +159,7 @@ class epretrace(IStrategy):
                 #(dataframe['senkou_a'] > dataframe['senkou_b']) &
                 (dataframe['volume'] > 0)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
@@ -189,7 +189,7 @@ class epretrace(IStrategy):
             
         return 1
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: datetime,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
                 
         # Obtain pair dataframe.

@@ -59,10 +59,10 @@ class TrixV23Strategy(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = False
 
     use_custom_stoploss = True
 
@@ -71,16 +71,16 @@ class TrixV23Strategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
     
     #---------------------------#
@@ -262,7 +262,7 @@ class TrixV23Strategy(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
         stake = self.config['stake_currency'].lower()
@@ -303,11 +303,11 @@ class TrixV23Strategy(IStrategy):
 
         dataframe.loc[
             reduce(lambda x, y: x & y, conditions),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         
         conditions = []
 
@@ -336,5 +336,5 @@ class TrixV23Strategy(IStrategy):
 
         dataframe.loc[
             reduce(lambda x, y: x & y, conditions),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

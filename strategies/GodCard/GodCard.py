@@ -43,24 +43,24 @@ class GodCard(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = False
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Hyperopt parameters
-    buy_rsi = IntParameter(low=1, high=100, default=30, space='buy', optimize=True)
+    buy_rsi = IntParameter(low=1, high=100, default=30, space='entry', optimize=True)
     buy_rsi_enabled = CategoricalParameter([True, False], default=False, space="buy", optimize=True)
     buy_trigger = CategoricalParameter(["bb_one", "bb_two", "bb_three"], default="bb_one", space="buy", optimize=True)
 
-    sell_rsi = IntParameter(low=1, high=100, default=70, space='sell', optimize=True)
+    sell_rsi = IntParameter(low=1, high=100, default=70, space='exit', optimize=True)
     sell_rsi_enabled = CategoricalParameter([True, False], default=False, space="sell", optimize=True)
     sell_trigger = CategoricalParameter(["bb_low_sell", "bb_mid_sell", "bb_up_sell", "sarBoi"], default="bb_two_sell",  space="sell", optimize=True)
 
@@ -132,7 +132,7 @@ class GodCard(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         # GUARDS AND TRENDS
         if self.buy_rsi_enabled.value:
@@ -154,11 +154,11 @@ class GodCard(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         # GUARDS AND TRENDS
         if self.sell_rsi_enabled.value:
@@ -185,6 +185,6 @@ class GodCard(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
 
         return dataframe

@@ -31,10 +31,10 @@ class BBRSIv2(IStrategy):
     stoploss = -0.99
     
     process_only_new_candles = True  
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset= 0.01
-    ignore_roi_if_buy_signal = False    
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset= 0.01
+    ignore_roi_if_entry_signal = False    
     use_custom_stoploss = True
   
 
@@ -104,7 +104,7 @@ class BBRSIv2(IStrategy):
 
         return dataframe 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[:, 'buy_tag'] = ''
         conditions = []
 #        dont_buy_conditions = []     
@@ -136,10 +136,10 @@ class BBRSIv2(IStrategy):
                            #is_additional_check & 
                            #can_buy &
                            #is_live_data & 
-                           reduce(lambda x, y: x | y, conditions),'buy'] = 1
+                           reduce(lambda x, y: x | y, conditions),'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dataframe.loc[:, 'exit_tag'] = ''
         #sell_now = []     
@@ -158,7 +158,7 @@ class BBRSIv2(IStrategy):
                           
                            #can_sell &
                            #is_live_data & 
-                           reduce(lambda x, y: x | y, conditions),'sell'] = 1
+                           reduce(lambda x, y: x | y, conditions),'exit_long'] = 1
 
         
 

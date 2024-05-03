@@ -72,53 +72,53 @@ class NASOSv4(IStrategy):
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        2, 20, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
+        2, 20, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
     base_nb_candles_sell = IntParameter(
-        2, 25, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
+        2, 25, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=False)
+        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=False)
     low_offset_2 = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset_2'], space='buy', optimize=False)
+        0.9, 0.99, default=buy_params['low_offset_2'], space='entry', optimize=False)
     high_offset = DecimalParameter(
-        0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
+        0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
     high_offset_2 = DecimalParameter(
-        0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)
+        0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
 
     lookback_candles = IntParameter(
-        1, 24, default=buy_params['lookback_candles'], space='buy', optimize=True)
+        1, 24, default=buy_params['lookback_candles'], space='entry', optimize=True)
 
     profit_threshold = DecimalParameter(1.0, 1.03,
-                                        default=buy_params['profit_threshold'], space='buy', optimize=True)
+                                        default=buy_params['profit_threshold'], space='entry', optimize=True)
 
     ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='buy', optimize=False)
+                               default=buy_params['ewo_low'], space='entry', optimize=False)
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=False)
+        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=False)
 
     ewo_high_2 = DecimalParameter(
-        -6.0, 12.0, default=buy_params['ewo_high_2'], space='buy', optimize=False)
+        -6.0, 12.0, default=buy_params['ewo_high_2'], space='entry', optimize=False)
 
-    rsi_buy = IntParameter(50, 100, default=buy_params['rsi_buy'], space='buy', optimize=False)
+    rsi_buy = IntParameter(50, 100, default=buy_params['rsi_buy'], space='entry', optimize=False)
 
     # trailing stoploss hyperopt parameters
     # hard stoploss profit
     pHSL = DecimalParameter(-0.200, -0.040, default=-0.15, decimals=3,
-                            space='sell', optimize=False, load=True)
+                            space='exit', optimize=False, load=True)
     # profit threshold 1, trigger point, SL_1 is used
     pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3,
-                             space='sell', optimize=False, load=True)
+                             space='exit', optimize=False, load=True)
     pSL_1 = DecimalParameter(0.008, 0.020, default=0.014, decimals=3,
-                             space='sell', optimize=False, load=True)
+                             space='exit', optimize=False, load=True)
 
     # profit threshold 2, SL_2 is used
     pPF_2 = DecimalParameter(0.040, 0.100, default=0.024, decimals=3,
-                             space='sell', optimize=False, load=True)
+                             space='exit', optimize=False, load=True)
     pSL_2 = DecimalParameter(0.020, 0.070, default=0.022, decimals=3,
-                             space='sell', optimize=False, load=True)
+                             space='exit', optimize=False, load=True)
 
     # Trailing stop:
     trailing_stop = True
@@ -127,15 +127,15 @@ class NASOSv4(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'ioc'
+        'entry': 'gtc',
+        'exit': 'ioc'
     }
 
     # Optimal timeframe for the strategy
@@ -194,7 +194,7 @@ class NASOSv4(IStrategy):
         last_candle = dataframe.iloc[-1]
 
         if (last_candle is not None):
-            if (sell_reason in ['sell_signal']):
+            if (sell_reason in ['exit_signal']):
                 if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
                     return False
 
@@ -273,7 +273,7 @@ class NASOSv4(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dont_buy_conditions = []
 
@@ -295,7 +295,7 @@ class NASOSv4(IStrategy):
                 (dataframe['close'] < (
                     dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo1')
+            ['entry', 'buy_tag']] = (1, 'ewo1')
 
         dataframe.loc[
             (
@@ -307,7 +307,7 @@ class NASOSv4(IStrategy):
                 (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
                 (dataframe['rsi'] < 25)
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo2')
+            ['entry', 'buy_tag']] = (1, 'ewo2')
 
         dataframe.loc[
             (
@@ -318,15 +318,15 @@ class NASOSv4(IStrategy):
                 (dataframe['close'] < (
                     dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewolow')
+            ['entry', 'buy_tag']] = (1, 'ewolow')
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -349,7 +349,7 @@ class NASOSv4(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

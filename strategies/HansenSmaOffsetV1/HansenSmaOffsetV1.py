@@ -47,20 +47,20 @@ class HansenSmaOffsetV1(IStrategy):
         return dataframe
         
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['high']<dataframe['smad1'])&
                 (dataframe['hopen'] < dataframe['hclose'])
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (dataframe['low']>dataframe['smau1'])&
                 (dataframe['hopen'] > dataframe['hclose'])
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

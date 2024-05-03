@@ -21,9 +21,9 @@ class StrategyScalpingFast(IStrategy):
     timeframe_support = '5m'
     timeframe_main = '5m'
 
-    use_sell_signal = False
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = False
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
     ignore_buying_expired_candle_after = 0
     trailing_stop = False
 
@@ -56,7 +56,7 @@ class StrategyScalpingFast(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -72,10 +72,10 @@ class StrategyScalpingFast(IStrategy):
                 )
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -90,5 +90,5 @@ class StrategyScalpingFast(IStrategy):
                     )
                 ) & (dataframe['cci'] > 150)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

@@ -129,17 +129,17 @@ class Obelisk_TradePro_Ichi_v1_1(IStrategy):
         return dataframe
 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
 
             qtpylib.crossed_above(dataframe['go_long'], 0),
 
-        'buy'] = 1
+        'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
 
@@ -147,7 +147,7 @@ class Obelisk_TradePro_Ichi_v1_1(IStrategy):
             | 
             qtpylib.crossed_below(dataframe['close'], dataframe['kijun_sen']),
 
-        'sell'] = 1
+        'exit_long'] = 1
 
         return dataframe
 
@@ -182,7 +182,7 @@ class Obelisk_TradePro_Ichi_v1_1(IStrategy):
 # |   Sell Reason |   Sells |   Wins |   Draws |   Losses |   Avg Profit % |   Cum Profit % |   Tot Profit USD |   Tot Profit % |
 # |---------------+---------+--------+---------+----------+----------------+----------------+------------------+----------------|
 # |     stop_loss |     145 |      0 |       0 |      145 |          -1.54 |        -223.21 |         -1116.28 |         -44.64 |
-# |   sell_signal |      63 |     50 |       0 |       13 |          14.01 |         882.7  |          4414.39 |         176.54 |
+# |   exit_signal |      63 |     50 |       0 |       13 |          14.01 |         882.7  |          4414.39 |         176.54 |
 # ======================================================= LEFT OPEN TRADES REPORT ========================================================
 # |   Pair |   Buys |   Avg Profit % |   Cum Profit % |   Tot Profit USD |   Tot Profit % |   Avg Duration |   Wins |   Draws |   Losses |
 # |--------+--------+----------------+----------------+------------------+----------------+----------------+--------+---------+----------|

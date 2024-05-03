@@ -46,28 +46,28 @@ class Seb(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = False
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
-    buy_volumeAVG = IntParameter(low=50, high=300, default=70, space='buy', optimize=True)
-    buy_rsi = IntParameter(low=1, high=100, default=30, space='buy', optimize=True)
-    buy_fastd = IntParameter(low=1, high=100, default=30, space='buy', optimize=True)
-    buy_fishRsiNorma = IntParameter(low=1, high=100, default=30, space='buy', optimize=True)
+    buy_volumeAVG = IntParameter(low=50, high=300, default=70, space='entry', optimize=True)
+    buy_rsi = IntParameter(low=1, high=100, default=30, space='entry', optimize=True)
+    buy_fastd = IntParameter(low=1, high=100, default=30, space='entry', optimize=True)
+    buy_fishRsiNorma = IntParameter(low=1, high=100, default=30, space='entry', optimize=True)
 
-    sell_rsi = IntParameter(low=1, high=100, default=70, space='sell', optimize=True)
-    sell_minusDI = IntParameter(low=1, high=100, default=50, space='sell', optimize=True)
-    sell_fishRsiNorma = IntParameter(low=1, high=100, default=50, space='sell', optimize=True)
+    sell_rsi = IntParameter(low=1, high=100, default=70, space='exit', optimize=True)
+    sell_minusDI = IntParameter(low=1, high=100, default=50, space='exit', optimize=True)
+    sell_fishRsiNorma = IntParameter(low=1, high=100, default=50, space='exit', optimize=True)
     sell_trigger = CategoricalParameter(["rsi-macd-minusdi", "sar-fisherRsi"],
-                                        default=30, space='sell', optimize=True)
+                                        default=30, space='exit', optimize=True)
 
     # Buy hyperspace params:
     buy_params = {
@@ -171,7 +171,7 @@ class Seb(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame
@@ -183,11 +183,11 @@ class Seb(IStrategy):
                 (dataframe['ha_close'] > dataframe['ema20']) &
                 (dataframe['ha_open'] < dataframe['ha_close'])  # green bar
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         :param dataframe: DataFrame
@@ -199,6 +199,6 @@ class Seb(IStrategy):
                 (dataframe['ha_close'] < dataframe['ema20']) &
                 (dataframe['ha_open'] > dataframe['ha_close'])  # red bar
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
 

@@ -39,10 +39,10 @@ class Hacklemore2(IStrategy):
     
     timeframe = '15m'
 
-    use_sell_signal = True
-    sell_profit_only = False
-    #sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    #exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = True
     
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe['volume_mean_slow'] = dataframe['volume'].rolling(window=24).mean()
@@ -64,7 +64,7 @@ class Hacklemore2(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         active_trade = False
 
         if self.config['runmode'].value in ('live', 'dry_run'):
@@ -93,11 +93,11 @@ class Hacklemore2(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         active_trade = False
 
         if self.config['runmode'].value in ('live', 'dry_run'):
@@ -112,7 +112,7 @@ class Hacklemore2(IStrategy):
             current_profit = active_trade[0].calc_profit_ratio(rate=current_price)
 
             conditions.append(
-                (dataframe['buy'] == 0) &
+                (dataframe['entry'] == 0) &
                 (dataframe['dn_trend'] == True) &
                 (dataframe['RMI'] < 30) &
                 (current_profit > -0.03) &
@@ -122,9 +122,9 @@ class Hacklemore2(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
         else:
-            dataframe['sell'] = 0
+            dataframe['exit_long'] = 0
       
         return dataframe
 

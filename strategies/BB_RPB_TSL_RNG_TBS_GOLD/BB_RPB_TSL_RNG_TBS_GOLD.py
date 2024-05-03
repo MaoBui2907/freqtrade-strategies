@@ -112,7 +112,7 @@ class BB_RPB_TSL_RNG_TBS_GOLD(IStrategy):
 
     # Custom stoploss
     use_custom_stoploss = True
-    use_sell_signal = True
+    use_exit_signal = True
     process_only_new_candles = True
     ############################################################################
 
@@ -158,26 +158,26 @@ class BB_RPB_TSL_RNG_TBS_GOLD(IStrategy):
     buy_threshold = DecimalParameter(0.003, 0.012, default=0.008, optimize = is_optimize_btc_safe)
 
     # Buy params toggle
-    buy_is_dip_enabled = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_is_break_enabled = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+    buy_is_dip_enabled = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_is_break_enabled = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
 
     ## Sell params
     sell_btc_safe = IntParameter(-400, -300, default=-365, optimize = True)
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    high_offset          = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2        = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)      
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    high_offset          = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2        = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)      
 
     ## Trailing params
 
     # hard stoploss profit
-    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='sell', load=True)
+    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='exit', load=True)
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='sell', load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='exit', load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='sell', load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='sell', load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='exit', load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='exit', load=True)
 
     ############################################################################
 
@@ -337,7 +337,7 @@ class BB_RPB_TSL_RNG_TBS_GOLD(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
 
         conditions = []
@@ -458,11 +458,11 @@ class BB_RPB_TSL_RNG_TBS_GOLD(IStrategy):
         dataframe.loc[is_nfi_33, 'buy_tag'] += 'nfi 33 '
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'buy' ] = 1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'entry' ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -488,7 +488,7 @@ class BB_RPB_TSL_RNG_TBS_GOLD(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe
@@ -500,7 +500,7 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
     # This class is designed to inherit from yours and starts trailing buy with your buy signals
     # Trailing buy starts at any buy signal and will move to next candles if the trailing still active
     # Trailing buy stops  with BUY if : price decreases and rises again more than trailing_buy_offset
-    # Trailing buy stops with NO BUY : current price is > initial price * (1 +  trailing_buy_max) OR custom_sell tag
+    # Trailing buy stops with NO BUY : current price is > initial price * (1 +  trailing_buy_max) OR custom_exit tag
     # IT IS NOT COMPATIBLE WITH BACKTEST/HYPEROPT
     #
 
@@ -586,7 +586,7 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
         current_time = datetime.now(timezone.utc)
         trailing_duration = current_time - trailing_buy['start_trailing_time']
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
-            if ((current_trailing_profit_ratio > 0) and (last_candle['buy'] == 1)):
+            if ((current_trailing_profit_ratio > 0) and (last_candle['entry'] == 1)):
                 # more than 1h, price under first signal, buy signal still active -> buy
                 return 'forcebuy'
             else:
@@ -634,7 +634,7 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
                     trailing_buy_offset = self.trailing_buy_offset(dataframe, pair, current_price)
 
                     if trailing_buy['allow_trailing']:
-                        if (not trailing_buy['trailing_buy_order_started'] and (last_candle['buy'] == 1)):
+                        if (not trailing_buy['trailing_buy_order_started'] and (last_candle['entry'] == 1)):
                             # start trailing buy
                             
                             # self.custom_info_trail_buy[pair]['trailing_buy']['trailing_buy_order_started'] = True
@@ -701,13 +701,13 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
         
         return val
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe = super().populate_buy_trend(dataframe, metadata)
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe = super().populate_entry_trend(dataframe, metadata)
 
         if self.trailing_buy_order_enabled and self.config['runmode'].value in ('live', 'dry_run'): 
             last_candle = dataframe.iloc[-1].squeeze()
             trailing_buy = self.trailing_buy(metadata['pair'])
-            if (last_candle['buy'] == 1):
+            if (last_candle['entry'] == 1):
                 if not trailing_buy['trailing_buy_order_started']:
                     open_trades = Trade.get_trades([Trade.pair == metadata['pair'], Trade.is_open.is_(True), ]).all()
                     if not open_trades:
@@ -719,9 +719,9 @@ class TrailingBuyStrat2(BB_RPB_TSL_RNG_TBS_GOLD):
             else:
                 if (trailing_buy['trailing_buy_order_started'] == True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
-                    dataframe.loc[:,'buy'] = 1
+                    dataframe.loc[:,'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']
-                    # dataframe['buy'] = 1
+                    # dataframe['enter_long'] = 1
 
         return dataframe
 

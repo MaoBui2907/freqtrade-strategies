@@ -91,14 +91,14 @@ class DCBBBounce(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = True
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': True
     }
@@ -176,7 +176,7 @@ class DCBBBounce(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         # GUARDS AND TRENDS
 
@@ -220,11 +220,11 @@ class DCBBBounce(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         :param dataframe: DataFrame
@@ -233,7 +233,7 @@ class DCBBBounce(IStrategy):
         """
         # if hold, then don't set a sell signal
         if self.sell_hold.value:
-            dataframe.loc[(dataframe['close'].notnull() ), 'sell'] = 0
+            dataframe.loc[(dataframe['close'].notnull() ), 'exit_long'] = 0
 
         else:
 
@@ -247,6 +247,6 @@ class DCBBBounce(IStrategy):
 
             # build the dataframe using the conditions
             if conditions:
-                dataframe.loc[reduce(lambda x, y: x & y, conditions), 'sell'] = 1
+                dataframe.loc[reduce(lambda x, y: x & y, conditions), 'exit_long'] = 1
 
         return dataframe

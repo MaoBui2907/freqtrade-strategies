@@ -68,10 +68,10 @@ class Obelisk_Ichimoku_ZEMA_v1(IStrategy):
      'high_offset': 1.004, 'zema_len_sell': 72
     }
 
-    low_offset = DecimalParameter(0.80, 1.20, default=1.004, space='buy', optimize=True)
-    high_offset = DecimalParameter(0.80, 1.20, default=0.964, space='sell', optimize=True)
-    zema_len_buy = IntParameter(30, 90, default=72, space='buy', optimize=True)
-    zema_len_sell = IntParameter(30, 90, default=51, space='sell', optimize=True)
+    low_offset = DecimalParameter(0.80, 1.20, default=1.004, space='entry', optimize=True)
+    high_offset = DecimalParameter(0.80, 1.20, default=0.964, space='exit', optimize=True)
+    zema_len_buy = IntParameter(30, 90, default=72, space='entry', optimize=True)
+    zema_len_sell = IntParameter(30, 90, default=51, space='exit', optimize=True)
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
@@ -218,24 +218,24 @@ class Obelisk_Ichimoku_ZEMA_v1(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         zema = f'zema_{self.zema_len_buy.value}'
 
         dataframe.loc[
             (dataframe['ichimoku_valid'] > 0)
             & (dataframe['bear_trending'] == 0)
             & (dataframe['close'] < (dataframe[zema] * self.low_offset.value))
-        , 'buy'] = 1
+        , 'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         zema = f'zema_{self.zema_len_sell.value}'
 
         dataframe.loc[
             (
                 (dataframe['close'] > (dataframe[zema] * self.high_offset.value))
             )
-        , 'sell'] = 1
+        , 'exit_long'] = 1
 
         return dataframe
 

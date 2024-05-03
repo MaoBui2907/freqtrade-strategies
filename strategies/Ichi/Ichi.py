@@ -36,8 +36,8 @@ logging.info("test")
 
 class Ichi(IStrategy):
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'limit',
         'stoploss_on_exchange': True
     }
@@ -74,7 +74,7 @@ class Ichi(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -96,14 +96,14 @@ class Ichi(IStrategy):
                 #             )
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         #        dataframe.loc[
         #            (
         #                (dataframe['close'].shift(-26) <= dataframe['close'].shift(26))
         #            ),
-        #            'sell'] = 1
+        #            'exit_long'] = 1
         return dataframe

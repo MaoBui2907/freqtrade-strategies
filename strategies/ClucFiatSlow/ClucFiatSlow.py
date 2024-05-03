@@ -51,10 +51,10 @@ class ClucFiatSlow(IStrategy):
     
     timeframe = '5m'
 
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = True
 
     startup_candle_count: int = 48
 
@@ -85,7 +85,7 @@ class ClucFiatSlow(IStrategy):
         
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         params = self.buy_params
 
         dataframe.loc[
@@ -104,12 +104,12 @@ class ClucFiatSlow(IStrategy):
                     (dataframe['close'] < params['close-bblower'] * dataframe['lower-bb2']) &
                     (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * params['volume']))
             )),
-            'buy'
+            'entry'
         ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         params = self.sell_params
 
         dataframe.loc[
@@ -118,7 +118,7 @@ class ClucFiatSlow(IStrategy):
             dataframe['fisher-rsi'].gt(params['sell-fisher']) &
             dataframe['volume'].gt(0)
             ,
-            'sell'
+            'exit'
         ] = 1
 
         return dataframe

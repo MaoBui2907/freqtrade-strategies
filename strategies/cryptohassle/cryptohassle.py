@@ -46,8 +46,8 @@ class cryptohassle(IStrategy):
     ticker_interval = '1h'
     # Optional order type mapping.
     order_types = {
-        'buy': 'market',
-        'sell': 'market',
+        'entry': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': True
     }
@@ -128,7 +128,7 @@ class cryptohassle(IStrategy):
         dataframe['ha_ssl_cross_above'] = qtpylib.crossed_above(dataframe['ha_sslUp'],dataframe['ha_sslDown'])
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     
@@ -142,10 +142,10 @@ class cryptohassle(IStrategy):
                     (dataframe['volume'] > 1000)
                     
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 
@@ -153,5 +153,5 @@ class cryptohassle(IStrategy):
                 (dataframe['volume'] > 0)
                               
             ),
-        'sell'] = 1
+        'exit_long'] = 1
         return dataframe

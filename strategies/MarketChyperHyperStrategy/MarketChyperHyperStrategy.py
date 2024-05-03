@@ -90,10 +90,10 @@ class MarketChyperHyperStrategy(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = False
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 400
@@ -102,16 +102,16 @@ class MarketChyperHyperStrategy(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
 
 
@@ -121,117 +121,117 @@ class MarketChyperHyperStrategy(IStrategy):
     # Total Buy Signal Percentage needed for a signal to be positive
     # im testing number of signals * 50 / 2
     buy___trades_when_downwards = \
-        CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+        CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
     buy___trades_when_sideways = \
-        CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+        CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
     buy___trades_when_upwards = \
-        CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+        CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
 
-    buy_uptrend_total_signal_needed = IntParameter(0, 100, default=65, space='buy', optimize=True, load=True)
+    buy_uptrend_total_signal_needed = IntParameter(0, 100, default=65, space='entry', optimize=True, load=True)
     #wave trend
     buy_uptrend_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
     #rsi divs
     buy_uptrend_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     # buy_rsi_div_value (rsi used in condition of bullish div)
     buy_uptrend_rsi_div_value = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     buy_uptrend_oslevel = \
-        IntParameter(-100, 0, default=0, space='buy', optimize=True, load=True)
+        IntParameter(-100, 0, default=0, space='entry', optimize=True, load=True)
 
 
     # Sideways Trend Buy
     # -------------------
-    buy_sideways_total_signal_needed = IntParameter(0, 100, default=65, space='buy', optimize=True, load=True)
+    buy_sideways_total_signal_needed = IntParameter(0, 100, default=65, space='entry', optimize=True, load=True)
     #wave trend
     buy_sideways_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
     #rsi divs
     buy_sideways_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     # buy_rsi_div_value (rsi used in condition of bullish div)
     buy_sideways_rsi_div_value = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     buy_sideways_oslevel = \
-        IntParameter(-100, 0, default=0, space='buy', optimize=True, load=True)
+        IntParameter(-100, 0, default=0, space='entry', optimize=True, load=True)
 
 
     # Downtrend Trend Buy
     # -------------------
-    buy_downtrend_total_signal_needed = IntParameter(0, 100, default=65, space='buy', optimize=True, load=True)
+    buy_downtrend_total_signal_needed = IntParameter(0, 100, default=65, space='entry', optimize=True, load=True)
     #wave trend
     buy_downtrend_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
     #rsi divs
     buy_downtrend_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     # buy_rsi_div_value (rsi used in condition of bullish div)
     buy_downtrend_rsi_div_value = \
-        IntParameter(0, 100, default=0, space='buy', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='entry', optimize=True, load=True)
 
     buy_downtrend_oslevel = \
-        IntParameter(-100, 0, default=0, space='buy', optimize=True, load=True)
+        IntParameter(-100, 0, default=0, space='entry', optimize=True, load=True)
 
 
 
     #sell??
     sell___trades_when_downwards = \
-        CategoricalParameter([True, False], default=True, space='sell', optimize=True, load=True)
+        CategoricalParameter([True, False], default=True, space='exit', optimize=True, load=True)
     sell___trades_when_sideways = \
-        CategoricalParameter([True, False], default=True, space='sell', optimize=True, load=True)
+        CategoricalParameter([True, False], default=True, space='exit', optimize=True, load=True)
     sell___trades_when_upwards = \
-        CategoricalParameter([True, False], default=True, space='sell', optimize=True, load=True)
+        CategoricalParameter([True, False], default=True, space='exit', optimize=True, load=True)
 
     # Uptrend Trend Sell
     # --------------------
 
     # Total Sell Signal Percentage needed for a signal to be positive
-    sell_uptrend_total_signal_needed = IntParameter(0, 100, default=65, space='sell', optimize=True, load=True)
+    sell_uptrend_total_signal_needed = IntParameter(0, 100, default=65, space='exit', optimize=True, load=True)
     #wave trend
     sell_uptrend_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
     #rsi divs
     sell_uptrend_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
     sell_uptrend_oblevel = \
-        RealParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        RealParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
 
     # Sidewyas Trend Sell
     # --------------------
 
     # Total Sell Signal Percentage needed for a signal to be positive
-    sell_sideways_total_signal_needed = IntParameter(0, 100, default=65, space='sell', optimize=True, load=True)
+    sell_sideways_total_signal_needed = IntParameter(0, 100, default=65, space='exit', optimize=True, load=True)
     #wave trend
     sell_sideways_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
     #rsi divs
     sell_sideways_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
     sell_sideways_oblevel = \
-        RealParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        RealParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
 
     # Downtrend Trend Sell
     # --------------------
-    sell_downtrend_total_signal_needed = IntParameter(0, 100, default=65, space='sell', optimize=True, load=True)
+    sell_downtrend_total_signal_needed = IntParameter(0, 100, default=65, space='exit', optimize=True, load=True)
     #wave trend
     sell_downtrend_wavetrend_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
     #rsi divs
     sell_downtrend_rsi_divergence_weight = \
-        IntParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        IntParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
     sell_downtrend_oblevel = \
-        RealParameter(0, 100, default=0, space='sell', optimize=True, load=True)
+        RealParameter(0, 100, default=0, space='exit', optimize=True, load=True)
 
 
     # ---------------------------------------------------------------- #
@@ -303,7 +303,7 @@ class MarketChyperHyperStrategy(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param dataframe: DataFrame populated with indicators
@@ -353,21 +353,21 @@ class MarketChyperHyperStrategy(IStrategy):
             ) | (
                     (dataframe['trend'] == 'upwards') &
                     (dataframe['total_buy_signal_strength'] >= self.buy_uptrend_total_signal_needed.value)
-            ), 'buy'] = 1
+            ), 'enter_long'] = 1
 
         # Override Buy Signal: When configured buy signals can be completely turned off for each kind of trend
         if not self.buy___trades_when_downwards.value:
-            dataframe.loc[dataframe['trend'] == 'downwards', 'buy'] = 0
+            dataframe.loc[dataframe['trend'] == 'downwards', 'entry'] = 0
         if not self.buy___trades_when_sideways.value:
-            dataframe.loc[dataframe['trend'] == 'sideways', 'buy'] = 0
+            dataframe.loc[dataframe['trend'] == 'sideways', 'entry'] = 0
         if not self.buy___trades_when_upwards.value:
-            dataframe.loc[dataframe['trend'] == 'upwards', 'buy'] = 0
+            dataframe.loc[dataframe['trend'] == 'upwards', 'entry'] = 0
 
         return dataframe
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe = self.market_cipher(dataframe)
 
        #CALCULATE WT OVERSOLD
@@ -411,7 +411,7 @@ class MarketChyperHyperStrategy(IStrategy):
             ) | (
                     (dataframe['trend'] == 'upwards') &
                     (dataframe['total_sell_signal_strength'] >= self.sell_uptrend_total_signal_needed.value)
-            ), 'sell'] = 1
+            ), 'exit_long'] = 1
 
 
         return dataframe

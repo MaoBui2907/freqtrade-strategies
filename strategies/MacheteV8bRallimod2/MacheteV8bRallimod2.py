@@ -77,34 +77,34 @@ class MacheteV8bRallimod2(IStrategy):
 
     # buy signal
 
-    buy_should_use_get_buy_signal_offset_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_offset_strategy'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_bbrsi_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_bbrsi_strategy'], space='buy', optimize=True)
+    buy_should_use_get_buy_signal_offset_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_offset_strategy'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_bbrsi_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_bbrsi_strategy'], space='entry', optimize=True)
 
     # Dynamic ROI
-    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default=sell_params['droi_trend_type'], space='sell', optimize=True)
-    droi_pullback = CategoricalParameter([True, False], default=sell_params['droi_pullback'], space='sell', optimize=True)
-    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=sell_params['droi_pullback_amount'], space='sell')
-    droi_pullback_respect_table = CategoricalParameter([True, False], default=sell_params['droi_pullback_respect_table'], space='sell', optimize=True)
+    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default=sell_params['droi_trend_type'], space='exit', optimize=True)
+    droi_pullback = CategoricalParameter([True, False], default=sell_params['droi_pullback'], space='exit', optimize=True)
+    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=sell_params['droi_pullback_amount'], space='exit')
+    droi_pullback_respect_table = CategoricalParameter([True, False], default=sell_params['droi_pullback_respect_table'], space='exit', optimize=True)
 
     # Custom Stoploss
-    cstp_threshold = DecimalParameter(-0.05, 0, default=sell_params['cstp_threshold'], space='sell')
-    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default=sell_params['cstp_bail_how'], space='sell', optimize=True)
-    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=sell_params['cstp_bail_roc'], space='sell')
-    cstp_bail_time = IntParameter(720, 1440, default=sell_params['cstp_bail_time'], space='sell')
-    cstp_trailing_only_offset_is_reached = DecimalParameter(0.01, 0.06, default=sell_params['cstp_trailing_only_offset_is_reached'], space='sell')
-    cstp_trailing_stop_profit_devider = IntParameter(2, 4, default=sell_params['cstp_trailing_stop_profit_devider'], space='sell')
-    cstp_trailing_max_stoploss = DecimalParameter(0.02, 0.08, default=sell_params['cstp_trailing_max_stoploss'], space='sell')
-    cstp_bb_trailing_input = CategoricalParameter(['bb_lowerband_trend', 'bb_lowerband_trend_inf', 'bb_lowerband_neutral', 'bb_lowerband_neutral_inf', 'bb_upperband_neutral_inf'], default=sell_params['cstp_bb_trailing_input'], space='sell', optimize=True)
+    cstp_threshold = DecimalParameter(-0.05, 0, default=sell_params['cstp_threshold'], space='exit')
+    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default=sell_params['cstp_bail_how'], space='exit', optimize=True)
+    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=sell_params['cstp_bail_roc'], space='exit')
+    cstp_bail_time = IntParameter(720, 1440, default=sell_params['cstp_bail_time'], space='exit')
+    cstp_trailing_only_offset_is_reached = DecimalParameter(0.01, 0.06, default=sell_params['cstp_trailing_only_offset_is_reached'], space='exit')
+    cstp_trailing_stop_profit_devider = IntParameter(2, 4, default=sell_params['cstp_trailing_stop_profit_devider'], space='exit')
+    cstp_trailing_max_stoploss = DecimalParameter(0.02, 0.08, default=sell_params['cstp_trailing_max_stoploss'], space='exit')
+    cstp_bb_trailing_input = CategoricalParameter(['bb_lowerband_trend', 'bb_lowerband_trend_inf', 'bb_lowerband_neutral', 'bb_lowerband_neutral_inf', 'bb_upperband_neutral_inf'], default=sell_params['cstp_bb_trailing_input'], space='exit', optimize=True)
 
     fast_ewo = 50
     slow_ewo = 200
-    ewo_high = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=True)
-    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
+    ewo_high = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
+    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
 
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
     # nested hyperopt class
     class HyperOpt:
 
@@ -121,9 +121,9 @@ class MacheteV8bRallimod2(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
     startup_candle_count = 200#149
 
     use_dynamic_roi = True
@@ -133,8 +133,8 @@ class MacheteV8bRallimod2(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -269,7 +269,7 @@ class MacheteV8bRallimod2(IStrategy):
     # Processing buy signals
     #
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (self.get_buy_signal_offset_strategy(dataframe) == True)
@@ -277,7 +277,7 @@ class MacheteV8bRallimod2(IStrategy):
                 (self.get_buy_signal_bbrsi_strategy(dataframe) == True)
             )
             #(dataframe['sslUp_inf'] > dataframe['sslDown_inf'])
-        ,'buy'] = 1
+        ,'enter_long'] = 1
 
         return dataframe
 
@@ -317,7 +317,7 @@ class MacheteV8bRallimod2(IStrategy):
     # Processing sell signals
     #
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (qtpylib.crossed_above(dataframe['sslDown_inf'], dataframe['sslUp_inf']))
             & (
@@ -340,7 +340,7 @@ class MacheteV8bRallimod2(IStrategy):
             #(dataframe['vfi'] < 0.0) &
             #(dataframe['volume'] > 0)
 
-        ,'sell'] = 1
+        ,'exit_long'] = 1
 
         return dataframe
 
@@ -454,10 +454,10 @@ class MacheteV8bRallimod2(IStrategy):
             if rate:
                 return rate
 
-        ask_strategy = self.config.get('ask_strategy', {})
-        if ask_strategy.get('use_order_book', False):
+        exit_pricing = self.config.get('exit_pricing', {})
+        if exit_pricing.get('use_order_book', False):
             ob = self.dp.orderbook(pair, 1)
-            rate = ob[f"{ask_strategy['price_side']}s"][0][0]
+            rate = ob[f"{exit_pricing['price_side']}s"][0][0]
         else:
             ticker = self.dp.ticker(pair)
             rate = ticker['last']

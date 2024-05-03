@@ -135,7 +135,7 @@ class Dracula(IStrategy):
     min_lost = -0.005
 
     buy_bbt = DecimalParameter(
-        0, 100, decimals=4, default=0.023, space='buy')
+        0, 100, decimals=4, default=0.023, space='entry')
     # Buy hypers
     timeframe = '1m'
     # Protection
@@ -169,7 +169,7 @@ class Dracula(IStrategy):
         return dataframe
 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         prev = dataframe.shift(1)
         prev1 = dataframe.shift(2)
         lost_protect = (dataframe['ema'] > (dataframe['close'] * 1.07)).rolling(10).sum() == 0
@@ -186,7 +186,7 @@ class Dracula(IStrategy):
         item_buy_logic.append(lost_protect)
         dataframe.loc[
             reduce(lambda x, y: x & y, item_buy_logic),
-            ['buy', 'buy_tag']] = (1, f'buy_1')
+            ['entry', 'buy_tag']] = (1, f'buy_1')
 
         item_buy_logic = []
         item_buy_logic.append(dataframe['volume'] > 0)
@@ -199,11 +199,11 @@ class Dracula(IStrategy):
         item_buy_logic.append(lost_protect)
         dataframe.loc[
             reduce(lambda x, y: x & y, item_buy_logic),
-            ['buy', 'buy_tag']] = (1, f'buy_2')
+            ['entry', 'buy_tag']] = (1, f'buy_2')
 
         return dataframe
 
-    def custom_sell(self, pair: str, trade: Trade, current_time: datetime, current_rate: float,
+    def custom_exit(self, pair: str, trade: Trade, current_time: datetime, current_rate: float,
                     current_profit: float, **kwargs):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1].squeeze()
@@ -232,7 +232,7 @@ class Dracula(IStrategy):
             return 'stop_loss_sma'
         return None
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[:, 'sell'] = 0
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[:, 'exit_long'] = 0
 
         return dataframe

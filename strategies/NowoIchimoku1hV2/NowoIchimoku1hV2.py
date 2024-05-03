@@ -65,7 +65,7 @@ class NowoIchimoku1hV2(IStrategy):
 
     startup_candle_count = 100
 
-    use_sell_signal = False
+    use_exit_signal = False
 
     use_custom_stoploss = True
 
@@ -194,7 +194,7 @@ class NowoIchimoku1hV2(IStrategy):
 
         return df
 
-    def populate_buy_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
         df['is_cloud_green'] = df['lead_1'] > df['lead_2']
 
         double_shifted_upper_cloud = df['upper_cloud'].shift(50)
@@ -214,22 +214,22 @@ class NowoIchimoku1hV2(IStrategy):
                            close_above_shifted_conversion_line & \
                            close_above_double_shifted_upper_cloud
 
-        df['buy'] = False
+        df['entry'] = False
         df['buy_allowed'] = True
         for row in df.itertuples():
             if row.Index > 100:
                 df.loc[row.Index, 'buy_allowed'] = df.at[row.Index - 1, 'buy_allowed']
 
-                if df.at[row.Index - 1, 'buy']:
+                if df.at[row.Index - 1, 'entry']:
                     df.loc[row.Index, 'buy_allowed'] = False
 
                 if not df.at[row.Index, 'is_cloud_green']:
                     df.loc[row.Index, 'buy_allowed'] = True
 
-                df.loc[row.Index, 'buy'] = df.at[row.Index, 'buy_allowed'] & df.at[row.Index, 'should_buy']
+                df.loc[row.Index, 'entry'] = df.at[row.Index, 'buy_allowed'] & df.at[row.Index, 'should_buy']
 
         return df
 
-    def populate_sell_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
-        df['sell'] = 0
+    def populate_exit_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        df['exit_long'] = 0
         return df

@@ -56,10 +56,10 @@ class Guacamole(IStrategy):
 
     timeframe = '5m'
 
-    use_sell_signal = True
-    sell_profit_only = False
-    # sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    # exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = True
 
     process_only_new_candles = False
 
@@ -82,7 +82,7 @@ class Guacamole(IStrategy):
         
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         params = self.buy_params
         conditions = []
 
@@ -107,11 +107,11 @@ class Guacamole(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         params = self.sell_params
         conditions = []
 
@@ -133,9 +133,9 @@ class Guacamole(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
         else:
-            dataframe['sell'] = 0
+            dataframe['exit_long'] = 0
       
         return dataframe
     

@@ -22,26 +22,26 @@ class Momentumv2(IStrategy):
     use_custom_stoploss = True
     trailing_stop = False
     timeframe = '4h'
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
     startup_candle_count: int = 100
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': True
     }
 
     # Buy Parameters
-    buy_ema = IntParameter(10, 100, default=30, space='buy', optimize=True, load=True)
+    buy_ema = IntParameter(10, 100, default=30, space='entry', optimize=True, load=True)
 
     # Sell Parameters
-    sell_rsi = DecimalParameter(70, 99, default=80, space='sell', optimize=True, load=True)
+    sell_rsi = DecimalParameter(70, 99, default=80, space='exit', optimize=True, load=True)
 
     # Stoploss Parameters
-    atr_timeperiod = IntParameter(5, 21, default=7, space='sell')
-    atr_multiplier = DecimalParameter(2.5, 3.5, default=2.5, space='sell')
+    atr_timeperiod = IntParameter(5, 21, default=7, space='exit')
+    atr_multiplier = DecimalParameter(2.5, 3.5, default=2.5, space='exit')
 
     buy_params = {
         "buy_ema": 80
@@ -93,7 +93,7 @@ class Momentumv2(IStrategy):
 
         return 1
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal']))
         conditions.append(dataframe['close'] > dataframe['ema'])
@@ -102,11 +102,11 @@ class Momentumv2(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         conditions.append(qtpylib.crossed_below(dataframe['macd'], dataframe['macdsignal']) | (
             qtpylib.crossed_below(dataframe['rsi'], self.sell_rsi.value)))
@@ -115,6 +115,6 @@ class Momentumv2(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
 
         return dataframe

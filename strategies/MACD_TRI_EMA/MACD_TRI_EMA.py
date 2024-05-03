@@ -39,20 +39,20 @@ class MACD_TRI_EMA(IStrategy):
         dataframe['tema'] = ta.TEMA(dataframe, timeperiod=13)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     qtpylib.crossed_above(dataframe['macd'], dataframe['macdsignal']) &
                     (dataframe['close'].shift(1) > dataframe['tema'].shift(1)) 
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                    qtpylib.crossed_above(dataframe['macdsignal'], dataframe['macd'])
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

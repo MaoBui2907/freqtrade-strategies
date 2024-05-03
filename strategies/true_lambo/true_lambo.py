@@ -209,7 +209,7 @@ class true_lambo(IStrategy):
 
     # Custom stoploss
     use_custom_stoploss = True
-    use_sell_signal = True
+    use_exit_signal = True
     startup_candle_count: int = 400
 
     ############################################################################
@@ -317,21 +317,21 @@ class true_lambo(IStrategy):
     buy_crash_4_tpct_9 = DecimalParameter(0.13, 0.32, default=0.13, decimals=2, optimize = is_optimize_crash_4)
 
     ## Sell params
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=False)
-    high_offset          = DecimalParameter(0.85, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2        = DecimalParameter(0.85, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=False)
+    high_offset          = DecimalParameter(0.85, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2        = DecimalParameter(0.85, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
 
     ## Trailing params
 
     # hard stoploss profit
-    pHSL = DecimalParameter(-0.10, -0.040, default=-0.08, decimals=3, space='sell', load=True, optimize=True)
+    pHSL = DecimalParameter(-0.10, -0.040, default=-0.08, decimals=3, space='exit', load=True, optimize=True)
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='sell', load=True, optimize=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', load=True, optimize=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='exit', load=True, optimize=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', load=True, optimize=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='sell', load=True, optimize=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='sell', load=True, optimize=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='exit', load=True, optimize=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='exit', load=True, optimize=True)
 
     ############################################################################
 
@@ -370,7 +370,7 @@ class true_lambo(IStrategy):
 
         return stoploss_from_open(sl_profit, current_profit)
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
                     current_profit: float, **kwargs):
 
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
@@ -529,7 +529,7 @@ class true_lambo(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
 
         conditions = []
@@ -759,11 +759,11 @@ class true_lambo(IStrategy):
                             &
                             reduce(lambda x, y: x | y, conditions)
 
-                        , 'buy' ] = 1
+                        , 'entry' ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -788,7 +788,7 @@ class true_lambo(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ] = 1
 
         return dataframe

@@ -29,18 +29,18 @@ class Ichimoku_v37(IStrategy):
   # Run "populate_indicators()" only for new candle.
   process_only_new_candles = True
 
-  # These values can be overridden in the "ask_strategy" section in the config.
-  use_sell_signal = True
-  sell_profit_only = False
-  ignore_roi_if_buy_signal = True
+  # These values can be overridden in the "exit_pricing" section in the config.
+  use_exit_signal = True
+  exit_profit_only = False
+  ignore_roi_if_entry_signal = True
 
   # Number of candles the strategy requires before producing valid signals
   startup_candle_count = 150
 
   # Optional order type mapping.
   order_types = {
-    'buy': 'market',
-    'sell': 'market',
+    'entry': 'market',
+    'exit': 'market',
     'stoploss': 'market',
     'stoploss_on_exchange': False
   }
@@ -99,7 +99,7 @@ class Ichimoku_v37(IStrategy):
     """
     return dataframe
 
-  def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+  def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
     dataframe.loc[
       (
         (
@@ -113,16 +113,16 @@ class Ichimoku_v37(IStrategy):
           (dataframe['cloud_red_1d'] == True)
         )
       ),
-      'buy'] = 1
+      'enter_long'] = 1
 
     return dataframe
 
-  def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+  def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
     dataframe.loc[
       (
         (dataframe['ha_4h_close'] < dataframe['senkou_a_1d']) |
         (dataframe['ha_4h_close'] < dataframe['senkou_b_1d'])
       ),
-        'sell'] = 1
+        'exit_long'] = 1
         
     return dataframe

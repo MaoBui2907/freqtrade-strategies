@@ -141,9 +141,9 @@ def pmax(df, period, multiplier, length, MAtype, src):
 ##   Highly recommended to blacklist leveraged tokens (*BULL, *BEAR, *UP, *DOWN etc).                    ##
 ##   Ensure that you don't override any variables in you config.json. Especially                         ##
 ##   the timeframe (must be 5m).                                                                         ##
-##     use_sell_signal must set to true (or not set at all).                                             ##
-##     sell_profit_only must set to false (or not set at all).                                           ##
-##     ignore_roi_if_buy_signal must set to true (or not set at all).                                    ##
+##     use_exit_signal must set to true (or not set at all).                                             ##
+##     exit_profit_only must set to false (or not set at all).                                           ##
+##     ignore_roi_if_entry_signal must set to true (or not set at all).                                    ##
 ##                                                                                                       ##
 ###########################################################################################################
 ##               HOLD SUPPORT                                                                            ##
@@ -253,18 +253,18 @@ class NostalgiaForInfinityXw(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = True
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = True
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = True
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 480
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'trailing_stop_loss': 'limit',
         'stoploss': 'limit',
         'stoploss_on_exchange': False,
@@ -399,114 +399,114 @@ class NostalgiaForInfinityXw(IStrategy):
     
     
     ema_fast = CategoricalParameter(
-        [True, False], default=buy_params["ema_fast"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["ema_fast"], space='entry', optimize=optimizeBuy)
     
     ema_fast_len = CategoricalParameter(
-        ["8", "12", "16", "20", "25", "50", "100", "200"], default=buy_params["ema_fast_len"], space='buy', optimize=optimizeBuy)
+        ["8", "12", "16", "20", "25", "50", "100", "200"], default=buy_params["ema_fast_len"], space='entry', optimize=optimizeBuy)
     
     ema_slow = CategoricalParameter(
-        [True, False], default=buy_params["ema_slow"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["ema_slow"], space='entry', optimize=optimizeBuy)
     
     ema_slow_len = CategoricalParameter(
-        ["8", "12", "20", "25", "50", "100", "200"], default=buy_params["ema_slow_len"], space='buy', optimize=optimizeBuy)
+        ["8", "12", "20", "25", "50", "100", "200"], default=buy_params["ema_slow_len"], space='entry', optimize=optimizeBuy)
     
     close_above_ema_fast = CategoricalParameter(
-        [True, False], default=buy_params["close_above_ema_fast"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["close_above_ema_fast"], space='entry', optimize=optimizeBuy)
     
     close_above_ema_fast_len = CategoricalParameter(
-        ["8", "12", "20", "25", "50", "100", "200"], default=buy_params["close_above_ema_fast_len"], space='buy', optimize=optimizeBuy)
+        ["8", "12", "20", "25", "50", "100", "200"], default=buy_params["close_above_ema_fast_len"], space='entry', optimize=optimizeBuy)
    
     close_above_ema_slow = CategoricalParameter(
-        [True, False], default=buy_params["close_above_ema_slow"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["close_above_ema_slow"], space='entry', optimize=optimizeBuy)
     
     close_above_ema_slow_len = CategoricalParameter(
-        ["8", "12", "20", "25", "50", "100", "200"], default=20, space='buy', optimize=optimizeBuy)
+        ["8", "12", "20", "25", "50", "100", "200"], default=20, space='entry', optimize=optimizeBuy)
     
     sma200_rising = CategoricalParameter(
-        [True, False], default=buy_params["sma200_rising"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["sma200_rising"], space='entry', optimize=optimizeBuy)
     
     sma200_rising_val = IntParameter(
-        10, 400, default=buy_params["sma200_rising_val"], space='buy', optimize=optimizeBuy)
+        10, 400, default=buy_params["sma200_rising_val"], space='entry', optimize=optimizeBuy)
     
     sma200_1h_rising = CategoricalParameter(
-        [True, False], default=buy_params["sma200_1h_rising"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["sma200_1h_rising"], space='entry', optimize=optimizeBuy)
     
     sma200_1h_rising_val = IntParameter(
-        10, 400, default=buy_params["sma200_1h_rising_val"], space='buy', optimize=optimizeBuy)
+        10, 400, default=buy_params["sma200_1h_rising_val"], space='entry', optimize=optimizeBuy)
     
     
     btc_uptrend = CategoricalParameter(
-        [True, False], default=buy_params["btc_uptrend"], space='buy', optimize=optimizeBuy)
+        [True, False], default=buy_params["btc_uptrend"], space='entry', optimize=optimizeBuy)
     
     
     buy_real = DecimalParameter(
-        0.001, 0.999, decimals=4, default=buy_params["buy_real"], space='buy', optimize=optimizeBuy)
+        0.001, 0.999, decimals=4, default=buy_params["buy_real"], space='entry', optimize=optimizeBuy)
     
     buy_cat = CategoricalParameter(
-        [">R", "=R", "<R"], default=buy_params["buy_cat"], space='buy', optimize=optimizeBuy)
+        [">R", "=R", "<R"], default=buy_params["buy_cat"], space='entry', optimize=optimizeBuy)
     
     
     ichimoku_window1 = IntParameter(
-        10, 50, default=buy_params["ichimoku_window1"], space='buy', optimize=optimizeBuy)
+        10, 50, default=buy_params["ichimoku_window1"], space='entry', optimize=optimizeBuy)
     
     ichimoku_window2 = IntParameter(
-        10, 50, default=buy_params["ichimoku_window2"], space='buy', optimize=optimizeBuy)
+        10, 50, default=buy_params["ichimoku_window2"], space='entry', optimize=optimizeBuy)
     
     sell_real = DecimalParameter(
-        0.001, 0.999, decimals=4, default=sell_params["sell_real"], space='sell', optimize=optimizeSell)
+        0.001, 0.999, decimals=4, default=sell_params["sell_real"], space='exit', optimize=optimizeSell)
     sell_cat = CategoricalParameter(
-        [">R", "=R", "<R"], default=sell_params["sell_cat"], space='sell', optimize=optimizeSell)
+        [">R", "=R", "<R"], default=sell_params["sell_cat"], space='exit', optimize=optimizeSell)
     
     kst_window1 = IntParameter(
-        10, 50, default=sell_params["kst_window1"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_window1"], space='exit', optimize=optimizeSell)
     
     kst_window2 = IntParameter(
-        10, 50, default=sell_params["kst_window2"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_window2"], space='exit', optimize=optimizeSell)
     
     kst_window3 = IntParameter(
-        10, 50, default=sell_params["kst_window3"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_window3"], space='exit', optimize=optimizeSell)
     
     kst_window4 = IntParameter(
-        10, 50, default=sell_params["kst_window4"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_window4"], space='exit', optimize=optimizeSell)
     
     kst_roc1 = IntParameter(
-        10, 50, default=sell_params["kst_roc1"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_roc1"], space='exit', optimize=optimizeSell)
     
     kst_roc2 = IntParameter(
-        10, 50, default=sell_params["kst_roc2"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_roc2"], space='exit', optimize=optimizeSell)
     
     kst_roc3 = IntParameter(
-        10, 50, default=sell_params["kst_roc3"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_roc3"], space='exit', optimize=optimizeSell)
     
     kst_roc4 = IntParameter(
-        10, 50, default=sell_params["kst_roc4"], space='sell', optimize=optimizeSell)
+        10, 50, default=sell_params["kst_roc4"], space='exit', optimize=optimizeSell)
     
     safe_dips_threshold_0 = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_0"], space='buy', optimize=optimizeDump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_0"], space='entry', optimize=optimizeDump)
     
     safe_dips_threshold_2 = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_2"], space='buy', optimize=optimizeDump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_2"], space='entry', optimize=optimizeDump)
     
     safe_dips_threshold_12 = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_12"], space='buy', optimize=optimizeDump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_12"], space='entry', optimize=optimizeDump)
     
     safe_dips_threshold_144 = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_144"], space='buy', optimize=optimizeDump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_dips_threshold_144"], space='entry', optimize=optimizeDump)
     
     safe_pump_6h_threshold = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_pump_6h_threshold"], space='buy', optimize=optimizePump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_pump_6h_threshold"], space='entry', optimize=optimizePump)
     
     safe_pump_12h_threshold = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_pump_12h_threshold"], space='buy', optimize=optimizePump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_pump_12h_threshold"], space='entry', optimize=optimizePump)
     
     safe_pump_24h_threshold = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_pump_24h_threshold"], space='buy', optimize=optimizePump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_pump_24h_threshold"], space='entry', optimize=optimizePump)
     
     safe_pump_36h_threshold = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_pump_36h_threshold"], space='buy', optimize=optimizePump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_pump_36h_threshold"], space='entry', optimize=optimizePump)
     
     safe_pump_48h_threshold = DecimalParameter(
-        0.01, 1.0, decimals=2, default=buy_params["safe_pump_48h_threshold"], space='buy', optimize=optimizePump)
+        0.01, 1.0, decimals=2, default=buy_params["safe_pump_48h_threshold"], space='entry', optimize=optimizePump)
     
     
 
@@ -8626,7 +8626,7 @@ class NostalgiaForInfinityXw(IStrategy):
 
         return False, None
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
                     current_profit: float, **kwargs):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         last_candle = dataframe.iloc[-1]
@@ -9289,7 +9289,7 @@ class NostalgiaForInfinityXw(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dataframe.loc[:, 'buy_tag'] = ''
 
@@ -10219,12 +10219,12 @@ class NostalgiaForInfinityXw(IStrategy):
                 conditions.append(item_buy)
 
         if conditions:
-            dataframe.loc[:, 'buy'] = reduce(lambda x, y: x | y, conditions)
+            dataframe.loc[:, 'entry'] = reduce(lambda x, y: x | y, conditions)
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[:, 'sell'] = 0
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[:, 'exit_long'] = 0
 
         return dataframe
 
@@ -10266,7 +10266,7 @@ class NostalgiaForInfinityXw(IStrategy):
         :param time_in_force: Time in force. Defaults to GTC (Good-til-cancelled).
         :param sell_reason: Sell reason.
             Can be any of ['roi', 'stop_loss', 'stoploss_on_exchange', 'trailing_stop_loss',
-                           'sell_signal', 'force_sell', 'emergency_sell']
+                           'exit_signal', 'force_exit', 'emergency_exit']
         :param **kwargs: Ensure to keep this here so updates to this won't break your strategy.
         :return bool: When True is returned, then the sell-order is placed on the exchange.
             False aborts the process
@@ -10302,7 +10302,7 @@ class NostalgiaForInfinityXw(IStrategy):
         if trade_ids and trade.id in trade_ids:
             trade_profit_ratio = trade_ids[trade.id]
             current_profit_ratio = trade.calc_profit_ratio(rate)
-            if sell_reason == "force_sell":
+            if sell_reason == "force_exit":
                 formatted_profit_ratio = f"{trade_profit_ratio * 100}%"
                 formatted_current_profit_ratio = f"{current_profit_ratio * 100}%"
                 log.warning(
@@ -10327,7 +10327,7 @@ class NostalgiaForInfinityXw(IStrategy):
         if trade_pairs and trade.pair in trade_pairs:
             trade_profit_ratio = trade_pairs[trade.pair]
             current_profit_ratio = trade.calc_profit_ratio(rate)
-            if sell_reason == "force_sell":
+            if sell_reason == "force_exit":
                 formatted_profit_ratio = f"{trade_profit_ratio * 100}%"
                 formatted_current_profit_ratio = f"{current_profit_ratio * 100}%"
                 log.warning(

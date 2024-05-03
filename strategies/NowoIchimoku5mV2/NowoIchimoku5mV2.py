@@ -126,7 +126,7 @@ class NowoIchimoku5mV2(IStrategy):
 
     startup_candle_count = int(100 * time_factor)
 
-    use_sell_signal = False
+    use_exit_signal = False
 
     use_custom_stoploss = True
 
@@ -268,7 +268,7 @@ class NowoIchimoku5mV2(IStrategy):
 
         return -0.99
 
-    def populate_buy_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
         df.info(verbose=True)
 
         double_shifted_upper_cloud = df['upper_cloud'].shift(50 * self.time_factor)
@@ -289,22 +289,22 @@ class NowoIchimoku5mV2(IStrategy):
                            close_above_shifted_conversion_line & \
                            close_above_double_shifted_upper_cloud
 
-        df['buy'] = False
+        df['entry'] = False
         df['buy_allowed'] = True
 
         for i in range(1, len(df)):
             df.loc[i, 'buy_allowed'] = df.at[i - 1, 'buy_allowed']
 
-            if df.at[i - 1, 'buy']:
+            if df.at[i - 1, 'entry']:
                 df.loc[i, 'buy_allowed'] = False
 
             if not df.at[i, 'is_cloud_green']:
                 df.loc[i, 'buy_allowed'] = True
 
-            df.loc[i, 'buy'] = df.at[i, 'buy_allowed'] & df.at[i, 'should_buy']
+            df.loc[i, 'entry'] = df.at[i, 'buy_allowed'] & df.at[i, 'should_buy']
 
         return df
 
-    def populate_sell_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
-        df['sell'] = 0
+    def populate_exit_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        df['exit_long'] = 0
         return df

@@ -23,7 +23,7 @@ from skopt.space import Dimension
 ##   A pairlist with 20 to 40 pairs. Volume pairlist works well.                                         ##
 ##   Prefer stable coin (USDT, BUSDT etc) pairs, instead of BTC or ETH pairs.                            ##
 ##   Ensure that you don't override any variables in you config.json. Especially                         ##
-##   the timeframe (must be 5m) & sell_profit_only (must be true).                                       ##
+##   the timeframe (must be 5m) & exit_profit_only (must be true).                                       ##
 ##                                                                                                       ##
 ###########################################################################################################
 ##               DONATIONS                                                                               ##
@@ -46,10 +46,10 @@ class CombinedBinHAndClucV5Hyperoptable(IStrategy):
     timeframe = '5m'
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
     trailing_stop = True
@@ -68,17 +68,17 @@ class CombinedBinHAndClucV5Hyperoptable(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
     
-    buy_bin_bbdelta_close =  RealParameter(0.004, 0.15, default=0.008, space='buy', optimize=True, load=True)
-    buy_bin_closedelta_close = RealParameter(0.01, 0.03, default=0.0175, space='buy', optimize=True, load=True)
-    buy_bin_tail_bbdelta = RealParameter(0.1, 0.5, default=0.25, space='buy', optimize=True, load=True)
-    buy_cluc_close_bblowerband = RealParameter(0.5, 1.5, default=0.985, space='buy', optimize=True, load=True)
-    buy_cluc_volume = IntParameter(15, 30, default=20, space='buy', optimize=True, load=True)
+    buy_bin_bbdelta_close =  RealParameter(0.004, 0.15, default=0.008, space='entry', optimize=True, load=True)
+    buy_bin_closedelta_close = RealParameter(0.01, 0.03, default=0.0175, space='entry', optimize=True, load=True)
+    buy_bin_tail_bbdelta = RealParameter(0.1, 0.5, default=0.25, space='entry', optimize=True, load=True)
+    buy_cluc_close_bblowerband = RealParameter(0.5, 1.5, default=0.985, space='entry', optimize=True, load=True)
+    buy_cluc_volume = IntParameter(15, 30, default=20, space='entry', optimize=True, load=True)
     
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
                         current_rate: float, current_profit: float, **kwargs) -> float:
@@ -109,7 +109,7 @@ class CombinedBinHAndClucV5Hyperoptable(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (  # strategy BinHV45
                 (dataframe['lower'].shift() > 0 ) &
@@ -127,11 +127,11 @@ class CombinedBinHAndClucV5Hyperoptable(IStrategy):
                 (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * self.buy_cluc_volume.value)) &
                 (dataframe['volume'] > 0) # Make sure Volume is not 0
             ),
-            'buy'
+            'entry'
         ] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             ( # Improves the profit slightly.
                 (dataframe['close'] > dataframe['bb_upperband']) &
@@ -139,7 +139,7 @@ class CombinedBinHAndClucV5Hyperoptable(IStrategy):
                 (dataframe['volume'] > 0) # Make sure Volume is not 0
             )
             ,
-            'sell'
+            'exit'
         ] = 1
         return dataframe
         

@@ -114,30 +114,30 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=False)
+        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=False)
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
+        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=False)
+        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=False)
     low_offset_2 = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset_2'], space='buy', optimize=True)
+        0.9, 0.99, default=buy_params['low_offset_2'], space='entry', optimize=True)
     high_offset = DecimalParameter(
-        0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=False)
+        0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=False)
     high_offset_2 = DecimalParameter(
-        0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)
+        0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
     ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='buy', optimize=False)
+                               default=buy_params['ewo_low'], space='entry', optimize=False)
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=False)
+        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=False)
 
     ewo_high_2 = DecimalParameter(
-        -6.0, 12.0, default=buy_params['ewo_high_2'], space='buy', optimize=True)
+        -6.0, 12.0, default=buy_params['ewo_high_2'], space='entry', optimize=True)
 
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
 
     # Trailing stop:
     trailing_stop = True
@@ -146,15 +146,15 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'ioc'
+        'entry': 'gtc',
+        'exit': 'ioc'
     }
 
     # Optimal timeframe for the strategy
@@ -186,7 +186,7 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
         last_candle = dataframe.iloc[-1]
 
         if (last_candle is not None):
-            if (sell_reason in ['sell_signal']):
+            if (sell_reason in ['exit_signal']):
                 if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
                     return False
 
@@ -233,7 +233,7 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             (
@@ -245,7 +245,7 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
                 (dataframe['close'] < (
                     dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo1')
+            ['entry', 'buy_tag']] = (1, 'ewo1')
 
         dataframe.loc[
             (
@@ -257,7 +257,7 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
                 (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
                 (dataframe['rsi'] < 25)
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo2')
+            ['entry', 'buy_tag']] = (1, 'ewo2')
 
         dataframe.loc[
             (
@@ -268,11 +268,11 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
                 (dataframe['close'] < (
                     dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewolow')
+            ['entry', 'buy_tag']] = (1, 'ewolow')
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -295,7 +295,7 @@ class NotAnotherSMAOffsetStrategyHO(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

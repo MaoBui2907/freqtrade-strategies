@@ -75,48 +75,48 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
     stoploss = -0.15
 
     # SMAOffset
-    base_nb_candles_buy = IntParameter(2, 26, default=buy_params['base_nb_candles_buy'], space='buy', optimize=False)
-    base_nb_candles_sell = IntParameter(2, 20, default=sell_params['base_nb_candles_sell'], space='sell', optimize=False)
-    low_offset = DecimalParameter(0.85, 0.99, default=buy_params['low_offset'], space='buy', optimize=False)
-    low_offset_2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_2'], space='buy', optimize=False)
-    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=False)
-    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=False)
+    base_nb_candles_buy = IntParameter(2, 26, default=buy_params['base_nb_candles_buy'], space='entry', optimize=False)
+    base_nb_candles_sell = IntParameter(2, 20, default=sell_params['base_nb_candles_sell'], space='exit', optimize=False)
+    low_offset = DecimalParameter(0.85, 0.99, default=buy_params['low_offset'], space='entry', optimize=False)
+    low_offset_2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_2'], space='entry', optimize=False)
+    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=False)
+    high_offset_2 = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=False)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
 
-    lookback_candles = IntParameter(1, 36, default=buy_params['lookback_candles'], space='buy', optimize=False)
-    profit_threshold = DecimalParameter(1.0, 1.08, default=buy_params['profit_threshold'], space='buy', optimize=False)
-    ewo_low = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low'], space='buy', optimize=False)
-    ewo_high = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=False)
-    ewo_high_2 = DecimalParameter(-6.0, 12.0, default=buy_params['ewo_high_2'], space='buy', optimize=False)
-    rsi_buy = IntParameter(60, 82, default=buy_params['rsi_buy'], space='buy', optimize=False)
+    lookback_candles = IntParameter(1, 36, default=buy_params['lookback_candles'], space='entry', optimize=False)
+    profit_threshold = DecimalParameter(1.0, 1.08, default=buy_params['profit_threshold'], space='entry', optimize=False)
+    ewo_low = DecimalParameter(-20.0, -8.0, default=buy_params['ewo_low'], space='entry', optimize=False)
+    ewo_high = DecimalParameter(2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=False)
+    ewo_high_2 = DecimalParameter(-6.0, 12.0, default=buy_params['ewo_high_2'], space='entry', optimize=False)
+    rsi_buy = IntParameter(60, 82, default=buy_params['rsi_buy'], space='entry', optimize=False)
 
     # trailing stoploss hyperopt parameters
-    pHSL = DecimalParameter(-0.15, -0.08, default=sell_params['pHSL'], decimals=3, space='sell', optimize=True)
-    ProfitMargin1 = DecimalParameter(0.009, 0.019, default=sell_params['ProfitMargin1'], decimals=3, space='sell', optimize=True)
-    ProfitLoss1 = DecimalParameter(0.005, 0.012, default=sell_params['ProfitLoss1'], decimals=3, space='sell', optimize=True)
-    ProfitMargin2 = DecimalParameter(0.033, 0.099, default=sell_params['ProfitMargin2'], decimals=3, space='sell', optimize=True)
-    ProfitLoss2 = DecimalParameter(0.010, 0.025, default=sell_params['ProfitLoss2'], decimals=3, space='sell', optimize=True)
+    pHSL = DecimalParameter(-0.15, -0.08, default=sell_params['pHSL'], decimals=3, space='exit', optimize=True)
+    ProfitMargin1 = DecimalParameter(0.009, 0.019, default=sell_params['ProfitMargin1'], decimals=3, space='exit', optimize=True)
+    ProfitLoss1 = DecimalParameter(0.005, 0.012, default=sell_params['ProfitLoss1'], decimals=3, space='exit', optimize=True)
+    ProfitMargin2 = DecimalParameter(0.033, 0.099, default=sell_params['ProfitMargin2'], decimals=3, space='exit', optimize=True)
+    ProfitLoss2 = DecimalParameter(0.010, 0.025, default=sell_params['ProfitLoss2'], decimals=3, space='exit', optimize=True)
 
     # ClucHA
-    clucha_bbdelta_close = DecimalParameter(0.01,0.05, default=buy_params['clucha_bbdelta_close'], decimals=5, space='buy', optimize=False)
-    clucha_bbdelta_tail = DecimalParameter(0.7, 1.2, default=buy_params['clucha_bbdelta_tail'], decimals=5, space='buy', optimize=False)
-    clucha_close_bblower = DecimalParameter(0.001, 0.05, default=buy_params['clucha_close_bblower'], decimals=5, space='buy', optimize=False)
-    clucha_closedelta_close = DecimalParameter(0.001, 0.05, default=buy_params['clucha_closedelta_close'], decimals=5, space='buy', optimize=False)
-    clucha_rocr_1h = DecimalParameter(0.1, 1.0, default=buy_params['clucha_rocr_1h'], decimals=5, space='buy', optimize=False)
+    clucha_bbdelta_close = DecimalParameter(0.01,0.05, default=buy_params['clucha_bbdelta_close'], decimals=5, space='entry', optimize=False)
+    clucha_bbdelta_tail = DecimalParameter(0.7, 1.2, default=buy_params['clucha_bbdelta_tail'], decimals=5, space='entry', optimize=False)
+    clucha_close_bblower = DecimalParameter(0.001, 0.05, default=buy_params['clucha_close_bblower'], decimals=5, space='entry', optimize=False)
+    clucha_closedelta_close = DecimalParameter(0.001, 0.05, default=buy_params['clucha_closedelta_close'], decimals=5, space='entry', optimize=False)
+    clucha_rocr_1h = DecimalParameter(0.1, 1.0, default=buy_params['clucha_rocr_1h'], decimals=5, space='entry', optimize=False)
 
     # Zema
-    base_nb_candles_buy_zema = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_zema'], space='buy', optimize=False)
-    low_offset_zema = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_zema'], space='buy', optimize=False)
-    base_nb_candles_buy_zema2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_zema2'], space='buy', optimize=False)
-    low_offset_zema2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_zema2'], space='buy', optimize=False)
-    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=buy_params['high_offset_sell_ema'], space='buy', optimize=False)
-    base_nb_candles_buy_ema = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_ema'], space='buy', optimize=False)
-    low_offset_ema = DecimalParameter(0.9, 1.1, default=buy_params['low_offset_ema'], space='buy', optimize=False)
-    base_nb_candles_buy_ema2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_ema2'], space='buy', optimize=False)
-    low_offset_ema2 = DecimalParameter(0.9, 1.1, default=buy_params['low_offset_ema2'], space='buy', optimize=False)
+    base_nb_candles_buy_zema = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_zema'], space='entry', optimize=False)
+    low_offset_zema = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_zema'], space='entry', optimize=False)
+    base_nb_candles_buy_zema2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_zema2'], space='entry', optimize=False)
+    low_offset_zema2 = DecimalParameter(0.9, 0.99, default=buy_params['low_offset_zema2'], space='entry', optimize=False)
+    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=buy_params['high_offset_sell_ema'], space='entry', optimize=False)
+    base_nb_candles_buy_ema = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_ema'], space='entry', optimize=False)
+    low_offset_ema = DecimalParameter(0.9, 1.1, default=buy_params['low_offset_ema'], space='entry', optimize=False)
+    base_nb_candles_buy_ema2 = IntParameter(5, 80, default=buy_params['base_nb_candles_buy_ema2'], space='entry', optimize=False)
+    low_offset_ema2 = DecimalParameter(0.9, 1.1, default=buy_params['low_offset_ema2'], space='entry', optimize=False)
 
     # Trailing stop:
     trailing_stop = False
@@ -125,15 +125,15 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
     #trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    #sell_profit_only = False
-    #sell_profit_offset = -0.0001
-    #ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    #exit_profit_only = False
+    #exit_profit_offset = -0.0001
+    #ignore_roi_if_entry_signal = False
 
     # Optional order time in force.
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc'
+        'entry': 'gtc',
+        'exit': 'gtc'
     }
 
     # Optimal timeframe for the strategy
@@ -166,7 +166,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
         'max_slippage': -0.02
     }
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs):
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float, current_profit: float, **kwargs):
         if ((current_time - trade.open_date_utc).seconds / 60 > 1440):
             return 'unclog'
 
@@ -190,7 +190,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
         last_candle = dataframe.iloc[-1]
 
         if (last_candle is not None):
-            if (sell_reason in ['sell_signal']):
+            if (sell_reason in ['exit_signal']):
                 if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
                     return False
 
@@ -212,7 +212,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
         state[pair] = 0
 
         if hasattr(last_candle, 'sell_tag') and str(last_candle.sell_tag) != "nan":
-            if (sell_reason == "sell_signal"):
+            if (sell_reason == "exit_signal"):
                 sell_reason = last_candle.sell_tag
             else:
                 sell_reason += last_candle.sell_tag
@@ -378,7 +378,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dont_buy_conditions = []
         dont_buy_conditions.append(
@@ -403,7 +403,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
                     (dataframe['close'] < (
                             dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo1')
+            ['entry', 'buy_tag']] = (1, 'ewo1')
 
         dataframe.loc[
             (
@@ -415,7 +415,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
                     (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value)) &
                     (dataframe['rsi'] < 25)
             ),
-            ['buy', 'buy_tag']] = (1, 'ewo2')
+            ['entry', 'buy_tag']] = (1, 'ewo2')
 
 
         dataframe.loc[
@@ -427,7 +427,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
                     (dataframe['close'] < (
                             dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             ),
-            ['buy', 'buy_tag']] = (1, 'ewolow')
+            ['entry', 'buy_tag']] = (1, 'ewolow')
 
         # This produces around 0.85% - 1.0% profitable trades but long durations so decided against it.
         # dataframe.loc[
@@ -441,11 +441,11 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
         #         (dataframe['rsi_36'] < 0.55) &
         #         (dataframe['uptrend'] < 1)
         #     ),
-        #     ['buy', 'buy_tag']] = (1, 'MacD')
+        #     ['entry', 'buy_tag']] = (1, 'MacD')
 
         if dont_buy_conditions:
             for condition in dont_buy_conditions:
-                dataframe.loc[condition, 'buy'] = 0
+                dataframe.loc[condition, 'entry'] = 0
 
         # This does not fit well the protections for EWO buys.
         dataframe.loc[
@@ -467,7 +467,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
                      )
                  )
             ),
-            ['buy', 'buy_tag']] = (1, 'clucHA')
+            ['entry', 'buy_tag']] = (1, 'clucHA')
 
         # This does not fit well the protections for EWO buys.
         dataframe.loc[
@@ -510,11 +510,11 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
                     )
                 )
             ),
-            ['buy', 'buy_tag']] = (1, 'zema')
+            ['entry', 'buy_tag']] = (1, 'zema')
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -538,7 +538,7 @@ class NASOSRv6_private_Reinuvader_20211121(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

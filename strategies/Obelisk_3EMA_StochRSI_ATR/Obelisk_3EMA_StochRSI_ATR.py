@@ -134,18 +134,18 @@ class Obelisk_3EMA_StochRSI_ATR(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
             qtpylib.crossed_above(dataframe['go_long'], 0)
         ,
-        'buy'] = 1
+        'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
-        dataframe['sell'] = 0
+        dataframe['exit_long'] = 0
 
         return dataframe
 

@@ -86,39 +86,39 @@ class MacheteV8b(IStrategy):
     use_custom_stoploss = True
 
     # buy signal
-    buy_should_use_get_buy_signal_awesome_macd = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_awesome_macd'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_adx_momentum = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_adx_momentum'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_adx_smas = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_adx_smas'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_asdts_rockwelltrading = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_asdts_rockwelltrading'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_averages_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_averages_strategy'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_fisher_hull = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_fisher_hull'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_gettin_moist = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_gettin_moist'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_hlhb = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_hlhb'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_macd_strategy_crossed = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_macd_strategy_crossed'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_macd_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_macd_strategy'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_pmax = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_pmax'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_quickie = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_quickie'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_scalp = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_scalp'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_simple = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_simple'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_strategy001 = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_strategy001'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_technical_example_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_technical_example_strategy'], space='buy', optimize=True)
-    buy_should_use_get_buy_signal_tema_rsi_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_tema_rsi_strategy'], space='buy', optimize=True)
+    buy_should_use_get_buy_signal_awesome_macd = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_awesome_macd'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_adx_momentum = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_adx_momentum'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_adx_smas = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_adx_smas'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_asdts_rockwelltrading = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_asdts_rockwelltrading'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_averages_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_averages_strategy'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_fisher_hull = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_fisher_hull'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_gettin_moist = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_gettin_moist'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_hlhb = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_hlhb'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_macd_strategy_crossed = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_macd_strategy_crossed'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_macd_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_macd_strategy'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_pmax = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_pmax'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_quickie = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_quickie'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_scalp = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_scalp'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_simple = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_simple'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_strategy001 = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_strategy001'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_technical_example_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_technical_example_strategy'], space='entry', optimize=True)
+    buy_should_use_get_buy_signal_tema_rsi_strategy = CategoricalParameter([True, False], default=buy_params['buy_should_use_get_buy_signal_tema_rsi_strategy'], space='entry', optimize=True)
 
     # Dynamic ROI
-    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default=sell_params['droi_trend_type'], space='sell', optimize=True)
-    droi_pullback = CategoricalParameter([True, False], default=sell_params['droi_pullback'], space='sell', optimize=True)
-    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=sell_params['droi_pullback_amount'], space='sell')
-    droi_pullback_respect_table = CategoricalParameter([True, False], default=sell_params['droi_pullback_respect_table'], space='sell', optimize=True)
+    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default=sell_params['droi_trend_type'], space='exit', optimize=True)
+    droi_pullback = CategoricalParameter([True, False], default=sell_params['droi_pullback'], space='exit', optimize=True)
+    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=sell_params['droi_pullback_amount'], space='exit')
+    droi_pullback_respect_table = CategoricalParameter([True, False], default=sell_params['droi_pullback_respect_table'], space='exit', optimize=True)
 
     # Custom Stoploss
-    cstp_threshold = DecimalParameter(-0.05, 0, default=sell_params['cstp_threshold'], space='sell')
-    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default=sell_params['cstp_bail_how'], space='sell', optimize=True)
-    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=sell_params['cstp_bail_roc'], space='sell')
-    cstp_bail_time = IntParameter(720, 1440, default=sell_params['cstp_bail_time'], space='sell')
-    cstp_trailing_only_offset_is_reached = DecimalParameter(0.01, 0.06, default=sell_params['cstp_trailing_only_offset_is_reached'], space='sell')
-    cstp_trailing_stop_profit_devider = IntParameter(2, 4, default=sell_params['cstp_trailing_stop_profit_devider'], space='sell')
-    cstp_trailing_max_stoploss = DecimalParameter(0.02, 0.08, default=sell_params['cstp_trailing_max_stoploss'], space='sell')
-    cstp_bb_trailing_input = CategoricalParameter(['bb_lowerband_trend', 'bb_lowerband_trend_inf', 'bb_lowerband_neutral', 'bb_lowerband_neutral_inf', 'bb_upperband_neutral_inf'], default=sell_params['cstp_bb_trailing_input'], space='sell', optimize=True)
+    cstp_threshold = DecimalParameter(-0.05, 0, default=sell_params['cstp_threshold'], space='exit')
+    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default=sell_params['cstp_bail_how'], space='exit', optimize=True)
+    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=sell_params['cstp_bail_roc'], space='exit')
+    cstp_bail_time = IntParameter(720, 1440, default=sell_params['cstp_bail_time'], space='exit')
+    cstp_trailing_only_offset_is_reached = DecimalParameter(0.01, 0.06, default=sell_params['cstp_trailing_only_offset_is_reached'], space='exit')
+    cstp_trailing_stop_profit_devider = IntParameter(2, 4, default=sell_params['cstp_trailing_stop_profit_devider'], space='exit')
+    cstp_trailing_max_stoploss = DecimalParameter(0.02, 0.08, default=sell_params['cstp_trailing_max_stoploss'], space='exit')
+    cstp_bb_trailing_input = CategoricalParameter(['bb_lowerband_trend', 'bb_lowerband_trend_inf', 'bb_lowerband_neutral', 'bb_lowerband_neutral_inf', 'bb_upperband_neutral_inf'], default=sell_params['cstp_bb_trailing_input'], space='exit', optimize=True)
 
     # nested hyperopt class
     class HyperOpt:
@@ -136,9 +136,9 @@ class MacheteV8b(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
     startup_candle_count = 500#149
 
     use_dynamic_roi = True
@@ -148,8 +148,8 @@ class MacheteV8b(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -418,7 +418,7 @@ class MacheteV8b(IStrategy):
     # Processing buy signals
     #
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (self.get_buy_signal_awesome_macd(dataframe) == True)
@@ -445,7 +445,7 @@ class MacheteV8b(IStrategy):
             # NOTE: I keep the volume checks of feels like it has not much benifit when trading leverage tokens, maybe im wrong!?
             #(dataframe['vfi'] < 0.0) &
             #(dataframe['volume'] > 0)
-        ,'buy'] = 1
+        ,'enter_long'] = 1
 
         return dataframe
 
@@ -607,7 +607,7 @@ class MacheteV8b(IStrategy):
     # Processing sell signals
     #
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (qtpylib.crossed_above(dataframe['sslDown_inf'], dataframe['sslUp_inf']))
             & (
@@ -619,7 +619,7 @@ class MacheteV8b(IStrategy):
             #(dataframe['vfi'] < 0.0) &
             #(dataframe['volume'] > 0)
 
-        ,'sell'] = 1
+        ,'exit_long'] = 1
 
         return dataframe
 
@@ -733,10 +733,10 @@ class MacheteV8b(IStrategy):
             if rate:
                 return rate
 
-        ask_strategy = self.config.get('ask_strategy', {})
-        if ask_strategy.get('use_order_book', False):
+        exit_pricing = self.config.get('exit_pricing', {})
+        if exit_pricing.get('use_order_book', False):
             ob = self.dp.orderbook(pair, 1)
-            rate = ob[f"{ask_strategy['price_side']}s"][0][0]
+            rate = ob[f"{exit_pricing['price_side']}s"][0][0]
         else:
             ticker = self.dp.ticker(pair)
             rate = ticker['last']

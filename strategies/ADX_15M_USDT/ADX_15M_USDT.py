@@ -37,7 +37,7 @@ class ADX_15M_USDT(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['adx'] > 16) &
@@ -46,10 +46,10 @@ class ADX_15M_USDT(IStrategy):
                     (qtpylib.crossed_above( dataframe['plus_di'],dataframe['minus_di']))
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['adx'] > 43) &
@@ -58,5 +58,5 @@ class ADX_15M_USDT(IStrategy):
                     (qtpylib.crossed_above(dataframe['sell-minus_di'], dataframe['sell-plus_di']))
 
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

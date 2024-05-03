@@ -25,8 +25,8 @@ def zlema2(dataframe, fast):
 
 
 order_types = {
-    'buy': 'limit',
-    'sell': 'market',
+    'entry': 'limit',
+    'exit': 'market',
     'stoploss': 'market',
     'stoploss_on_exchange': False
     }    
@@ -67,10 +67,10 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.005
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.005
+    ignore_roi_if_entry_signal = False
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
@@ -93,7 +93,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
         last_candle = dataframe.iloc[-1]
 
         if (last_candle is not None):
-            if (sell_reason in ['sell_signal']):
+            if (sell_reason in ['exit_signal']):
                 if (last_candle['hma_50']*1.149 > last_candle['ema_100']) and (last_candle['close'] < last_candle['ema_100']*0.951):  # *1.2
                     return False
 
@@ -127,36 +127,36 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
 
             # buy params
             self.trailing_stop_positive_offset = 0.03
-            self.base_nb_candles_buy  = IntParameter(5, 80, default=14, space='buy', optimize=False)
-            self.low_offset           = DecimalParameter(0.9, 0.99, default=0.975, space='buy', optimize=False)
-            self.low_offset_2         = DecimalParameter(0.9, 0.99, default=0.955, space='buy', optimize=False)  
-            self.ewo_low              = DecimalParameter(-20.0, -8.0,default=-20.988, space='buy', optimize=False)
-            self.ewo_high             = DecimalParameter(2.0, 12.0, default=2.327, space='buy', optimize=False)
-            self.ewo_high_2           = DecimalParameter(-6.0, 12.0, default=-2.327, space='buy', optimize=False)
-            self.rsi_buy              = IntParameter(30, 70, default=69, space='buy', optimize=False)
+            self.base_nb_candles_buy  = IntParameter(5, 80, default=14, space='entry', optimize=False)
+            self.low_offset           = DecimalParameter(0.9, 0.99, default=0.975, space='entry', optimize=False)
+            self.low_offset_2         = DecimalParameter(0.9, 0.99, default=0.955, space='entry', optimize=False)  
+            self.ewo_low              = DecimalParameter(-20.0, -8.0,default=-20.988, space='entry', optimize=False)
+            self.ewo_high             = DecimalParameter(2.0, 12.0, default=2.327, space='entry', optimize=False)
+            self.ewo_high_2           = DecimalParameter(-6.0, 12.0, default=-2.327, space='entry', optimize=False)
+            self.rsi_buy              = IntParameter(30, 70, default=69, space='entry', optimize=False)
 
             # sell params
-            self.base_nb_candles_sell = IntParameter(5, 80, default=16, space='sell', optimize=True)
-            self.high_offset          = DecimalParameter(0.95, 1.1, default=0.991, space='sell', optimize=True)
-            self.high_offset_2        = DecimalParameter(0.99, 1.5, default=0.997, space='sell', optimize=True)     
+            self.base_nb_candles_sell = IntParameter(5, 80, default=16, space='exit', optimize=True)
+            self.high_offset          = DecimalParameter(0.95, 1.1, default=0.991, space='exit', optimize=True)
+            self.high_offset_2        = DecimalParameter(0.99, 1.5, default=0.997, space='exit', optimize=True)     
 
 
         else:
             # normale - si sale
 
             # buy params
-            self.base_nb_candles_buy  = IntParameter(5, 80, default=14, space='buy', optimize=False)
-            self.low_offset           = DecimalParameter(0.9, 0.99, default=0.986, space='buy', optimize=False)
-            self.low_offset_2         = DecimalParameter(0.9, 0.99, default=0.944, space='buy', optimize=False)  
-            self.ewo_low              = DecimalParameter(-20.0, -8.0,default=-16.917, space='buy', optimize=False)
-            self.ewo_high             = DecimalParameter(2.0, 12.0, default=4.179, space='buy', optimize=False)
-            self.ewo_high_2           = DecimalParameter(-6.0, 12.0, default=-2.609, space='buy', optimize=False)
-            self.rsi_buy              = IntParameter(30, 70, default=58, space='buy', optimize=False)
+            self.base_nb_candles_buy  = IntParameter(5, 80, default=14, space='entry', optimize=False)
+            self.low_offset           = DecimalParameter(0.9, 0.99, default=0.986, space='entry', optimize=False)
+            self.low_offset_2         = DecimalParameter(0.9, 0.99, default=0.944, space='entry', optimize=False)  
+            self.ewo_low              = DecimalParameter(-20.0, -8.0,default=-16.917, space='entry', optimize=False)
+            self.ewo_high             = DecimalParameter(2.0, 12.0, default=4.179, space='entry', optimize=False)
+            self.ewo_high_2           = DecimalParameter(-6.0, 12.0, default=-2.609, space='entry', optimize=False)
+            self.rsi_buy              = IntParameter(30, 70, default=58, space='entry', optimize=False)
 
             # sell params
-            self.base_nb_candles_sell = IntParameter(5, 80, default=16, space='sell', optimize=True)
-            self.high_offset          = DecimalParameter(0.95, 1.1, default=1.054, space='sell', optimize=True)
-            self.high_offset_2        = DecimalParameter(0.99, 1.5, default=1.018, space='sell', optimize=True)     
+            self.base_nb_candles_sell = IntParameter(5, 80, default=16, space='exit', optimize=True)
+            self.high_offset          = DecimalParameter(0.95, 1.1, default=1.054, space='exit', optimize=True)
+            self.high_offset_2        = DecimalParameter(0.99, 1.5, default=1.018, space='exit', optimize=True)     
 
         # Calculate all ma_buy values
         for val in self.base_nb_candles_buy.range:
@@ -199,7 +199,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         dataframe.loc[
         (
@@ -210,7 +210,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
                 (dataframe['volume'] > 0) &
                 (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
         ),
-        ['buy', 'buy_tag']] = (1, 'ewo1')
+        ['entry', 'buy_tag']] = (1, 'ewo1')
 
 
         dataframe.loc[
@@ -223,7 +223,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
                 (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))&
                 (dataframe['rsi']<25)
         ),
-        ['buy', 'buy_tag']] = (1, 'ewo2')
+        ['entry', 'buy_tag']] = (1, 'ewo2')
 
         dataframe.loc[
         (
@@ -233,7 +233,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
                 (dataframe['volume'] > 0) &
                 (dataframe['close'] < (dataframe[f'ma_sell_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
         ),
-        ['buy', 'buy_tag']] = (1, 'ewolow')
+        ['entry', 'buy_tag']] = (1, 'ewolow')
 
 
         # buy in bull market
@@ -257,11 +257,11 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
                 (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * 21)) &
                 (dataframe['volume'] > 0)
         ),
-        ['buy', 'buy_tag']] = (1, 'bb_bull')    
+        ['entry', 'buy_tag']] = (1, 'bb_bull')    
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -287,7 +287,7 @@ class NotAnotherSMAOffsetStrategy_uzi3(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

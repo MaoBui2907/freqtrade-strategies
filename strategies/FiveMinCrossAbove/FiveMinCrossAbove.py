@@ -45,14 +45,14 @@ class FiveMinCrossAbove(IStrategy):
     process_only_new_candles = False
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = False
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = False
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = False
 
     # Optional order type mapping
     order_types = {
-        'buy': 'market',
-        'sell': 'market',
+        'entry': 'market',
+        'exit': 'market',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -87,7 +87,7 @@ class FiveMinCrossAbove(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         :param metadata:
@@ -100,11 +100,11 @@ class FiveMinCrossAbove(IStrategy):
                     (qtpylib.crossed_above(dataframe['rsi8'], 30)) &
 					(dataframe['rsi8'] < 41)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         :param metadata:
@@ -117,5 +117,5 @@ class FiveMinCrossAbove(IStrategy):
                     (dataframe['close'] > 9999999999)
             ),
 
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe

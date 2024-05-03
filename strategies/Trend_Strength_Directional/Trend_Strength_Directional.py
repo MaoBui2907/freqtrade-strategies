@@ -42,25 +42,25 @@ class Trend_Strength_Directional(IStrategy):
     trailing_only_offset_is_reached = False
 
     # Hyperopt Buy Parameters
-    buy_plusdi_enabled = CategoricalParameter([True, False], space='buy', optimize=True, default=False)
-    buy_adx = IntParameter(low=1, high=100, default=12, space='buy', optimize=True, load=True)
-    buy_adx_timeframe = IntParameter(low=1, high=50, default=9, space='buy', optimize=True, load=True)
-    buy_plusdi = IntParameter(low=1, high=100, default=44, space='buy', optimize=True, load=True)
-    buy_minusdi = IntParameter(low=1, high=100, default=74, space='buy', optimize=True, load=True)
+    buy_plusdi_enabled = CategoricalParameter([True, False], space='entry', optimize=True, default=False)
+    buy_adx = IntParameter(low=1, high=100, default=12, space='entry', optimize=True, load=True)
+    buy_adx_timeframe = IntParameter(low=1, high=50, default=9, space='entry', optimize=True, load=True)
+    buy_plusdi = IntParameter(low=1, high=100, default=44, space='entry', optimize=True, load=True)
+    buy_minusdi = IntParameter(low=1, high=100, default=74, space='entry', optimize=True, load=True)
 
     # Hyperopt Sell Parameters
-    sell_plusdi_enabled = CategoricalParameter([True, False], space='sell', optimize=True, default=True)
-    sell_adx = IntParameter(low=1, high=100, default=3, space='sell', optimize=True, load=True)
-    sell_adx_timeframe = IntParameter(low=1, high=50, default=41, space='sell', optimize=True, load=True)
-    sell_plusdi = IntParameter(low=1, high=100, default=49, space='sell', optimize=True, load=True)
-    sell_minusdi = IntParameter(low=1, high=100, default=11, space='sell', optimize=True, load=True)
+    sell_plusdi_enabled = CategoricalParameter([True, False], space='exit', optimize=True, default=True)
+    sell_adx = IntParameter(low=1, high=100, default=3, space='exit', optimize=True, load=True)
+    sell_adx_timeframe = IntParameter(low=1, high=50, default=41, space='exit', optimize=True, load=True)
+    sell_plusdi = IntParameter(low=1, high=100, default=49, space='exit', optimize=True, load=True)
+    sell_minusdi = IntParameter(low=1, high=100, default=11, space='exit', optimize=True, load=True)
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # RSI
         dataframe['rsi'] = ta.RSI(dataframe)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         # GUARDS
@@ -76,11 +76,11 @@ class Trend_Strength_Directional(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy'] = 1
+                'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         # GUARDS
@@ -96,6 +96,6 @@ class Trend_Strength_Directional(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell'] = 1
+                'exit_long'] = 1
 
         return dataframe

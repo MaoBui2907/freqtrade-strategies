@@ -25,10 +25,10 @@ class CombinedBinHAndClucV4(IStrategy):
     timeframe = '5m'
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = True
-    sell_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = True
+    exit_profit_offset = 0.001 # it doesn't meant anything, just to guarantee there is a minimal profit.
+    ignore_roi_if_entry_signal = True
 
     # Trailing stoploss
     trailing_stop = True
@@ -47,8 +47,8 @@ class CombinedBinHAndClucV4(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -78,7 +78,7 @@ class CombinedBinHAndClucV4(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (  # strategy BinHV45
                 dataframe['lower'].shift().gt(0) &
@@ -96,11 +96,11 @@ class CombinedBinHAndClucV4(IStrategy):
                 (dataframe['volume'] < (dataframe['volume_mean_slow'].shift(1) * 20)) &
                 (dataframe['volume'] > 0) # Make sure Volume is not 0
             ),
-            'buy'
+            'entry'
         ] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             ( # Improves the profit slightly.
                 (dataframe['close'] > dataframe['bb_upperband']) &
@@ -112,6 +112,6 @@ class CombinedBinHAndClucV4(IStrategy):
                 (dataframe['volume'] > 0) # Make sure Volume is not 0
             )
             ,
-            'sell'
+            'exit'
         ] = 1
         return dataframe

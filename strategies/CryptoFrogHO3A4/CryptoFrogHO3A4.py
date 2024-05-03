@@ -67,16 +67,16 @@ class CryptoFrogHO3A4(IStrategy):
     }
 
     # Dynamic ROI
-    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default='any', space='sell', optimize=True)
-    droi_pullback = CategoricalParameter([True, False], default=True, space='sell', optimize=True)
-    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=0.005, space='sell')
-    droi_pullback_respect_table = CategoricalParameter([True, False], default=False, space='sell', optimize=True)    
+    droi_trend_type = CategoricalParameter(['rmi', 'ssl', 'candle', 'any'], default='any', space='exit', optimize=True)
+    droi_pullback = CategoricalParameter([True, False], default=True, space='exit', optimize=True)
+    droi_pullback_amount = DecimalParameter(0.005, 0.02, default=0.005, space='exit')
+    droi_pullback_respect_table = CategoricalParameter([True, False], default=False, space='exit', optimize=True)    
     
     # Custom Stoploss
-    cstp_threshold = DecimalParameter(-0.05, 0, default=-0.03, space='sell')
-    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default='roc', space='sell', optimize=True)
-    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=-0.03, space='sell')
-    cstp_bail_time = IntParameter(720, 1440, default=720, space='sell')    
+    cstp_threshold = DecimalParameter(-0.05, 0, default=-0.03, space='exit')
+    cstp_bail_how = CategoricalParameter(['roc', 'time', 'any'], default='roc', space='exit', optimize=True)
+    cstp_bail_roc = DecimalParameter(-0.05, -0.01, default=-0.03, space='exit')
+    cstp_bail_time = IntParameter(720, 1440, default=720, space='exit')    
     
     stoploss = custom_stop['decay-start']    
 
@@ -87,9 +87,9 @@ class CryptoFrogHO3A4(IStrategy):
     process_only_new_candles = True
 
     # Experimental settings (configuration will overide these if set)
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = True
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = True
 
     use_dynamic_roi = True    
     
@@ -98,8 +98,8 @@ class CryptoFrogHO3A4(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'market',
         'stoploss_on_exchange': False
     }
@@ -303,7 +303,7 @@ class CryptoFrogHO3A4(IStrategy):
         return dataframe
 
     ## cryptofrog signals
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -361,12 +361,12 @@ class CryptoFrogHO3A4(IStrategy):
                     (dataframe['volume'] > 0)                    
                 )
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
     
     ## more going on here
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 (
@@ -395,7 +395,7 @@ class CryptoFrogHO3A4(IStrategy):
                     (dataframe['volume'] > 0)                    
                 )
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
 
     """
@@ -497,10 +497,10 @@ class CryptoFrogHO3A4(IStrategy):
             if rate:
                 return rate
 
-        ask_strategy = self.config.get('ask_strategy', {})
-        if ask_strategy.get('use_order_book', False):
+        exit_pricing = self.config.get('exit_pricing', {})
+        if exit_pricing.get('use_order_book', False):
             ob = self.dp.orderbook(pair, 1)
-            rate = ob[f"{ask_strategy['price_side']}s"][0][0]
+            rate = ob[f"{exit_pricing['price_side']}s"][0][0]
         else:
             ticker = self.dp.ticker(pair)
             rate = ticker['last']

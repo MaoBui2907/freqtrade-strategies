@@ -74,10 +74,10 @@ class MostOfAll(IStrategy):
     trailing_stop_positive = 0.01
     trailing_stop_positive_offset = 0.015
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = True
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = True
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 30
@@ -116,15 +116,15 @@ class MostOfAll(IStrategy):
         }
 
     # hard stoploss profit
-    pHSL = DecimalParameter(-0.500, -0.040, default=-0.99, decimals=3, space='sell', load=True)
+    pHSL = DecimalParameter(-0.500, -0.040, default=-0.99, decimals=3, space='exit', load=True)
 
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.009, decimals=3, space='sell', load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.009, decimals=3, space='exit', load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.040, decimals=3, space='sell', load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.020, decimals=3, space='sell', load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.040, decimals=3, space='exit', load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.020, decimals=3, space='exit', load=True)
 
     # Custom stoploss
     def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
@@ -177,7 +177,7 @@ class MostOfAll(IStrategy):
         return dataframe
 
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the buy signal for the given dataframe
         If the bullish fractal is active and below the teeth of the gator -> buy
@@ -195,12 +195,12 @@ class MostOfAll(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'buy']=1
+                'entry']=1
 
         return dataframe
 
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         Based on TA indicators, populates the sell signal for the given dataframe
         If the bearish fractal is active and above the teeth of the gator -> sell
@@ -218,6 +218,6 @@ class MostOfAll(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x & y, conditions),
-                'sell']=1
+                'exit_long']=1
 
         return dataframe

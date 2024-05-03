@@ -41,20 +41,20 @@ class NotAnotherSMAOffsetStrategyLite(IStrategy):
     # use_custom_stoploss = True
 
     # SMAOffset
-    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    low_offset = DecimalParameter(0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=True)
-    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
+    base_nb_candles_buy = IntParameter(5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    low_offset = DecimalParameter(0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
+    high_offset = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
 
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
-    order_time_in_force = {'buy': 'gtc', 'sell': 'ioc'}
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
+    order_time_in_force = {'entry': 'gtc', 'exit': 'ioc'}
     timeframe = '5m'
     process_only_new_candles = True
     startup_candle_count = 200
@@ -77,22 +77,22 @@ class NotAnotherSMAOffsetStrategyLite(IStrategy):
         dataframe['ewo'] = ewo(dataframe, self.fast_ewo, self.slow_ewo)
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[(
             (dataframe['close'] < (dataframe[f'ema_{self.base_nb_candles_buy.value}'] * self.low_offset.value))
             &
             (dataframe['ewo'] > 0)
             &
             (dataframe['volume'] > 0)
-        ), 'buy'] = 1
+        ), 'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[(
             (dataframe['close'] > (dataframe[f'ema_{self.base_nb_candles_sell.value}'] * self.high_offset.value))
             &
             (dataframe['volume'] > 0)
-        ), 'sell'] = 1
+        ), 'exit_long'] = 1
 
         return dataframe

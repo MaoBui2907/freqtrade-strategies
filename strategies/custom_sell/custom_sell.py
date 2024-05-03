@@ -24,7 +24,7 @@ import arrow
 from freqtrade.exchange import timeframe_to_minutes
 import time
 
-class custom_sell(IStrategy):
+class custom_exit(IStrategy):
     custom_info = {}
 
     buy_signal_buy6 = CategoricalParameter([True, False], default=True, space="buy", optimize=False)
@@ -88,14 +88,14 @@ class custom_sell(IStrategy):
     startup_candle_count = 450
     process_only_new_candles = True
 
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Custom stoploss
     use_custom_stoploss = False
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
                     current_profit: float, **kwargs):
 
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
@@ -144,7 +144,7 @@ class custom_sell(IStrategy):
         dataframe['keltner_upper'] = keltner['upper']
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # BUY6
         if (self.buy_signal_buy6.value):
           dataframe.loc[
@@ -153,11 +153,11 @@ class custom_sell(IStrategy):
                (dataframe['close'] > dataframe['keltner_middle'])
              )
            ),
-           ['buy', 'buy_tag']] = (1, 'buy6')
+           ['entry', 'buy_tag']] = (1, 'buy6')
 
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[:, 'sell'] = 0
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[:, 'exit_long'] = 0
         return dataframe

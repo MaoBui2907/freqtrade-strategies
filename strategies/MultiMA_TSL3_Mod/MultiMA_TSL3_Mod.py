@@ -93,65 +93,65 @@ class MultiMA_TSL3_Mod(IStrategy):
 
     # Buy hyperspace params:
     """optimize_buy_ema = False # Not used
-    base_nb_candles_buy_ema = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_ema)
-    low_offset_ema = DecimalParameter(0.9, 1.1, default=0.958, space='buy', optimize=optimize_buy_ema)
-    base_nb_candles_buy_ema2 = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_ema)
-    low_offset_ema2 = DecimalParameter(0.9, 1.1, default=0.958, space='buy', optimize=optimize_buy_ema)
+    base_nb_candles_buy_ema = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_ema)
+    low_offset_ema = DecimalParameter(0.9, 1.1, default=0.958, space='entry', optimize=optimize_buy_ema)
+    base_nb_candles_buy_ema2 = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_ema)
+    low_offset_ema2 = DecimalParameter(0.9, 1.1, default=0.958, space='entry', optimize=optimize_buy_ema)
 
     optimize_buy_trima = False # Not used
-    base_nb_candles_buy_trima = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_trima)
-    low_offset_trima = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_trima)
-    base_nb_candles_buy_trima2 = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_trima)
-    low_offset_trima2 = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_trima)
+    base_nb_candles_buy_trima = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_trima)
+    low_offset_trima = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_trima)
+    base_nb_candles_buy_trima2 = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_trima)
+    low_offset_trima2 = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_trima)
     
     optimize_buy_zema = False # Not used
-    base_nb_candles_buy_zema = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_zema)
-    low_offset_zema = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_zema)
-    base_nb_candles_buy_zema2 = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_zema)
-    low_offset_zema2 = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_zema)
+    base_nb_candles_buy_zema = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_zema)
+    low_offset_zema = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_zema)
+    base_nb_candles_buy_zema2 = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_zema)
+    low_offset_zema2 = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_zema)
 
     optimize_buy_hma = False # Not used
-    base_nb_candles_buy_hma = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_hma)
-    low_offset_hma = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_hma)
-    base_nb_candles_buy_hma2 = IntParameter(5, 80, default=20, space='buy', optimize=optimize_buy_hma)
-    low_offset_hma2 = DecimalParameter(0.9, 0.99, default=0.958, space='buy', optimize=optimize_buy_hma)"""
+    base_nb_candles_buy_hma = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_hma)
+    low_offset_hma = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_hma)
+    base_nb_candles_buy_hma2 = IntParameter(5, 80, default=20, space='entry', optimize=optimize_buy_hma)
+    low_offset_hma2 = DecimalParameter(0.9, 0.99, default=0.958, space='entry', optimize=optimize_buy_hma)"""
 
     buy_condition_enable_optimize = False # Not used
-    buy_condition_ema_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)
-    """buy_condition_trima_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)
-    buy_condition_zema_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)
-    buy_condition_hma_enable = BooleanParameter(default=True, space='buy', optimize=buy_condition_enable_optimize)"""
+    buy_condition_ema_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
+    """buy_condition_trima_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
+    buy_condition_zema_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)
+    buy_condition_hma_enable = BooleanParameter(default=True, space='entry', optimize=buy_condition_enable_optimize)"""
 
     ewo_check_optimize = True
-    ewo_low = DecimalParameter(-20.0, -8.0, default=-20.0, space='buy', optimize=ewo_check_optimize)
-    ewo_high = DecimalParameter(0.0, 12.0, default=6.0, space='buy', optimize=ewo_check_optimize)
-    ewo_low2 = DecimalParameter(-20.0, -8.0, default=-20.0, space='buy', optimize=ewo_check_optimize)
-    ewo_high2 = DecimalParameter(2.0, 12.0, default=6.0, space='buy', optimize=ewo_check_optimize)
-    fast_ewo = IntParameter(10, 50, default=50, space='buy', optimize=True)
-    slow_ewo = IntParameter(100, 200, default=200, space='buy', optimize=True)
+    ewo_low = DecimalParameter(-20.0, -8.0, default=-20.0, space='entry', optimize=ewo_check_optimize)
+    ewo_high = DecimalParameter(0.0, 12.0, default=6.0, space='entry', optimize=ewo_check_optimize)
+    ewo_low2 = DecimalParameter(-20.0, -8.0, default=-20.0, space='entry', optimize=ewo_check_optimize)
+    ewo_high2 = DecimalParameter(2.0, 12.0, default=6.0, space='entry', optimize=ewo_check_optimize)
+    fast_ewo = IntParameter(10, 50, default=50, space='entry', optimize=True)
+    slow_ewo = IntParameter(100, 200, default=200, space='entry', optimize=True)
     
     pct_optimize = True
-    pmax_pct_min = DecimalParameter(1.00, 100.00, default=1, space='buy', optimize=pct_optimize)
-    pmax_pct_max = DecimalParameter(1.00, 100.00, default=1, space='buy', optimize=pct_optimize)
-    volume_pct_min = DecimalParameter(0.01, 20, default=0.01, space='buy', optimize=pct_optimize)
-    volume_pct_max = DecimalParameter(0.01, 20, default=0.01, space='buy', optimize=pct_optimize)
+    pmax_pct_min = DecimalParameter(1.00, 100.00, default=1, space='entry', optimize=pct_optimize)
+    pmax_pct_max = DecimalParameter(1.00, 100.00, default=1, space='entry', optimize=pct_optimize)
+    volume_pct_min = DecimalParameter(0.01, 20, default=0.01, space='entry', optimize=pct_optimize)
+    volume_pct_max = DecimalParameter(0.01, 20, default=0.01, space='entry', optimize=pct_optimize)
 
     high_precision_pct_optimize = False # Optimise this setting individually
-    close_pct_min = RealParameter(0.0001, 0.1, default=0.01, space='buy', optimize=high_precision_pct_optimize)
-    close_pct_max = RealParameter(0.0001, 0.1, default=0.01, space='buy', optimize=high_precision_pct_optimize)
+    close_pct_min = RealParameter(0.0001, 0.1, default=0.01, space='entry', optimize=high_precision_pct_optimize)
+    close_pct_max = RealParameter(0.0001, 0.1, default=0.01, space='entry', optimize=high_precision_pct_optimize)
     
     buy_rsi_optimize = True
-    buy_rsi_min = IntParameter(0, 100, default=1, space='buy', optimize=buy_rsi_optimize)
-    buy_rsi_max = IntParameter(0, 100, default=100, space='buy', optimize=buy_rsi_optimize)
-    buy_rsi_fast_min = IntParameter(0, 100, default=1, space='buy', optimize=buy_rsi_optimize)
-    buy_rsi_fast_max = IntParameter(0, 100, default=100, space='buy', optimize=buy_rsi_optimize)
+    buy_rsi_min = IntParameter(0, 100, default=1, space='entry', optimize=buy_rsi_optimize)
+    buy_rsi_max = IntParameter(0, 100, default=100, space='entry', optimize=buy_rsi_optimize)
+    buy_rsi_fast_min = IntParameter(0, 100, default=1, space='entry', optimize=buy_rsi_optimize)
+    buy_rsi_fast_max = IntParameter(0, 100, default=100, space='entry', optimize=buy_rsi_optimize)
     
     # Sell hyperspace params:
 
     optimize_sell_ema = True
-    base_nb_candles_ema_sell = IntParameter(5, 80, default=20, space='sell', optimize=True)
-    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=1.012, space='sell', optimize=True)
-    base_nb_candles_ema_sell2 = IntParameter(5, 80, default=20, space='sell', optimize=True)
+    base_nb_candles_ema_sell = IntParameter(5, 80, default=20, space='exit', optimize=True)
+    high_offset_sell_ema = DecimalParameter(0.99, 1.1, default=1.012, space='exit', optimize=True)
+    base_nb_candles_ema_sell2 = IntParameter(5, 80, default=20, space='exit', optimize=True)
 
     # Protection hyperspace params:
 
@@ -191,15 +191,15 @@ class MultiMA_TSL3_Mod(IStrategy):
     # Run "populate_indicators()" only for new candle.
     process_only_new_candles = True
 
-    # These values can be overridden in the "ask_strategy" section in the config.
-    use_sell_signal = True
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    # These values can be overridden in the "exit_pricing" section in the config.
+    use_exit_signal = True
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 400
 
-    def custom_sell(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
                     current_profit: float, **kwargs):
        
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
@@ -360,7 +360,7 @@ class MultiMA_TSL3_Mod(IStrategy):
         
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         """dataframe['ema_offset_buy'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema.value)) *self.low_offset_ema.value
         dataframe['ema_offset_buy2'] = ta.EMA(dataframe, int(self.base_nb_candles_buy_ema2.value)) *self.low_offset_ema2.value"""
@@ -368,7 +368,7 @@ class MultiMA_TSL3_Mod(IStrategy):
         
         dataframe.loc[:, 'buy_tag'] = ''
         dataframe.loc[:, 'buy_copy'] = 0
-        dataframe.loc[:, 'buy'] = 0
+        dataframe.loc[:, 'entry'] = 0
 
         if (self.buy_condition_ema_enable.value):
 
@@ -528,13 +528,13 @@ class MultiMA_TSL3_Mod(IStrategy):
         if conditions:
             dataframe.loc[
                 (add_check & reduce(lambda x, y: x | y, conditions)),
-                ['buy_copy','buy']
+                ['buy_copy','entry']
             ]=(1,1)
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[:, 'sell'] = 0
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[:, 'exit_long'] = 0
 
         return dataframe
 

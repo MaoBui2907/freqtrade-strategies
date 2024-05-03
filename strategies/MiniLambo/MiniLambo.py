@@ -139,9 +139,9 @@ class MiniLambo(IStrategy):
 
     timeframe = '1m'
 
-    use_sell_signal = False
-    sell_profit_only = False
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = False
+    exit_profit_only = False
+    ignore_roi_if_entry_signal = False
     use_custom_stoploss = True
     process_only_new_candles = True
     startup_candle_count = 200
@@ -204,16 +204,16 @@ class MiniLambo(IStrategy):
     }
 
     # lambo2
-    lambo2_ema_14_factor = DecimalParameter(0.8, 1.2, decimals=3, default=buy_params['lambo2_ema_14_factor'], space='buy', optimize=False)
-    lambo2_rsi_4_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_4_limit'], space='buy', optimize=False)
-    lambo2_rsi_14_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_14_limit'], space='buy', optimize=False)
-    lambo2_rsi_21_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_21_limit'], space='buy', optimize=False)
+    lambo2_ema_14_factor = DecimalParameter(0.8, 1.2, decimals=3, default=buy_params['lambo2_ema_14_factor'], space='entry', optimize=False)
+    lambo2_rsi_4_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_4_limit'], space='entry', optimize=False)
+    lambo2_rsi_14_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_14_limit'], space='entry', optimize=False)
+    lambo2_rsi_21_limit = IntParameter(5, 60, default=buy_params['lambo2_rsi_21_limit'], space='entry', optimize=False)
 
-    lambo2_pct_change_low_period = IntParameter(1, 60, default=buy_params['lambo2_pct_change_low_period'], space='buy', optimize=True)
-    lambo2_pct_change_low_ratio = DecimalParameter(low=-0.20, high=-0.01, decimals=3, default=buy_params['lambo2_pct_change_low_ratio'], space='buy', optimize=True)
+    lambo2_pct_change_low_period = IntParameter(1, 60, default=buy_params['lambo2_pct_change_low_period'], space='entry', optimize=True)
+    lambo2_pct_change_low_ratio = DecimalParameter(low=-0.20, high=-0.01, decimals=3, default=buy_params['lambo2_pct_change_low_ratio'], space='entry', optimize=True)
 
-    lambo2_pct_change_high_period = IntParameter(1, 180, default=buy_params['lambo2_pct_change_high_period'], space='buy', optimize=True)
-    lambo2_pct_change_high_ratio = DecimalParameter(low=-0.30, high=-0.01, decimals=3, default=buy_params['lambo2_pct_change_high_ratio'], space='buy', optimize=True)
+    lambo2_pct_change_high_period = IntParameter(1, 180, default=buy_params['lambo2_pct_change_high_period'], space='entry', optimize=True)
+    lambo2_pct_change_high_ratio = DecimalParameter(low=-0.30, high=-0.01, decimals=3, default=buy_params['lambo2_pct_change_high_ratio'], space='entry', optimize=True)
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
@@ -251,7 +251,7 @@ class MiniLambo(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
         dataframe.loc[:, 'buy_tag'] = ''
 
@@ -266,10 +266,10 @@ class MiniLambo(IStrategy):
         dataframe.loc[lambo2, 'buy_tag'] += 'lambo2 '
         conditions.append(lambo2)
 
-        dataframe.loc[reduce(lambda x, y: x | y, conditions), 'buy'] = 1
+        dataframe.loc[reduce(lambda x, y: x | y, conditions), 'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         return dataframe
 
     def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
@@ -389,7 +389,7 @@ class MiniLambo_TBS(MiniLambo):
         current_time = datetime.now(timezone.utc)
         trailing_duration = current_time - trailing_buy['start_trailing_time']
         if trailing_duration.total_seconds() > self.trailing_expire_seconds:
-            if (current_trailing_profit_ratio > 0) and (last_candle['buy'] == 1):
+            if (current_trailing_profit_ratio > 0) and (last_candle['entry'] == 1):
                 # more than 1h, price under first signal, buy signal still active -> buy
                 return 'forcebuy'
             else:
@@ -440,7 +440,7 @@ class MiniLambo_TBS(MiniLambo):
                     trailing_buy_offset = self.trailing_buy_offset(dataframe, pair, current_price)
 
                     if trailing_buy['allow_trailing']:
-                        if not trailing_buy['trailing_buy_order_started'] and (last_candle['buy'] == 1):
+                        if not trailing_buy['trailing_buy_order_started'] and (last_candle['entry'] == 1):
                             trailing_buy['trailing_buy_order_started'] = True
                             trailing_buy['trailing_buy_order_uplimit'] = last_candle['close']
                             trailing_buy['start_trailing_price'] = last_candle['close']
@@ -506,13 +506,13 @@ class MiniLambo_TBS(MiniLambo):
 
         return val
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe = super().populate_buy_trend(dataframe, metadata)
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe = super().populate_entry_trend(dataframe, metadata)
 
         if self.trailing_buy_order_enabled and self.config['runmode'].value in ('live', 'dry_run'):
             last_candle = dataframe.iloc[-1].squeeze()
             trailing_buy = self.trailing_buy(metadata['pair'])
-            if (last_candle['buy'] == 1):
+            if (last_candle['entry'] == 1):
                 if not trailing_buy['trailing_buy_order_started']:
                     open_trades = Trade.get_trades([Trade.pair == metadata['pair'], Trade.is_open.is_(True), ]).all()
                     if not open_trades:
@@ -524,8 +524,8 @@ class MiniLambo_TBS(MiniLambo):
             else:
                 if (trailing_buy['trailing_buy_order_started'] == True):
                     logger.info(f"Continue trailing for {metadata['pair']}. Manually trigger buy signal!!")
-                    dataframe.loc[:, 'buy'] = 1
+                    dataframe.loc[:, 'enter_long'] = 1
                     dataframe.loc[:, 'buy_tag'] = trailing_buy['buy_tag']
-                    # dataframe['buy'] = 1
+                    # dataframe['enter_long'] = 1
 
         return dataframe

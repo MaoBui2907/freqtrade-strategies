@@ -36,8 +36,8 @@ sell_params = {
 
 class MADisplaceV3(IStrategy):
 
-    ma_lower_length = IntParameter(15, 25, default=buy_params['ma_lower_length'], space='buy')
-    ma_lower_offset = DecimalParameter(0.95, 0.97, default=buy_params['ma_lower_offset'], space='buy')
+    ma_lower_length = IntParameter(15, 25, default=buy_params['ma_lower_length'], space='entry')
+    ma_lower_offset = DecimalParameter(0.95, 0.97, default=buy_params['ma_lower_offset'], space='entry')
 
     informative_fast_length = IntParameter(15, 35, default=buy_params['informative_fast_length'], space='disable')
     informative_slow_length = IntParameter(20, 40, default=buy_params['informative_slow_length'], space='disable')
@@ -47,10 +47,10 @@ class MADisplaceV3(IStrategy):
     rsi_slow_length = IntParameter(10, 45, default=buy_params['rsi_slow_length'], space='disable')
     rsi_slow_confirmation = IntParameter(1, 5, default=buy_params['rsi_slow_confirmation'], space='disable')
 
-    ma_middle_1_length = IntParameter(15, 35, default=sell_params['ma_middle_1_length'], space='sell')
-    ma_middle_1_offset = DecimalParameter(0.93, 1.005, default=sell_params['ma_middle_1_offset'], space='sell')
-    ma_upper_length = IntParameter(15, 25, default=sell_params['ma_upper_length'], space='sell')
-    ma_upper_offset = DecimalParameter(1.005, 1.025, default=sell_params['ma_upper_offset'], space='sell')
+    ma_middle_1_length = IntParameter(15, 35, default=sell_params['ma_middle_1_length'], space='exit')
+    ma_middle_1_offset = DecimalParameter(0.93, 1.005, default=sell_params['ma_middle_1_offset'], space='exit')
+    ma_upper_length = IntParameter(15, 25, default=sell_params['ma_upper_length'], space='exit')
+    ma_upper_offset = DecimalParameter(1.005, 1.025, default=sell_params['ma_upper_offset'], space='exit')
 
     minimal_roi = {"0": 1}
 
@@ -63,8 +63,8 @@ class MADisplaceV3(IStrategy):
 
     timeframe = '5m'
 
-    use_sell_signal = True
-    sell_profit_only = False
+    use_exit_signal = True
+    exit_profit_only = False
 
     process_only_new_candles = True
 
@@ -142,7 +142,7 @@ class MADisplaceV3(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         # calculate indicators with adjustable params for hyperopt
         # it's calling multiple times and dataframe overrides same columns
@@ -166,11 +166,11 @@ class MADisplaceV3(IStrategy):
                 &
                 (dataframe['volume'] > 0)
             ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         if self.config['runmode'].value == 'hyperopt' and 'uptrend' not in dataframe:
             informative = self.get_informative_indicators(metadata)
@@ -191,7 +191,7 @@ class MADisplaceV3(IStrategy):
                 &
                 (dataframe['volume'] > 0)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe
 

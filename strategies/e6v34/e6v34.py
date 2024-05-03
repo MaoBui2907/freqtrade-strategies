@@ -20,8 +20,8 @@ pvol = 100 #period pvt
 
 class e6v34(IStrategy):
 
-    bwill = RealParameter(-25, -15, default=-20, space='buy')
-    swill = RealParameter(-55, -35, default=-50, space='sell')
+    bwill = RealParameter(-25, -15, default=-20, space='entry')
+    swill = RealParameter(-55, -35, default=-50, space='exit')
 
     # bwill = -20 #buy williams r
     # swill = -50 #sell williams r
@@ -59,7 +59,7 @@ class e6v34(IStrategy):
         dataframe['vol_mean'] = ta.EMA(dataframe, timeperiod=pvol, price='volume')
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         conditions = []
         conditions.append(dataframe[f'hma{shma}'].shift(1) - dataframe[f'hma{lhma}'].shift(1) < dataframe[f'hma{shma}'] - dataframe[f'hma{lhma}'])
@@ -74,12 +74,12 @@ class e6v34(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x,y: x&y, conditions),
-                'buy']=1
+                'entry']=1
 
         return dataframe
 
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 # ( (dataframe[f'hma{lhma_c}'] > dataframe[f'hma{shma_c}']) &
@@ -88,6 +88,6 @@ class e6v34(IStrategy):
                 (dataframe['willr'] < self.swill.value) &
                 (dataframe['willr'].shift(1) > self.swill.value)
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe

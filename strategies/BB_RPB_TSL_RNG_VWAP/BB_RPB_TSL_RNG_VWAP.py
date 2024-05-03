@@ -138,14 +138,14 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
 
     # Custom stoploss
     use_custom_stoploss = True
-    use_sell_signal = True
+    use_exit_signal = True
 
     process_only_new_candles = True
     startup_candle_count = 120
 
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'emergencysell': 'limit',
         'forcebuy': "limit",
         'forcesell': 'limit',
@@ -200,26 +200,26 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
     buy_threshold = DecimalParameter(0.003, 0.012, default=0.008, optimize = is_optimize_btc_safe)
 
     # Buy params toggle
-    buy_is_dip_enabled = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
-    buy_is_break_enabled = CategoricalParameter([True, False], default=True, space='buy', optimize=False, load=True)
+    buy_is_dip_enabled = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
+    buy_is_break_enabled = CategoricalParameter([True, False], default=True, space='entry', optimize=False, load=True)
 
     ## Sell params
     sell_btc_safe = IntParameter(-400, -300, default=-365, optimize = True)
-    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
-    high_offset          = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
-    high_offset_2        = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='sell', optimize=True)      
+    base_nb_candles_sell = IntParameter(5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
+    high_offset          = DecimalParameter(0.95, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
+    high_offset_2        = DecimalParameter(0.99, 1.5, default=sell_params['high_offset_2'], space='exit', optimize=True)      
 
     ## Trailing params
 
     # hard stoploss profit
-    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='sell', load=True)
+    pHSL = DecimalParameter(-0.200, -0.040, default=-0.08, decimals=3, space='exit', load=True)
     # profit threshold 1, trigger point, SL_1 is used
-    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='sell', load=True)
-    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='sell', load=True)
+    pPF_1 = DecimalParameter(0.008, 0.020, default=0.016, decimals=3, space='exit', load=True)
+    pSL_1 = DecimalParameter(0.008, 0.020, default=0.011, decimals=3, space='exit', load=True)
 
     # profit threshold 2, SL_2 is used
-    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='sell', load=True)
-    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='sell', load=True)
+    pPF_2 = DecimalParameter(0.040, 0.100, default=0.080, decimals=3, space='exit', load=True)
+    pSL_2 = DecimalParameter(0.020, 0.070, default=0.040, decimals=3, space='exit', load=True)
 
     ############################################################################
 
@@ -386,7 +386,7 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
 
         conditions = []
@@ -520,11 +520,11 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
         dataframe.loc[is_vwap, 'buy_tag'] += 'vwap '
 
         if conditions:
-            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'buy' ] = 1
+            dataframe.loc[reduce(lambda x, y: x | y, conditions), 'entry' ] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -550,7 +550,7 @@ class BB_RPB_TSL_RNG_VWAP(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

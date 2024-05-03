@@ -27,9 +27,9 @@ class BinHV45(IStrategy):
     stoploss = -0.05
     timeframe = '1m'
 
-    buy_bbdelta = IntParameter(low=1, high=15, default=30, space='buy', optimize=True)
-    buy_closedelta = IntParameter(low=15, high=20, default=30, space='buy', optimize=True)
-    buy_tail = IntParameter(low=20, high=30, default=30, space='buy', optimize=True)
+    buy_bbdelta = IntParameter(low=1, high=15, default=30, space='entry', optimize=True)
+    buy_closedelta = IntParameter(low=15, high=20, default=30, space='entry', optimize=True)
+    buy_tail = IntParameter(low=20, high=30, default=30, space='entry', optimize=True)
 
     # Hyperopt parameters
     buy_params = {
@@ -50,7 +50,7 @@ class BinHV45(IStrategy):
         dataframe['tail'] = (dataframe['close'] - dataframe['low']).abs()
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                 dataframe['lower'].shift().gt(0) &
@@ -60,12 +60,12 @@ class BinHV45(IStrategy):
                 dataframe['close'].lt(dataframe['lower'].shift()) &
                 dataframe['close'].le(dataframe['close'].shift())
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
         no sell signal
         """
-        dataframe.loc[:, 'sell'] = 0
+        dataframe.loc[:, 'exit_long'] = 0
         return dataframe

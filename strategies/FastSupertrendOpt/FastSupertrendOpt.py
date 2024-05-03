@@ -1,8 +1,8 @@
 """
 Supertrend strategy:
-* Description: Generate a 3 supertrend indicators for 'buy' strategies & 3 supertrend indicators for 'sell' strategies
-               Buys if the 3 'buy' indicators are 'up'
-               Sells if the 3 'sell' indicators are 'down'
+* Description: Generate a 3 supertrend indicators for 'entry' strategies & 3 supertrend indicators for 'exit' strategies
+               Buys if the 3 'entry' indicators are 'up'
+               Sells if the 3 'exit' indicators are 'down'
 * Author: @juankysoriano (Juan Carlos Soriano)
 * github: https://github.com/juankysoriano/
 
@@ -68,24 +68,24 @@ class FastSupertrendOpt(IStrategy):
 
     startup_candle_count = 18
 
-    buy_m1 = IntParameter(1, 7, default=4, space='buy', load=True, optimize=True)
-    buy_m2 = IntParameter(1, 7, default=4, space='buy', load=True, optimize=True)
-    buy_m3 = IntParameter(1, 7, default=4, space='buy', load=True, optimize=True)
-    buy_p1 = IntParameter(7, 21, default=14, space='buy', load=True, optimize=True)
-    buy_p2 = IntParameter(7, 21, default=14, space='buy', load=True, optimize=True)
-    buy_p3 = IntParameter(7, 21, default=14, space='buy', load=True, optimize=True)
+    buy_m1 = IntParameter(1, 7, default=4, space='entry', load=True, optimize=True)
+    buy_m2 = IntParameter(1, 7, default=4, space='entry', load=True, optimize=True)
+    buy_m3 = IntParameter(1, 7, default=4, space='entry', load=True, optimize=True)
+    buy_p1 = IntParameter(7, 21, default=14, space='entry', load=True, optimize=True)
+    buy_p2 = IntParameter(7, 21, default=14, space='entry', load=True, optimize=True)
+    buy_p3 = IntParameter(7, 21, default=14, space='entry', load=True, optimize=True)
 
-    sell_m1 = IntParameter(1, 7, default=4, space='sell', load=True, optimize=True)
-    sell_m2 = IntParameter(1, 7, default=4, space='sell', load=True, optimize=True)
-    sell_m3 = IntParameter(1, 7, default=4, space='sell', load=True, optimize=True)
-    sell_p1 = IntParameter(7, 21, default=14, space='sell', load=True, optimize=True)
-    sell_p2 = IntParameter(7, 21, default=14, space='sell', load=True, optimize=True)
-    sell_p3 = IntParameter(7, 21, default=14, space='sell', load=True, optimize=True)
+    sell_m1 = IntParameter(1, 7, default=4, space='exit', load=True, optimize=True)
+    sell_m2 = IntParameter(1, 7, default=4, space='exit', load=True, optimize=True)
+    sell_m3 = IntParameter(1, 7, default=4, space='exit', load=True, optimize=True)
+    sell_p1 = IntParameter(7, 21, default=14, space='exit', load=True, optimize=True)
+    sell_p2 = IntParameter(7, 21, default=14, space='exit', load=True, optimize=True)
+    sell_p3 = IntParameter(7, 21, default=14, space='exit', load=True, optimize=True)
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe['supertrend_1_buy'] = self.supertrend(dataframe, self.buy_m1.value, int(self.buy_p1.value))['STX'] 
         dataframe['supertrend_2_buy'] = self.supertrend(dataframe, self.buy_m2.value, int(self.buy_p2.value))['STX'] 
         dataframe['supertrend_3_buy'] = self.supertrend(dataframe, self.buy_m3.value, int(self.buy_p3.value))['STX'] 
@@ -100,11 +100,11 @@ class FastSupertrendOpt(IStrategy):
                (dataframe[f'supertrend_3_buy'] == 'up') & # The three indicators are 'up' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
         ),
-            'buy'] = 1
+            'enter_long'] = 1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                (dataframe[f'supertrend_1_sell'] == 'down') &
@@ -112,7 +112,7 @@ class FastSupertrendOpt(IStrategy):
                (dataframe[f'supertrend_3_sell'] == 'down') & # The three indicators are 'down' for the current candle
                (dataframe['volume'] > 0) # There is at least some trading volume
             ),
-            'sell'] = 1
+            'exit_long'] = 1
 
         return dataframe
 

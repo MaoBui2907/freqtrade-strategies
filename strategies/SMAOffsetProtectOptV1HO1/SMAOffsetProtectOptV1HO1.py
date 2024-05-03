@@ -54,22 +54,22 @@ class SMAOffsetProtectOptV1HO1(IStrategy):
 
     # SMAOffset
     base_nb_candles_buy = IntParameter(
-        5, 80, default=buy_params['base_nb_candles_buy'], space='buy', optimize=True)
+        5, 80, default=buy_params['base_nb_candles_buy'], space='entry', optimize=True)
     base_nb_candles_sell = IntParameter(
-        5, 80, default=sell_params['base_nb_candles_sell'], space='sell', optimize=True)
+        5, 80, default=sell_params['base_nb_candles_sell'], space='exit', optimize=True)
     low_offset = DecimalParameter(
-        0.9, 0.99, default=buy_params['low_offset'], space='buy', optimize=True)
+        0.9, 0.99, default=buy_params['low_offset'], space='entry', optimize=True)
     high_offset = DecimalParameter(
-        0.99, 1.1, default=sell_params['high_offset'], space='sell', optimize=True)
+        0.99, 1.1, default=sell_params['high_offset'], space='exit', optimize=True)
 
     # Protection
     fast_ewo = 50
     slow_ewo = 200
     ewo_low = DecimalParameter(-20.0, -8.0,
-                               default=buy_params['ewo_low'], space='buy', optimize=True)
+                               default=buy_params['ewo_low'], space='entry', optimize=True)
     ewo_high = DecimalParameter(
-        2.0, 12.0, default=buy_params['ewo_high'], space='buy', optimize=True)
-    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='buy', optimize=True)
+        2.0, 12.0, default=buy_params['ewo_high'], space='entry', optimize=True)
+    rsi_buy = IntParameter(30, 70, default=buy_params['rsi_buy'], space='entry', optimize=True)
 
 
     # Trailing stop:
@@ -79,10 +79,10 @@ class SMAOffsetProtectOptV1HO1(IStrategy):
     trailing_only_offset_is_reached = True
 
     # Sell signal
-    use_sell_signal = True
-    sell_profit_only = False
-    sell_profit_offset = 0.01
-    ignore_roi_if_buy_signal = False
+    use_exit_signal = True
+    exit_profit_only = False
+    exit_profit_offset = 0.01
+    ignore_roi_if_entry_signal = False
 
     # Optimal timeframe for the strategy
     timeframe = '5m'
@@ -132,7 +132,7 @@ class SMAOffsetProtectOptV1HO1(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -155,12 +155,12 @@ class SMAOffsetProtectOptV1HO1(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'buy'
+                'entry'
             ]=1
 
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         conditions = []
 
         conditions.append(
@@ -173,7 +173,7 @@ class SMAOffsetProtectOptV1HO1(IStrategy):
         if conditions:
             dataframe.loc[
                 reduce(lambda x, y: x | y, conditions),
-                'sell'
+                'exit'
             ]=1
 
         return dataframe

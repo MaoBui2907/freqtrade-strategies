@@ -45,7 +45,7 @@ class adx_opt_strat(IStrategy):
 
         return dataframe
 
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['mom'] < 0) &
@@ -53,11 +53,11 @@ class adx_opt_strat(IStrategy):
                     (dataframe['plus_di'] < dataframe['minus_di'])
 
             ),
-            'buy'] = 1
+            'enter_long'] = 1
         
         return dataframe
 
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
                     (dataframe['mom'] > 0) &
@@ -65,5 +65,5 @@ class adx_opt_strat(IStrategy):
                     (dataframe['plus_di'] > dataframe['minus_di'])
 
             ),
-            'sell'] = 1
+            'exit_long'] = 1
         return dataframe
