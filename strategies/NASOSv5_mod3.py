@@ -743,7 +743,7 @@ class TrailingBuyStrat(NASOSv5_mod3):
             return pd.Series(x).rolling(window=win).min().iloc[-1]
 
         dataframe = super(TrailingBuyStrat, self).populate_entry_trend(dataframe, metadata)
-        dataframe = dataframe.rename(columns={"buy": "pre_buy"})
+        dataframe = dataframe.rename(columns={"entry": "pre_buy"})
 
         if self.trailing_buy_order_enabled and self.config["runmode"].value in (
             "live",

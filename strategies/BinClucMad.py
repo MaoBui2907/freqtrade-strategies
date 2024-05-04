@@ -64,8 +64,8 @@ class BinClucMad(IStrategy):
 
     # Optional order type mapping.
     order_types = {
-        "buy": "market",
-        "sell": "market",
+        "entry": "market",
+        "exit": "market",
         "stoploss": "market",
         "stoploss_on_exchange": False,
     }

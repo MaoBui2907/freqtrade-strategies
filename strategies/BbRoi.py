@@ -27,7 +27,7 @@ class BbRoi(IStrategy):
     ignore_roi_if_entry_signal = False
 
     order_types = {
-        "buy": "market",
+        "entry": "market",
         "exit": "market",
         "stoploss": "limit",
         "stoploss_on_exchange": True,

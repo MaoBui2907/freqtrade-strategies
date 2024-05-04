@@ -56,7 +56,7 @@ class MontrealStrategy(IStrategy):
     }
 
     # Optional order time in force.
-    order_time_in_force = {"buy": "gtc", "sell": "gtc"}
+    order_time_in_force = {"entry": "gtc", "exit": "gtc"}
 
     plot_config = {
         "main_plot": {},

@@ -23,8 +23,8 @@ class custom_exit(IStrategy):
     buy_signal_buy6 = CategoricalParameter([True, False], default=True, space="buy", optimize=False)
 
     order_types = {
-        "entry": "limit"
-        "sell": "market",
+        "entry": "limit",
+        "exit": "market",
         "stoploss": "market",
         "stoploss_on_exchange": True,
         "stoploss_on_exchange_interval": 60,
