@@ -11,7 +11,6 @@ from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 # --------------------------------
 
-from finta import talib.abstract as ta as F
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np  # noqa
 
@@ -51,8 +50,8 @@ class redditMA(IStrategy):
         return []
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe["SLOWMA"] = F.EMA(dataframe, 13)
-        dataframe["FASTMA"] = F.EMA(dataframe, 34)
+        dataframe["SLOWMA"] = ta.EMA(dataframe, 13)
+        dataframe["FASTMA"] = ta.EMA(dataframe, 34)
 
         # dataframe = self.mods(dataframe)
         return dataframe

@@ -5,7 +5,6 @@ import rapidjson
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
-import talib.abstract as ta as ta2
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import (
     merge_informative_pair,
@@ -25445,7 +25444,7 @@ class NostalgiaForInfinityXw(IStrategy):
         dataframe["ema_100"] = ta.EMA(dataframe, timeperiod=100)
         dataframe["ema_200"] = ta.EMA(dataframe, timeperiod=200)
 
-        dataframe["trend_ichimoku_base"] = ta2.trend.ichimoku_base_line(
+        dataframe["trend_ichimoku_base"] = ta.trend.ichimoku_base_line(
             dataframe["high"],
             dataframe["low"],
             window1=self.ichimoku_window1.value,
@@ -25453,7 +25452,7 @@ class NostalgiaForInfinityXw(IStrategy):
             visual=False,
             fillna=False,
         )
-        KST = ta2.trend.KSTIndicator(
+        KST = ta.trend.KSTIndicator(
             close=dataframe["close"],
             roc1=self.kst_roc1.value,
             roc2=self.kst_roc2.value,
