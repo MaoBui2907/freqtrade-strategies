@@ -1,7 +1,7 @@
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
-from finta import TA as fta
+
 from typing import Optional, Tuple
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import (
@@ -698,18 +698,18 @@ class NFI4Frog(IStrategy):
         dataframe["emao"] = hansencalc["emao"]
 
         # money flow index (MFI) for in/outflow of money, like RSI adjusted for vol
-        dataframe["mfi"] = fta.MFI(dataframe)
+        dataframe["mfi"] = ta.MFI(dataframe)
 
         ## sqzmi to detect quiet periods
-        dataframe["sqzmi"] = fta.SQZMI(dataframe)  # , MA=hansencalc['emac'])
+        dataframe["sqzmi"] = ta.SQZMI(dataframe)  # , MA=hansencalc['emac'])
 
         # Volume Flow Indicator (MFI) for volume based on the direction of price movement
-        dataframe["vfi"] = fta.VFI(dataframe, period=14)
+        dataframe["vfi"] = ta.VFI(dataframe, period=14)
 
-        dmi = fta.DMI(dataframe, period=14)
+        dmi = ta.DMI(dataframe, period=14)
         dataframe["dmi_plus"] = dmi["DI+"]
         dataframe["dmi_minus"] = dmi["DI-"]
-        dataframe["adx"] = fta.ADX(dataframe, period=14)
+        dataframe["adx"] = ta.ADX(dataframe, period=14)
 
         ## for stoploss - all from Solipsis4
         ## simple ATR and ROC for stoploss

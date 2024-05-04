@@ -11,7 +11,7 @@ from freqtrade.strategy.interface import IStrategy
 from pandas import DataFrame
 # --------------------------------
 
-from finta import TA as F
+from finta import talib.abstract as ta as F
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np  # noqa
 

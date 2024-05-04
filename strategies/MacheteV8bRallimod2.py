@@ -307,7 +307,7 @@ class MacheteV8bRallimod2(IStrategy):
         dataframe["sslDown"] = ssl[0]
         dataframe["sslUp"] = ssl[1]
 
-        # dataframe['vfi'] = fta.VFI(dataframe, period=14)
+        # dataframe['vfi'] = ta.VFI(dataframe, period=14)
 
         # Summary indicators
         dataframe["future_green"] = (

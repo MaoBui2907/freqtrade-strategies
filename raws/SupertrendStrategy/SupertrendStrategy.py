@@ -16,7 +16,7 @@ from freqtrade.strategy import (
 
 # --------------------------------
 # Add your lib to import here
-import ta
+import talib.abstract as ta
 import pandas_ta as pda
 
 

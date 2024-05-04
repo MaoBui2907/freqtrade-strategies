@@ -21,8 +21,8 @@ from pandas import DataFrame
 
 # Add your lib to import here
 # import talib.abstract as ta
-import ta
-from ta.utils import dropna
+import talib.abstract as ta
+from talib.abstract.utils import dropna
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 
 

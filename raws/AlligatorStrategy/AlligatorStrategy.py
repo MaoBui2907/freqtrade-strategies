@@ -16,7 +16,7 @@ from freqtrade.strategy import (
 
 # --------------------------------
 # Add your lib to import here
-import ta
+import talib.abstract as ta
 
 
 # This class is a sample. Feel free to customize it.

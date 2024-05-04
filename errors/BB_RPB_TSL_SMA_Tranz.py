@@ -15,7 +15,7 @@ from technical.indicators import RMI, zema, VIDYA
 from freqtrade.strategy import CategoricalParameter, DecimalParameter, IStrategy, IntParameter
 from skopt.space import Dimension, Integer
 import time
-from finta import TA as fta
+
 
 log = logging.getLogger(__name__)
 
@@ -3656,7 +3656,7 @@ class BB_RPB_TSL_SMA_Tranz(IStrategy):
         dataframe["rsi_2"] = ta.RSI(dataframe, timeperiod=20)
         dataframe["rsi_fast2"] = ta.RSI(dataframe, timeperiod=5)
         dataframe["rsi_slow2"] = ta.RSI(dataframe, timeperiod=25)
-        dataframe["sqzmi"] = fta.SQZMI(dataframe)
+        dataframe["sqzmi"] = ta.SQZMI(dataframe)
 
         # Zero-Lag EMA
         dataframe["zema_61"] = zema(dataframe, period=61)

@@ -23,7 +23,7 @@ from numpy.typing import ArrayLike
 from datetime import datetime, timedelta
 import technical.indicators as indicators
 from freqtrade.exchange import timeframe_to_prev_date
-from finta import TA
+from finta import talib.abstract as ta
 
 
 def wma(series: Series, length: int) -> Series:

@@ -5,7 +5,7 @@ import rapidjson
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import numpy as np
 import talib.abstract as ta
-import ta as ta2
+import talib.abstract as ta as ta2
 from freqtrade.strategy.interface import IStrategy
 from freqtrade.strategy import (
     merge_informative_pair,
