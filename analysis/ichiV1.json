@@ -1,0 +1,26 @@
+{
+    "indicators": [
+        "Ichimoku Cloud",
+        "EMA (Exponential Moving Average)",
+        "Heikin Ashi",
+        "ATR (Average True Range)",
+        "Fan Magnitude"
+    ],
+    "explain": "The strategy utilizes a combination of Ichimoku Cloud indicators, Exponential Moving Averages (EMA), and Fan Magnitude metrics to determine entry and exit points for trades. The primary focus is on ensuring that the price is above specific Ichimoku levels and that certain bullish conditions are met over multiple timeframes. The strategy incorporates trend analysis and momentum indicators to filter trades effectively.",
+    "example": "For a buy signal, the strategy checks if the 5-minute close price is above the Senkou span, if the close price has been bullish compared to the open price across various timeframes, and if the fan magnitude indicates a positive trend. A sell signal is triggered when the 5-minute close crosses below a specified trend indicator.",
+    "strength": "The strategy is multifaceted and incorporates both trend-following and momentum-based elements, which can lead to more robust trading signals. By using multiple timeframes and indicators, it seeks to confirm trends before entering trades.",
+    "weakness": "The reliance on multiple conditions can lead to fewer trading opportunities, especially in choppy or sideways markets. Moreover, the parameters are static, which may not adapt well to changing market conditions without manual adjustments.",
+    "suggestion": "Consider implementing dynamic parameters for the buy and sell thresholds to adapt to varying market conditions. Additionally, incorporating risk management measures such as position sizing and additional stop-loss strategies could improve performance.",
+    "keywords": [
+        "Ichimoku",
+        "EMA",
+        "Trend Analysis",
+        "Momentum Trading",
+        "Heikin Ashi",
+        "Fan Magnitude",
+        "Multi-Timeframe",
+        "Bullish Conditions",
+        "Entry/Exit Signals",
+        "Technical Indicators"
+    ]
+}

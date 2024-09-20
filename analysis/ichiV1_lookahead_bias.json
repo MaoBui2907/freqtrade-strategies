@@ -1,0 +1,8 @@
+{
+    "issues": [
+        "The strategy may have lookahead bias due to the use of current candle data in the calculations for indicators like EMA and Heikin Ashi, which are typically calculated using historical data.",
+        "The fan magnitude and fan magnitude gain calculations also depend on current data, which could lead to premature entry signals.",
+        "The entry conditions rely on multi-timeframe indicators (5m, 15m, 30m, etc.) that may not be fully formed when the current candle closes.",
+        "The exit trend detection may use indicators that reflect the current state of the market, potentially causing signals to be generated before they are valid."
+    ]
+}

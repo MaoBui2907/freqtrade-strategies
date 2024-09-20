@@ -1,0 +1,10 @@
+ichiV1
+TenderEnter
+Minmax
+CombinedBinHAndCluc
+HyperStra_GSN_SMAOnly
+HyperStra_SMAOnly
+CombinedBinHClucAndMADV3
+mark_strat_opt
+GodCard
+BigZ0407
